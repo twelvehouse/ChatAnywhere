@@ -1,6 +1,6 @@
 <Project Sdk="Dalamud.NET.Sdk/14.0.1">
     <PropertyGroup>
-        <Version>0.1.1</Version>
+        <Version>0.1.2</Version>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
@@ -36,6 +36,6 @@
     <Target Name="UnzipFrontend" AfterTargets="Build"
             Condition="'$(IsPlogonBuild)' == 'True'">
         <Unzip SourceFiles="$(MSBuildProjectDirectory)/websiteBuild.zip"
-               DestinationFolder="$(OutputPath)dist" />
+               DestinationFolder="$(OutputPath)" />
     </Target>
 </Project>
