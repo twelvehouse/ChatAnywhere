@@ -21,12 +21,12 @@
 
     <!-- Build frontend, then copy dist/ into the output directory preserving subdirectory structure. -->
     <Target Name="BuildFrontend" BeforeTargets="BeforeBuild">
-        <Exec Command="npm run build" WorkingDirectory="$(MSBuildProjectDirectory)\Http\Frontend" />
+        <Exec Command="npm run build" WorkingDirectory="$(MSBuildProjectDirectory)/Http/Frontend" />
         <ItemGroup>
-            <_FrontendDist Include="$(MSBuildProjectDirectory)\Http\Frontend\dist\**\*" />
+            <_FrontendDist Include="$(MSBuildProjectDirectory)/Http/Frontend/dist/**/*" />
         </ItemGroup>
         <Copy SourceFiles="@(_FrontendDist)"
-              DestinationFolder="$(OutputPath)dist\%(_FrontendDist.RecursiveDir)"
+              DestinationFolder="$(OutputPath)dist/%(_FrontendDist.RecursiveDir)"
               SkipUnchangedFiles="true" />
     </Target>
 </Project>
