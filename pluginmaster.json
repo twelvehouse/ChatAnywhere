@@ -1,4 +1,4 @@
-{
+[{
   "Author": "twelvehouse",
   "Name": "ChatAnywhere",
   "InternalName": "ChatAnywhere",
@@ -22,6 +22,5 @@
   "IsHide": false,
   "IsTestingExclusive": false,
   "DownloadLinkInstall": "https://github.com/twelvehouse/ChatAnywhere/releases/download/v0.1.0/ChatAnywhere.zip",
-  "DownloadLinkUpdate": "https://github.com/twelvehouse/ChatAnywhere/releases/download/v0.1.0/ChatAnywhere.zip",
-  "LastUpdate": "1773825606"
-}
+  "DownloadLinkUpdate": "https://github.com/twelvehouse/ChatAnywhere/releases/download/v0.1.0/ChatAnywhere.zip"
+}]
