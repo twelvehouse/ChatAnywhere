@@ -4,19 +4,17 @@ on:
   push:
     tags:
       - 'v*'
-
-permissions:
-  contents: write
+  workflow_dispatch:
 
 jobs:
   release:
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -35,64 +33,36 @@ jobs:
           dotnet-version: '9.0.x'
 
       - name: Download Dalamud
-        shell: pwsh
         run: |
-          Invoke-WebRequest -Uri "https://goatcorp.github.io/dalamud-distrib/latest.zip" -OutFile latest.zip
-          Expand-Archive -Force latest.zip "$env:GITHUB_WORKSPACE\dalamud"
-
-      - name: Restore dependencies
-        run: dotnet restore --locked-mode
+          wget -q https://goatcorp.github.io/dalamud-distrib/latest.zip -O dalamud.zip
+          unzip -q dalamud.zip -d ~/dalamud
 
       - name: Build
-        run: dotnet build --configuration Release --no-restore -p:DalamudLibPath="$env:GITHUB_WORKSPACE\dalamud"
+        run: dotnet build -c Release -p:DalamudLibPath=$HOME/dalamud
 
       - name: Create release artifact
-        shell: pwsh
-        run: Compress-Archive -Path "bin/Release/*" -DestinationPath "ChatAnywhere.zip"
-
-      - name: Get version from tag
-        id: version
-        shell: pwsh
-        run: |
-          $tag = "${{ github.ref_name }}"
-          $version = $tag.TrimStart('v')
-          $parts = $version.Split('.')
-          while ($parts.Count -lt 4) { $parts += '0' }
-          $assemblyVersion = $parts -join '.'
-          "VERSION=$version" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
-          "ASSEMBLY_VERSION=$assemblyVersion" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+        run: cd bin/Release && zip -r ../../ChatAnywhere.zip .
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           files: ChatAnywhere.zip
           generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Update pluginmaster.json
-        shell: pwsh
         run: |
-          $assemblyVersion = "${{ steps.version.outputs.ASSEMBLY_VERSION }}"
-          $repo = "${{ github.repository }}"
-          $tag = "${{ github.ref_name }}"
-          $downloadUrl = "https://github.com/$repo/releases/download/$tag/ChatAnywhere.zip"
-          $timestamp = [DateTimeOffset]::UtcNow.ToUnixTimeSeconds().ToString()
-
-          $manifest = Get-Content "pluginmaster.json" | ConvertFrom-Json
-          $manifest[0].AssemblyVersion = $assemblyVersion
-          $manifest[0].DownloadLinkInstall = $downloadUrl
-          $manifest[0].DownloadLinkUpdate = $downloadUrl
-          $manifest[0].LastUpdate = $timestamp
-
-          $manifest | ConvertTo-Json -Depth 10 | Set-Content "pluginmaster.json" -Encoding UTF8
-
-      - name: Commit and push pluginmaster.json
-        shell: pwsh
-        run: |
+          TAG="${{ github.ref_name }}"
+          VERSION="${TAG#v}"
+          IFS='.' read -ra P <<< "$VERSION"
+          while [ ${#P[@]} -lt 4 ]; do P+=("0"); done
+          ASSEMBLY_VERSION="${P[0]}.${P[1]}.${P[2]}.${P[3]}"
+          DOWNLOAD_URL="https://github.com/${{ github.repository }}/releases/download/$TAG/ChatAnywhere.zip"
+          jq --arg v "$ASSEMBLY_VERSION" --arg u "$DOWNLOAD_URL" --arg t "$(date +%s)" \
+            '.[0].AssemblyVersion = $v | .[0].DownloadLinkInstall = $u | .[0].DownloadLinkUpdate = $u | .[0].LastUpdate = $t' \
+            pluginmaster.json > tmp.json && mv tmp.json pluginmaster.json
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add pluginmaster.json
-          git diff --cached --quiet
-          if ($LASTEXITCODE -ne 0) {
-            git commit -m "chore: update pluginmaster.json for ${{ github.ref_name }}"
-            git push origin HEAD:refs/heads/main
-          }
+          git diff --cached --quiet || git commit -m "chore: update pluginmaster.json for $TAG" && git push origin HEAD:refs/heads/main
