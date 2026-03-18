@@ -489,6 +489,20 @@
   width: calc(var(--sidebar-width) - 16px);
 }
 
+/* ========== Coming Soon Badge ========== */
+.coming-soon-badge {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text-muted);
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 1px 5px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  flex-shrink: 0;
+}
+
 /* ========== DM Section ========== */
 .dm-section {
   border-top: 1px solid var(--border);

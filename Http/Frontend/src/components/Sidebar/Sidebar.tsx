@@ -415,8 +415,9 @@ export function Sidebar({
         <div className={styles['dm-section']}>
           <div className={styles['channel-section-label']}>
             <span>Direct Messages</span>
+            <span className={styles['coming-soon-badge']}>In Development</span>
           </div>
-          <div className={styles['channel-empty']}>No recent tells</div>
+          <div className={styles['channel-empty']}>Not yet implemented</div>
         </div>
       </aside>
 

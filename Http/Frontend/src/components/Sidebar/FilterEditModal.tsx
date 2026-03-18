@@ -167,7 +167,10 @@ export function FilterEditModal({
         <div className={styles.section}>
           <div className={styles['section-title']}>Notification</div>
           <div className={styles.row}>
-            <span className={styles['row-label']}>Sound</span>
+            <span className={styles['row-label']}>
+              Sound
+              <span className={styles['coming-soon-badge']}>In Development</span>
+            </span>
             <div className="toggle-switch" style={{ opacity: 0.35, cursor: 'not-allowed' }}>
               <div className="toggle-knob" />
             </div>
