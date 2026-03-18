@@ -141,7 +141,7 @@ ChatAnywhere would not exist without these projects:
 
 | Project | Role |
 |---|---|
-| ChatTwo | Original inspiration — concept, channel handling, and UI approach |
+| [ChatTwo](https://github.com/Infiziert90/ChatTwo) | Original inspiration — concept, channel handling, and UI approach |
 | [Dalamud](https://github.com/goatcorp/Dalamud) | Plugin framework and FFXIV game API |
 | [NetStone](https://github.com/xivapi/NetStone) | Lodestone character avatar lookups |
 | [OpenGraph-Net](https://github.com/ghorsey/OpenGraph-Net) | URL Open Graph preview metadata |
