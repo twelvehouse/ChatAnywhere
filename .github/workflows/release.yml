@@ -34,11 +34,17 @@ jobs:
         with:
           dotnet-version: '9.0.x'
 
+      - name: Download Dalamud
+        shell: pwsh
+        run: |
+          Invoke-WebRequest -Uri "https://goatcorp.github.io/dalamud-distrib/latest.zip" -OutFile latest.zip
+          Expand-Archive -Force latest.zip "$env:GITHUB_WORKSPACE\dalamud"
+
       - name: Restore dependencies
         run: dotnet restore --locked-mode
 
       - name: Build
-        run: dotnet build --configuration Release --no-restore
+        run: dotnet build --configuration Release --no-restore -p:DalamudLibPath="$env:GITHUB_WORKSPACE\dalamud"
 
       - name: Create release artifact
         shell: pwsh
