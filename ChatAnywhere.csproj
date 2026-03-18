@@ -20,7 +20,9 @@
     </ItemGroup>
 
     <!-- Build frontend, then copy dist/ into the output directory preserving subdirectory structure. -->
-    <Target Name="BuildFrontend" BeforeTargets="BeforeBuild">
+    <!-- Skipped during Plogon builds (no internet/npm available); websiteBuild.zip is used instead. -->
+    <Target Name="BuildFrontend" BeforeTargets="BeforeBuild"
+            Condition="'$(IsPlogonBuild)' != 'True'">
         <Exec Command="npm run build" WorkingDirectory="$(MSBuildProjectDirectory)/Http/Frontend" />
         <ItemGroup>
             <_FrontendDist Include="$(MSBuildProjectDirectory)/Http/Frontend/dist/**/*" />
@@ -28,5 +30,12 @@
         <Copy SourceFiles="@(_FrontendDist)"
               DestinationFolder="$(OutputPath)dist/%(_FrontendDist.RecursiveDir)"
               SkipUnchangedFiles="true" />
+    </Target>
+
+    <!-- Plogon build: extract the pre-built frontend zip committed to the repository. -->
+    <Target Name="UnzipFrontend" AfterTargets="Build"
+            Condition="'$(IsPlogonBuild)' == 'True'">
+        <Unzip SourceFiles="$(MSBuildProjectDirectory)/websiteBuild.zip"
+               DestinationFolder="$(OutputPath)dist" />
     </Target>
 </Project>
