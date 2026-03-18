@@ -1,0 +1,27 @@
+# Reference and unwanted files
+.claude/
+.serena/
+CLAUDE.md
+
+# .NET / C#
+bin/
+obj/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+.vs/
+
+# Node / Frontend
+node_modules/
+dist/
+dist-ssr/
+*.local
+.vite/
+
+# Logs
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
