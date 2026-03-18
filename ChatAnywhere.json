@@ -10,6 +10,7 @@
   "LoadSync": false,
   "LoadPriority": 0,
   "CanUnloadAsync": false,
+  "IconUrl": "https://raw.githubusercontent.com/twelvehouse/ChatAnywhere/main/images/icon.png",
   "Punchline": "Chat in FFXIV from your browser anywhere.",
   "Tags": [
     "chat",

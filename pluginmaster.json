@@ -15,10 +15,10 @@
       "relay"
     ],
     "RepoUrl": "https://github.com/twelvehouse/ChatAnywhere",
-    "IconUrl": "https://raw.githubusercontent.com/twelvehouse/ChatAnywhere/main/images/icon1024.png",
+    "IconUrl": "https://raw.githubusercontent.com/twelvehouse/ChatAnywhere/main/images/icon.png",
     "ImageUrls": [
-      "https://raw.githubusercontent.com/twelvehouse/ChatAnywhere/main/images/screenshot1.png",
-      "https://raw.githubusercontent.com/twelvehouse/ChatAnywhere/main/images/screenshot2.png"
+      "https://raw.githubusercontent.com/twelvehouse/ChatAnywhere/main/images/image1.png",
+      "https://raw.githubusercontent.com/twelvehouse/ChatAnywhere/main/images/image2.png"
     ],
     "IsHide": false,
     "IsTestingExclusive": false,
