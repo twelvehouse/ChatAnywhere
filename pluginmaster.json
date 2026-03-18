@@ -1,26 +1,28 @@
-[{
-  "Author": "twelvehouse",
-  "Name": "ChatAnywhere",
-  "InternalName": "ChatAnywhere",
-  "AssemblyVersion": "0.1.0.0",
-  "Description": "Host your chat on a web server so you can talk from anywhere.",
-  "ApplicableVersion": "any",
-  "DalamudApiLevel": 14,
-  "Punchline": "Chat in FFXIV from your browser anywhere.",
-  "Tags": [
-    "chat",
-    "web",
-    "browser",
-    "relay"
-  ],
-  "RepoUrl": "https://github.com/twelvehouse/ChatAnywhere",
-  "IconUrl": "https://raw.githubusercontent.com/twelvehouse/ChatAnywhere/main/images/icon1024.png",
-  "ImageUrls": [
-    "https://raw.githubusercontent.com/twelvehouse/ChatAnywhere/main/images/screenshot1.png",
-    "https://raw.githubusercontent.com/twelvehouse/ChatAnywhere/main/images/screenshot2.png"
-  ],
-  "IsHide": false,
-  "IsTestingExclusive": false,
-  "DownloadLinkInstall": "https://github.com/twelvehouse/ChatAnywhere/releases/download/v0.1.0/ChatAnywhere.zip",
-  "DownloadLinkUpdate": "https://github.com/twelvehouse/ChatAnywhere/releases/download/v0.1.0/ChatAnywhere.zip"
-}]
+[
+  {
+    "Author": "twelvehouse",
+    "Name": "ChatAnywhere",
+    "InternalName": "ChatAnywhere",
+    "AssemblyVersion": "0.1.0.0",
+    "Description": "Host your chat on a web server so you can talk from anywhere.",
+    "ApplicableVersion": "any",
+    "DalamudApiLevel": 14,
+    "Punchline": "Chat in FFXIV from your browser anywhere.",
+    "Tags": [
+      "chat",
+      "web",
+      "browser",
+      "relay"
+    ],
+    "RepoUrl": "https://github.com/twelvehouse/ChatAnywhere",
+    "IconUrl": "https://raw.githubusercontent.com/twelvehouse/ChatAnywhere/main/images/icon1024.png",
+    "ImageUrls": [
+      "https://raw.githubusercontent.com/twelvehouse/ChatAnywhere/main/images/screenshot1.png",
+      "https://raw.githubusercontent.com/twelvehouse/ChatAnywhere/main/images/screenshot2.png"
+    ],
+    "IsHide": false,
+    "IsTestingExclusive": false,
+    "DownloadLinkInstall": "https://github.com/twelvehouse/ChatAnywhere/releases/download/v0.1.0/ChatAnywhere.zip",
+    "DownloadLinkUpdate": "https://github.com/twelvehouse/ChatAnywhere/releases/download/v0.1.0/ChatAnywhere.zip"
+  }
+]
