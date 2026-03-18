@@ -1,0 +1,32 @@
+/* ========== Channel Toggle List ========== */
+.ch-toggle-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.ch-toggle-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition:
+    background 0.15s,
+    border-color 0.15s;
+  user-select: none;
+}
+
+.ch-toggle-row:hover {
+  background: var(--bg-hover);
+  border-color: var(--border);
+}
+
+.ch-toggle-label {
+  flex: 1;
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+}

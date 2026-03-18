@@ -1,0 +1,92 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: Http/Frontend/package-lock.json
+
+      - name: Install frontend dependencies
+        run: npm ci
+        working-directory: Http/Frontend
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9.0.x'
+
+      - name: Restore dependencies
+        run: dotnet restore --locked-mode
+
+      - name: Build
+        run: dotnet build --configuration Release --no-restore
+
+      - name: Create release artifact
+        shell: pwsh
+        run: Compress-Archive -Path "bin/Release/*" -DestinationPath "ChatAnywhere.zip"
+
+      - name: Get version from tag
+        id: version
+        shell: pwsh
+        run: |
+          $tag = "${{ github.ref_name }}"
+          $version = $tag.TrimStart('v')
+          $parts = $version.Split('.')
+          while ($parts.Count -lt 4) { $parts += '0' }
+          $assemblyVersion = $parts -join '.'
+          "VERSION=$version" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+          "ASSEMBLY_VERSION=$assemblyVersion" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: ChatAnywhere.zip
+          generate_release_notes: true
+
+      - name: Update pluginmaster.json
+        shell: pwsh
+        run: |
+          $assemblyVersion = "${{ steps.version.outputs.ASSEMBLY_VERSION }}"
+          $repo = "${{ github.repository }}"
+          $tag = "${{ github.ref_name }}"
+          $downloadUrl = "https://github.com/$repo/releases/download/$tag/ChatAnywhere.zip"
+          $timestamp = [DateTimeOffset]::UtcNow.ToUnixTimeSeconds().ToString()
+
+          $manifest = Get-Content "pluginmaster.json" | ConvertFrom-Json
+          $manifest[0].AssemblyVersion = $assemblyVersion
+          $manifest[0].DownloadLinkInstall = $downloadUrl
+          $manifest[0].DownloadLinkUpdate = $downloadUrl
+          $manifest[0].LastUpdate = $timestamp
+
+          $manifest | ConvertTo-Json -Depth 10 | Set-Content "pluginmaster.json" -Encoding UTF8
+
+      - name: Commit and push pluginmaster.json
+        shell: pwsh
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add pluginmaster.json
+          git diff --cached --quiet
+          if ($LASTEXITCODE -ne 0) {
+            git commit -m "chore: update pluginmaster.json for ${{ github.ref_name }}"
+            git push origin HEAD:refs/heads/main
+          }

@@ -1,0 +1,120 @@
+/* ========== Channel Select (Custom Dropdown) ========== */
+.ch-select {
+  position: relative;
+  flex-shrink: 0;
+}
+
+/* trigger delegates appearance to the inner channel-badge */
+.ch-select-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 0;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  font-family: inherit;
+  cursor: pointer;
+  transition:
+    filter 0.15s,
+    opacity 0.15s,
+    transform 0.15s ease;
+}
+
+.ch-select-trigger:hover {
+  filter: brightness(1.2);
+  opacity: 0.8;
+}
+
+/* channel-badge inside the trigger */
+.ch-select-trigger :global(.channel-badge) {
+  font-size: 0.72rem;
+  padding: 2px 4px;
+}
+
+.ch-select-chevron {
+  flex-shrink: 0;
+  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.ch-select-chevron.open {
+  transform: rotate(180deg);
+}
+
+@keyframes ch-menu-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.ch-select-menu {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 0;
+  min-width: max-content;
+  width: max-content;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 4px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(8px);
+  z-index: 50;
+  animation: ch-menu-in 0.15s cubic-bezier(0.25, 0.8, 0.25, 1) both;
+}
+
+.ch-select-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 5px 10px;
+  border: none;
+  border-radius: 5px;
+  background: transparent;
+  font-family: inherit;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.12s;
+}
+
+.ch-select-item:hover {
+  background: var(--bg-hover) !important;
+  filter: brightness(1.15);
+}
+
+.ch-select-item.active {
+  font-weight: 700;
+}
+
+/* short badge label within a dropdown item */
+.ch-select-item-badge {
+  flex-shrink: 0;
+  font-size: 0.63rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  min-width: 44px;
+  text-align: center;
+  opacity: 0.9;
+}
+
+/* full channel name label */
+.ch-select-item-label {
+  flex: 1;
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+.ch-select-check {
+  flex-shrink: 0;
+  opacity: 0.8;
+}

@@ -1,0 +1,520 @@
+/* ========== Sidebar ========== */
+.sidebar {
+  width: var(--sidebar-width);
+  min-width: var(--sidebar-width);
+  background: var(--bg-secondary);
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid var(--border);
+  position: relative;
+  z-index: 10;
+}
+
+.sidebar-header {
+  height: 48px;
+  padding: 0 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-secondary);
+  box-shadow: var(--shadow-sm);
+  flex-shrink: 0;
+  position: relative;
+  z-index: 20;
+}
+
+.sidebar-logo {
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: var(--text-primary);
+  letter-spacing: 0.02em;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 0px;
+  padding-right: 0px;
+}
+
+/* ========== Settings Icon ========== */
+.settings-icon {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-size: 1.1rem;
+  cursor: pointer;
+  padding: 4px;
+  margin-right: 2px;
+  border-radius: 4px;
+  transition:
+    background 0.15s,
+    color 0.15s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.settings-icon svg {
+  display: block;
+  transition: transform 0.4s ease;
+}
+
+.settings-icon:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.settings-icon:hover svg {
+  transform: rotate(90deg);
+}
+
+/* ========== Connection Indicator (Antenna Style) ========== */
+.connection-indicator {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 2px;
+  width: 25px;
+  height: 25px;
+  padding-bottom: 5px;
+  box-sizing: border-box;
+  cursor: default;
+  transition: opacity 0.3s;
+  margin-right: -4px;
+}
+
+.antenna-bar {
+  width: 3px;
+  background: var(--text-muted);
+  border-radius: 1px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.antenna-bar:nth-child(1) {
+  height: 4px;
+}
+
+.antenna-bar:nth-child(2) {
+  height: 8px;
+}
+
+.antenna-bar:nth-child(3) {
+  height: 12px;
+}
+
+.antenna-bar:nth-child(4) {
+  height: 16px;
+}
+
+/* Online State */
+.connection-indicator.online .antenna-bar {
+  background: var(--online);
+}
+
+/* Offline State */
+.connection-indicator.offline .antenna-bar {
+  background: var(--text-muted);
+  opacity: 0.2;
+}
+
+.connection-indicator.offline .antenna-bar:nth-child(1) {
+  background: var(--offline);
+  opacity: 1;
+}
+
+@keyframes pulse-offline {
+  0% {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  50% {
+    opacity: 0.4;
+    transform: scale(0.98);
+  }
+
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.connection-indicator.offline {
+  animation: pulse-offline 2s infinite ease-in-out;
+}
+
+/* ========== Sidebar Navigation ========== */
+.sidebar-nav {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 8px 0;
+}
+
+.channel-section {
+  margin-bottom: 4px;
+}
+
+.channel-section-label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 16px 4px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  user-select: none;
+}
+
+.add-btn {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 1.1rem;
+  line-height: 1;
+  padding: 0 2px;
+  border-radius: 3px;
+  transition:
+    color 0.15s,
+    background 0.15s;
+}
+
+.add-btn:not(:disabled):hover {
+  color: var(--text-primary);
+  background: var(--bg-hover);
+}
+
+.add-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.channel-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  padding: 5px 16px;
+  background: none;
+  border: none;
+  border-radius: 4px;
+  color: var(--text-muted);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  text-align: left;
+  transition:
+    color 0.15s,
+    background 0.15s;
+  position: relative;
+  margin: 1px 4px;
+  width: calc(100% - 8px);
+}
+
+.channel-item:hover {
+  color: var(--text-secondary);
+  background: var(--bg-hover);
+}
+
+.channel-item.active {
+  color: var(--text-primary);
+  background: var(--bg-active);
+  font-weight: 600;
+}
+
+.channel-item.active::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 15%;
+  height: 70%;
+  width: 3px;
+  background: var(--accent);
+  border-radius: 0 3px 3px 0;
+}
+
+.channel-item.has-unread {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.channel-item.has-unread::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 35%;
+  height: 30%;
+  width: 3px;
+  background: var(--text-primary);
+  border-radius: 0 3px 3px 0;
+  opacity: 0.7;
+}
+
+.channel-hash {
+  color: var(--text-muted);
+  font-weight: 700;
+  font-size: 0.95em;
+  flex-shrink: 0;
+  transition: color 0.15s;
+}
+
+.channel-item.active .channel-hash,
+.channel-item:hover .channel-hash {
+  color: inherit;
+}
+
+.channel-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.channel-empty {
+  padding: 4px 16px 8px;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+/* ========== Sidebar Unread Pill ========== */
+.sidebar-unread-pill {
+  background: var(--offline);
+  color: #fff;
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 12px;
+  margin-left: auto;
+}
+
+/* ========== Folder label left area ========== */
+.folder-label-left {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+  overflow: hidden;
+}
+
+/* ========== Folder menu button (···) ========== */
+.folder-menu-btn {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 0.85rem;
+  line-height: 1;
+  padding: 0 2px;
+  border-radius: 3px;
+  flex-shrink: 0;
+  transition:
+    color 0.15s,
+    background 0.15s;
+  letter-spacing: 1px;
+}
+
+.folder-menu-btn:hover {
+  color: var(--text-primary);
+  background: var(--bg-hover);
+}
+
+/* ========== Filter row (item + menu btn) ========== */
+.filter-row {
+  display: flex;
+  align-items: center;
+  margin: 1px 4px;
+}
+
+.filter-row .channel-item {
+  flex: 1;
+  margin: 0;
+  width: auto;
+}
+
+/* ========== Filter menu button (···) ========== */
+.filter-menu-btn {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 0.85rem;
+  line-height: 1;
+  padding: 4px 6px;
+  border-radius: 3px;
+  flex-shrink: 0;
+  opacity: 0;
+  transition:
+    opacity 0.15s,
+    color 0.15s,
+    background 0.15s;
+  letter-spacing: 1px;
+}
+
+.filter-row:hover .filter-menu-btn {
+  opacity: 1;
+}
+
+.filter-menu-btn:hover {
+  color: var(--text-primary);
+  background: var(--bg-hover);
+}
+
+/* ========== Add Folder Button ========== */
+.add-folder-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: calc(100% - 16px);
+  margin: 8px 8px 4px;
+  padding: 6px 12px;
+  background: none;
+  border: 1px dashed var(--border);
+  border-radius: 6px;
+  color: var(--text-muted);
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background 0.15s,
+    color 0.15s,
+    border-color 0.15s;
+  font-family: inherit;
+}
+
+.add-folder-btn:hover {
+  background: var(--bg-hover);
+  color: var(--text-secondary);
+  border-color: var(--text-muted);
+}
+
+/* ========== Context Menu ========== */
+.context-menu {
+  position: fixed;
+  z-index: 9000;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  box-shadow: var(--shadow-md);
+  min-width: 130px;
+  overflow: hidden;
+  animation: fadeIn 0.12s ease-out both;
+}
+
+.context-item {
+  display: block;
+  width: 100%;
+  padding: 8px 14px;
+  background: none;
+  border: none;
+  text-align: left;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-family: inherit;
+  transition:
+    background 0.12s,
+    color 0.12s;
+}
+
+.context-item:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.context-danger {
+  color: var(--offline);
+}
+
+.context-danger:hover {
+  color: var(--offline);
+  filter: brightness(1.1);
+}
+
+/* ========== Drag cursors ========== */
+.filter-row {
+  cursor: grab;
+}
+
+.filter-row:active {
+  cursor: grabbing;
+}
+
+.channel-section-label {
+  cursor: grab;
+}
+
+.channel-section-label:active {
+  cursor: grabbing;
+}
+
+/* Buttons inside draggable rows keep pointer cursor */
+.filter-row button,
+.channel-section-label button {
+  cursor: pointer;
+}
+
+/* ========== Drag Overlays ========== */
+.drag-overlay-folder {
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-focus);
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-secondary);
+  box-shadow: var(--shadow-md);
+  cursor: grabbing;
+}
+
+.drag-overlay-filter {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-focus);
+  border-radius: 4px;
+  padding: 5px 12px;
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  box-shadow: var(--shadow-md);
+  cursor: grabbing;
+  width: calc(var(--sidebar-width) - 16px);
+}
+
+/* ========== DM Section ========== */
+.dm-section {
+  border-top: 1px solid var(--border);
+  padding: 8px 0;
+  flex-shrink: 0;
+}
+
+/* ========== Responsive: Mobile Slide-in ========== */
+@media (max-width: 768px) {
+  .sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100%;
+    z-index: 200;
+    transform: translateX(-100%);
+    transition:
+      transform 0.28s cubic-bezier(0.4, 0, 0.2, 1),
+      box-shadow 0.28s ease;
+    box-shadow: none;
+    width: min(var(--sidebar-width), 80vw);
+    min-width: unset;
+  }
+
+  .sidebar.open {
+    transform: translateX(0);
+    box-shadow: 4px 0 24px rgba(0, 0, 0, 0.5);
+  }
+}

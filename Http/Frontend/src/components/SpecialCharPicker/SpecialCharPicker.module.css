@@ -1,0 +1,156 @@
+/* ========== Special Character Picker ========== */
+.special-char-picker {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  right: 0;
+  width: 420px;
+  height: 400px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  z-index: 200;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  overflow: hidden;
+}
+
+/* Category icon bar */
+.scp-category-bar {
+  display: flex;
+  flex-direction: row;
+  overflow-x: auto;
+  padding: 4px 8px;
+  gap: 2px;
+  flex-shrink: 0;
+  scrollbar-width: none;
+  border-bottom: 1px solid var(--border);
+}
+
+.scp-category-bar::-webkit-scrollbar {
+  display: none;
+}
+
+.scp-cat-btn {
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  transition:
+    background 0.15s,
+    color 0.15s;
+  opacity: 0.5;
+}
+
+.scp-cat-btn:hover {
+  background: var(--bg-hover);
+  opacity: 0.85;
+}
+
+.scp-cat-btn.active {
+  background: var(--bg-active);
+  opacity: 1;
+  box-shadow: none;
+}
+
+.scp-cat-char {
+  font-family: 'FFXIV-Lodestone', var(--sys-font), sans-serif;
+  font-size: 1.1rem;
+  line-height: 1;
+  color: var(--text-primary);
+}
+
+/* Scroll area */
+.scp-scroll {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 8px 6px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--bg-tertiary) transparent;
+}
+
+.scp-scroll::-webkit-scrollbar {
+  width: 6px;
+}
+
+.scp-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.scp-scroll::-webkit-scrollbar-thumb {
+  background: var(--bg-tertiary);
+  border-radius: 3px;
+}
+
+.scp-scroll::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted);
+}
+
+.scp-section {
+  margin-bottom: 8px;
+}
+
+.scp-section-label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  padding: 8px 4px 4px;
+  user-select: none;
+}
+
+.scp-grid {
+  display: grid;
+  grid-template-columns: repeat(10, 1fr);
+  gap: 2px;
+}
+
+.special-char-item {
+  font-family: 'FFXIV-Lodestone', var(--sys-font), sans-serif;
+  font-size: 1.15rem;
+  width: 100%;
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 5px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  color: var(--text-primary);
+  transition: background 0.1s;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+.special-char-item:hover {
+  background: var(--bg-hover);
+}
+
+.special-char-item:active {
+  background: var(--accent, #5865f2);
+}
+
+/* Smartphone */
+@media (max-width: 600px) {
+  .special-char-picker {
+    position: fixed;
+    bottom: 72px;
+    right: 8px;
+    left: 8px;
+    width: auto;
+    height: 320px;
+  }
+
+  .scp-grid {
+    grid-template-columns: repeat(8, 1fr);
+  }
+}

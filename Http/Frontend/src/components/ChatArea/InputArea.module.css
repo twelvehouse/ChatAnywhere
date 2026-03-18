@@ -1,0 +1,275 @@
+/* ========== Input Area ========== */
+.input-area {
+  padding: 12px 16px;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 1;
+  border-top: 1px solid var(--border);
+  box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.15);
+  background: var(--bg-primary);
+}
+
+.chat-input-wrapper {
+  display: flex;
+  align-items: center;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 16px;
+  gap: 10px;
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s;
+  position: relative;
+}
+
+.chat-input-wrapper:focus-within {
+  border-color: var(--border-focus);
+  box-shadow: 0 0 0 2px var(--accent-dim);
+}
+
+.input-divider {
+  width: 1px;
+  height: 18px;
+  background: var(--border);
+  flex-shrink: 0;
+}
+
+.chat-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: var(--text-primary);
+  font-family: var(--chat-font);
+  font-size: inherit;
+  outline: none;
+  min-width: 0;
+}
+
+.chat-input::placeholder {
+  color: var(--text-muted);
+}
+
+/* ========== Special Char Picker Button ========== */
+@keyframes dice-rattle {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  15% {
+    transform: rotate(12deg);
+  }
+
+  30% {
+    transform: rotate(-10deg);
+  }
+
+  45% {
+    transform: rotate(8deg);
+  }
+
+  60% {
+    transform: rotate(-6deg);
+  }
+
+  75% {
+    transform: rotate(4deg);
+  }
+
+  90% {
+    transform: rotate(-2deg);
+  }
+
+  100% {
+    transform: rotate(0deg);
+  }
+}
+
+.char-picker-btn {
+  padding: 0 8px;
+  background: transparent;
+  border: none;
+  color: var(--text-primary);
+  font-size: 1.2rem;
+  cursor: pointer;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.char-picker-icon {
+  font-family: 'FFXIV-Lodestone', var(--sys-font), sans-serif;
+  display: inline-flex;
+  align-items: flex-end;
+  justify-content: center;
+  transform-origin: bottom center;
+  transition: color 0.15s;
+  line-height: 1;
+}
+
+.char-picker-btn:hover .char-picker-icon {
+  animation: dice-rattle 0.55s ease-in-out;
+}
+
+.char-picker-btn:active .char-picker-icon {
+  transform: rotate(0deg) scale(0.9);
+}
+
+/* ========== Tell Mode: Outer container (banner + input connected) ========== */
+.tell-mode-container {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  /* No overflow:hidden — keeps tooltips visible outside the container */
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s;
+}
+
+.tell-mode-container:focus-within {
+  border-color: var(--border-focus);
+  box-shadow: 0 0 0 2px var(--accent-dim);
+}
+
+/* ========== Tell Banner (sits inside container, above input) ========== */
+.tell-banner {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: rgba(255, 105, 180, 0.05);
+  border-bottom: 1px solid rgba(255, 105, 180, 0.15);
+  border-radius: 7px 7px 0 0;
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+}
+
+.tell-banner-label {
+  flex-shrink: 0;
+  color: var(--text-muted);
+  font-size: 0.75rem;
+}
+
+.tell-avatar {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  overflow: hidden;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+}
+
+.tell-banner-name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 600;
+  color: rgb(255, 105, 180);
+  font-family: var(--chat-font);
+  line-height: 1;
+}
+
+.tell-pin-btn {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  height: 22px;
+  padding: 0 6px;
+  border-radius: 4px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 0.7rem;
+  font-family: inherit;
+  white-space: nowrap;
+  transition:
+    background 0.15s,
+    color 0.15s,
+    border-color 0.15s;
+}
+
+.tell-pin-btn:hover {
+  background: var(--bg-hover);
+  color: var(--text-secondary);
+  border-color: var(--border);
+}
+
+.tell-pin-btn.pinned {
+  background: rgba(255, 105, 180, 0.12);
+  color: rgb(255, 105, 180);
+  border-color: rgba(255, 105, 180, 0.4);
+}
+
+.tell-pin-btn.pinned:hover {
+  background: rgba(255, 105, 180, 0.2);
+}
+
+.tell-dismiss-btn {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 4px;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 1rem;
+  line-height: 1;
+  transition:
+    background 0.15s,
+    color 0.15s;
+}
+
+.tell-dismiss-btn:hover {
+  background: rgba(243, 139, 168, 0.1);
+  color: var(--offline);
+}
+
+/* ========== Input row inside tell container (no outer border) ========== */
+.tell-input-inner {
+  display: flex;
+  align-items: center;
+  background: var(--bg-tertiary);
+  padding: 10px 16px;
+  gap: 10px;
+  position: relative;
+  border-radius: 0 0 7px 7px;
+}
+
+/* ========== Send Button ========== */
+.send-btn {
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  border: none;
+  margin-right: 4px;
+  cursor: pointer;
+  transition:
+    background 0.15s,
+    color 0.15s;
+  background: var(--accent, #5865f2);
+  color: #fff;
+}
+
+.send-btn:disabled {
+  background: var(--bg-hover);
+  color: var(--text-muted);
+  cursor: not-allowed;
+}
+
+.send-btn:not(:disabled):hover {
+  filter: brightness(1.15);
+}

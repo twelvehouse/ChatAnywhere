@@ -1,0 +1,20 @@
+{
+  "Author": "twelvehouse",
+  "Name": "ChatAnywhere",
+  "InternalName": "ChatAnywhere",
+  "AssemblyVersion": "1.0.0.0",
+  "Description": "Host your chat on a web server so you can talk from anywhere.",
+  "ApplicableVersion": "any",
+  "DalamudApiLevel": 14,
+  "LoadRequiredState": 0,
+  "LoadSync": false,
+  "LoadPriority": 0,
+  "CanUnloadAsync": false,
+  "Punchline": "Chat in FFXIV from your browser anywhere.",
+  "Tags": [
+    "chat",
+    "web",
+    "browser",
+    "relay"
+  ]
+}

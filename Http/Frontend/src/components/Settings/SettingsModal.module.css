@@ -1,0 +1,203 @@
+/* ========== Settings Modal (Discord-style 2-column) ========== */
+.settings-modal {
+  display: flex;
+  width: min(760px, 94vw);
+  height: min(580px, 88vh);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+  border: 1px solid var(--border);
+  animation: slideUp 0.2s ease-out;
+}
+
+/* ---- left column: category sidebar ---- */
+.settings-sidebar {
+  width: 210px;
+  min-width: 210px;
+  background: var(--bg-secondary);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  padding: 16px 8px;
+  overflow-y: auto;
+}
+
+.settings-sidebar-title {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-muted);
+  padding: 4px 8px 10px;
+  user-select: none;
+}
+
+.settings-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.settings-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 8px 10px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text-muted);
+  font-family: inherit;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  text-align: left;
+  transition:
+    background 0.15s,
+    color 0.15s;
+}
+
+.settings-nav-item:hover {
+  background: var(--bg-hover);
+  color: var(--text-secondary);
+}
+
+.settings-nav-item.active {
+  background: var(--bg-active);
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.settings-nav-item svg {
+  flex-shrink: 0;
+  opacity: 0.8;
+}
+
+/* ---- right column: content ---- */
+.settings-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-primary);
+  overflow: hidden;
+}
+
+.settings-content-header {
+  height: 52px;
+  padding: 0 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.settings-content-header h2 {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.modal-close {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 1.4rem;
+  line-height: 1;
+  padding: 4px 6px;
+  border-radius: 4px;
+  transition:
+    color 0.15s,
+    background 0.15s;
+}
+
+.modal-close:hover {
+  color: var(--text-primary);
+  background: var(--bg-hover);
+}
+
+.settings-content-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 24px;
+}
+
+/* ---- Settings Hamburger Button (hidden on desktop) ---- */
+.settings-hamburger-btn {
+  display: none;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 6px;
+  margin-right: 4px;
+  flex-shrink: 0;
+  transition: background 0.15s;
+}
+
+.settings-hamburger-btn:hover {
+  background: var(--bg-hover);
+}
+
+/* ---- Settings Sidebar Overlay (mobile, hidden on desktop) ---- */
+.settings-sidebar-overlay {
+  display: none;
+}
+
+/* ---- Responsive: hamburger + slide-in ---- */
+@media (max-width: 600px) {
+  .settings-hamburger-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .settings-modal {
+    width: 100%;
+    height: min(90vh, 660px);
+    border-radius: 8px 8px 0 0;
+    align-self: flex-end;
+    margin-bottom: 0;
+    position: relative;
+    overflow: visible;
+  }
+
+  /* adjust overlay to align the modal to the bottom of the screen */
+  :global(.modal-overlay) {
+    align-items: flex-end;
+  }
+
+  .settings-sidebar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: min(210px, 78vw);
+    min-width: unset;
+    z-index: 10;
+    border-radius: 8px 0 0 8px;
+    box-shadow: 4px 0 24px rgba(0, 0, 0, 0.5);
+    transform: translateX(-105%);
+    transition:
+      transform 0.28s cubic-bezier(0.4, 0, 0.2, 1),
+      box-shadow 0.28s ease;
+  }
+
+  .settings-sidebar.open {
+    transform: translateX(0);
+  }
+
+  .settings-sidebar-overlay {
+    display: block;
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.45);
+    z-index: 9;
+    border-radius: inherit;
+    backdrop-filter: blur(2px);
+    animation: overlayFadeIn 0.25s ease-out;
+  }
+}

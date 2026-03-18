@@ -1,0 +1,630 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+/* ========== Design Tokens (Dark Theme Default) ========== */
+:root,
+.theme-dark {
+  /* Background layers */
+  --bg-base: #0e0f14;
+  --bg-primary: #13141a;
+  --bg-secondary: #1a1c24;
+  --bg-tertiary: #22252f;
+  --bg-hover: rgba(255, 255, 255, 0.04);
+  --bg-active: rgba(137, 180, 250, 0.15);
+
+  /* Text */
+  --text-primary: #cdd6f4;
+  --text-secondary: #a6adc8;
+  --text-chat: #bac2de;
+  --text-dim: #7f849c;
+  --text-muted: #585b70;
+  --text-accent: #89b4fa;
+
+  /* Accent & status */
+  --accent: #89b4fa;
+  --accent-dim: #89b4fa33;
+  --online: #a6e3a1;
+  --offline: #f38ba8;
+
+  /* Borders */
+  --border: rgba(255, 255, 255, 0.06);
+  --border-focus: rgba(137, 180, 250, 0.5);
+
+  /* Sidebar */
+  --sidebar-width: 240px;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.5);
+
+  /* Shared Font Stack for Chat */
+  --chat-font: var(--sys-font, 'Inter'), 'FFXIV-Lodestone', system-ui, -apple-system, sans-serif;
+}
+
+/* ========== Reset & Base ========== */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body,
+#root {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+body {
+  font-family:
+    'Inter',
+    'FFXIV-Lodestone',
+    system-ui,
+    -apple-system,
+    sans-serif;
+  background: var(--bg-base);
+  color: var(--text-primary);
+  font-size: var(--sys-font-size, 14px);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  /* Windows rendering fix: Force clean edges with a very subtle shadow and smoothing */
+  text-shadow: 0 0 1px rgba(0, 0, 0, 0.01);
+}
+
+/* ========== Scrollbar ========== */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--bg-tertiary);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted);
+}
+
+/* ========== Custom Tooltip Style ========== */
+[data-tooltip] {
+  position: relative;
+}
+
+[data-tooltip]::before {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: calc(100% + 10px);
+  top: auto;
+  left: 50%;
+  transform: translateX(-50%) translateY(4px);
+  padding: 6px 10px;
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+  font-family: var(--chat-font), sans-serif;
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 1;
+  white-space: nowrap;
+  border-radius: 6px;
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--border);
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    opacity 0.2s ease,
+    transform 0.2s ease;
+  z-index: 9999;
+}
+
+[data-tooltip]::after {
+  content: '';
+  position: absolute;
+  bottom: calc(100% + 1px);
+  top: auto;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 5px solid transparent;
+  border-top-color: var(--border);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+  z-index: 9999;
+}
+
+[data-tooltip]:hover::before {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+[data-tooltip]:hover::after {
+  opacity: 1;
+}
+
+/* tooltip positioned below */
+[data-tooltip][data-tooltip-pos='bottom']::before {
+  bottom: auto;
+  top: calc(100% + 10px);
+  transform: translateX(-50%) translateY(-4px);
+}
+
+[data-tooltip][data-tooltip-pos='bottom']::after {
+  bottom: auto;
+  top: calc(100% + 1px);
+  border-top-color: transparent;
+  border-bottom-color: var(--border);
+}
+
+[data-tooltip][data-tooltip-pos='bottom']:hover::before {
+  transform: translateX(-50%) translateY(0);
+}
+
+[data-tooltip][data-picker-open]::before,
+[data-tooltip][data-picker-open]::after {
+  display: none;
+}
+
+/* ========== Global Keyframes ========== */
+@keyframes msg-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes overlayFadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+/* ========== FFXIV GFD Icons ========== */
+.gfd-icon {
+  display: inline-block;
+  vertical-align: middle;
+  position: relative;
+  margin: 0 1px;
+}
+
+.gfd-icon::before {
+  content: '';
+  display: block;
+}
+
+/* ========== Auto-Link ========== */
+.auto-link {
+  color: var(--accent);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition:
+    border-color 0.15s,
+    filter 0.15s;
+}
+
+.auto-link:hover {
+  filter: brightness(1.2);
+  border-bottom-color: var(--accent);
+}
+
+/* ========== Shared UI: Channel Badge ========== */
+/* Used in MessageItem, ChannelSelect, ChannelSettings, AppearanceSettings */
+.channel-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 52px;
+  width: 52px;
+  font-size: 0.63rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  border: 1px solid;
+  border-radius: 4px;
+  padding: 1px 0;
+  line-height: 1.6;
+  flex-shrink: 0;
+  text-align: center;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+/* backwards compatibility alias */
+.message-badge {
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  border: 1px solid;
+  border-radius: 3px;
+  padding: 0 5px;
+  line-height: 1.6;
+}
+
+/* ========== Shared UI: Modal Overlay ========== */
+/* Used in SettingsModal and LinkConfirmModal */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.65);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  backdrop-filter: blur(6px);
+  animation: fadeIn 0.2s ease-out;
+}
+
+/* ========== Shared UI: Hamburger Icon ========== */
+/* Used in ChatHeader and SettingsModal */
+.hamburger-icon {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 20px;
+  height: 14px;
+  position: relative;
+}
+
+.hamburger-icon span {
+  display: block;
+  height: 2px;
+  width: 100%;
+  background: var(--text-secondary);
+  border-radius: 2px;
+  transition:
+    transform 0.25s ease,
+    opacity 0.25s ease,
+    top 0.25s ease;
+  position: absolute;
+  left: 0;
+}
+
+.hamburger-icon span:nth-child(1) {
+  top: 0;
+}
+
+.hamburger-icon span:nth-child(2) {
+  top: 6px;
+}
+
+.hamburger-icon span:nth-child(3) {
+  top: 12px;
+}
+
+/* X transform when open */
+.hamburger-icon.open span:nth-child(1) {
+  top: 6px;
+  transform: rotate(45deg);
+}
+
+.hamburger-icon.open span:nth-child(2) {
+  opacity: 0;
+  transform: scaleX(0);
+}
+
+.hamburger-icon.open span:nth-child(3) {
+  top: 6px;
+  transform: rotate(-45deg);
+}
+
+/* ========== Shared UI: Toggle Switch ========== */
+/* Used in AppearanceSettings and ChannelSettings */
+.toggle-switch {
+  width: 38px;
+  height: 22px;
+  border-radius: 11px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  position: relative;
+  flex-shrink: 0;
+  transition:
+    background 0.25s,
+    border-color 0.25s;
+}
+
+.toggle-switch.on {
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
+.toggle-knob {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--text-muted);
+  transition:
+    transform 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+    background 0.25s;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+}
+
+.toggle-switch.on .toggle-knob {
+  transform: translateX(16px);
+  background: #fff;
+}
+
+/* ========== Shared UI: Buttons ========== */
+/* Used in LinkConfirmModal */
+.btn {
+  padding: 10px 20px;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.15s;
+  border: none;
+  font-family: inherit;
+}
+
+.btn-primary {
+  background: var(--accent);
+  color: white;
+}
+
+.btn-primary:hover {
+  filter: brightness(1.1);
+}
+
+.btn-primary:active {
+  transform: scale(0.98);
+}
+
+.btn-secondary {
+  background: transparent;
+  color: var(--text-primary);
+}
+
+.btn-secondary:hover {
+  background: var(--bg-hover);
+}
+
+/* ========== Shared: Message Item ========== */
+/* Used in MessageItem and AppearanceSettings (preview) */
+.message {
+  display: flex;
+  flex-direction: column;
+  padding: 6px 20px;
+  border-left: 2px solid transparent;
+  transition:
+    background 0.15s,
+    border-color 0.15s,
+    padding-left 0.15s,
+    filter 0.15s;
+  animation: msg-in 0.25s cubic-bezier(0.25, 0.8, 0.25, 1) both;
+}
+
+/* Inner row: avatar (or time-mini) + body — same layout as the old .message flex row */
+.message-inner {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.message:hover {
+  background-color: var(--bg-hover) !important;
+  filter: brightness(1.15);
+  border-left-color: var(--border-focus);
+}
+
+.message-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.9rem;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.message-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.message-header {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-bottom: 2px;
+  flex-wrap: wrap;
+}
+
+.message-author {
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.message-time {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+}
+
+.message-content {
+  font-family: var(--chat-font);
+  color: var(--text-chat);
+  line-height: 1.5;
+  word-break: break-word;
+}
+
+.message-content.message-content-system {
+  opacity: 0.75;
+}
+
+.message-content.message-content-italic {
+  display: inline-block;
+  transform: skewX(-8deg);
+  transform-origin: left center;
+}
+
+/* Grouped Message Styles */
+.message.message-compact {
+  padding-top: 2px;
+  padding-bottom: 2px;
+  animation: none;
+}
+
+.message.message-has-next {
+  padding-bottom: 2px;
+}
+
+.message-time-mini {
+  width: 36px;
+  text-align: right;
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  opacity: 0;
+  flex-shrink: 0;
+  margin-top: 4px;
+  user-select: none;
+  transition: opacity 0.1s ease-in-out;
+}
+
+.message-compact:hover .message-time-mini {
+  opacity: 1;
+}
+
+/* ========== Tell Thread Reference (Discord-style) ========== */
+
+/*
+ * Reference row — sits above .message-inner, aligned after the avatar column.
+ * margin-left = avatar(36px) + gap(12px) = 48px.
+ *
+ * The L-shaped connector is drawn via ::before:
+ *   left: -30px  → reaches avatar horizontal center (48 - 18 = 30px left)
+ *   top: 50%     → starts at the vertical center of the reference icon
+ *   bottom: 0    → extends down to connect with the avatar below
+ *   width: 26px  → stops just before the reference icon (30 - 4px gap)
+ */
+.tell-ref-row {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: 48px;
+  margin-bottom: 2px;
+  font-size: 0.75rem;
+  color: var(--text-dim);
+  user-select: none;
+}
+
+.tell-ref-row::before {
+  content: '';
+  position: absolute;
+  left: -30px;
+  top: 50%;
+  bottom: 0;
+  width: 26px;
+  border-left: 2px solid rgba(255, 255, 255, 0.15);
+  border-top: 2px solid rgba(255, 255, 255, 0.15);
+  border-top-left-radius: 6px;
+}
+
+/* Small avatar container for the reference row — matches AvatarImage usage */
+.tell-thread-ref-icon {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  overflow: hidden;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+}
+
+.tell-thread-ref-author {
+  font-weight: 600;
+  flex-shrink: 0;
+  font-family: var(--chat-font);
+  line-height: 1;
+}
+
+.tell-thread-ref-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  line-height: 1;
+  font-family: var(--chat-font);
+}
+
+/* ========== Shared: Settings Section ========== */
+/* Used in AppearanceSettings, ChannelSettings, OthersSettings */
+.settings-section {
+  margin-bottom: 24px;
+}
+
+.settings-section:last-child {
+  margin-bottom: 0;
+}
+
+.settings-section h3 {
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: var(--text-primary);
+}
+
+.settings-section p {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-bottom: 12px;
+}
+
+.settings-inline-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.settings-inline-label {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+  flex-shrink: 0;
+}
