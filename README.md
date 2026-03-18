@@ -69,7 +69,7 @@ You can whitelist trusted domains so subsequent clicks open immediately without 
 
 ### Appearance
 
-![Appearance settings](images/screenshot2.png)
+![Appearance settings](images/readme-appearance.png)
 
 - Choose any **Google Font** for the chat window
 - Adjust **font size**
