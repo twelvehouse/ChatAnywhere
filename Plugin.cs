@@ -34,7 +34,17 @@ public sealed class Plugin : IDalamudPlugin
     private const string CommandName = "/chatanywhere";
     private string _lastGameChannelPrefix = string.Empty;
     private DateTimeOffset _lastChannelPollTime = DateTimeOffset.MinValue;
-    private bool _pendingPlayerInfoBroadcast = false;
+    /// <summary>
+    /// The local player's name. Set by OnFrameworkUpdate once LocalPlayer is confirmed,
+    /// cleared by OnLogin. Read by WebServer from the SSE handler thread — must be volatile.
+    /// </summary>
+    public volatile string LocalPlayerName = string.Empty;
+
+    /// <summary>
+    /// The local player's home world. Set and cleared alongside LocalPlayerName.
+    /// Read by WebServer from the SSE handler thread — must be volatile.
+    /// </summary>
+    public volatile string LocalPlayerWorld = string.Empty;
 
     public Plugin(
         IDalamudPluginInterface pluginInterface,
@@ -142,16 +152,6 @@ public sealed class Plugin : IDalamudPlugin
                 Server.SendActiveChannel(currentPrefix);
         }
 
-        // Broadcast player info once LocalPlayer is confirmed after login
-        if (_pendingPlayerInfoBroadcast && ObjectTable.LocalPlayer != null)
-        {
-            _pendingPlayerInfoBroadcast = false;
-            Server.BroadcastPlayerInfo(
-                ObjectTable.LocalPlayer.Name.TextValue,
-                ObjectTable.LocalPlayer.HomeWorld.ValueNullable?.Name.ToString() ?? string.Empty
-            );
-        }
-
         // Poll channel list once per second; broadcast only when it has changed
         var now = DateTimeOffset.UtcNow;
         if ((now - _lastChannelPollTime).TotalSeconds >= 1.0)
@@ -159,13 +159,26 @@ public sealed class Plugin : IDalamudPlugin
             _lastChannelPollTime = now;
             Server.PollAndBroadcastChannels();
         }
+
+        // Once LocalPlayer is confirmed and name is not yet stored, capture and broadcast it.
+        // Covers both the post-login case and mid-session plugin startup.
+        // Runs every frame until LocalPlayerName is set, then becomes a no-op.
+        if (string.IsNullOrEmpty(LocalPlayerName) && ObjectTable.LocalPlayer != null)
+        {
+            LocalPlayerName = ObjectTable.LocalPlayer.Name.TextValue;
+            LocalPlayerWorld = ObjectTable.LocalPlayer.HomeWorld.ValueNullable?.Name.ToString() ?? string.Empty;
+            Server.BroadcastPlayerInfo(LocalPlayerName, LocalPlayerWorld);
+        }
     }
 
     private void OnLogin()
     {
         if (!Server.IsRunning) return;
+        LocalPlayerName = string.Empty;
+        LocalPlayerWorld = string.Empty;
         Server.BroadcastReset();
-        _pendingPlayerInfoBroadcast = true;
+        // LocalPlayerName being empty re-arms the OnFrameworkUpdate check,
+        // which will broadcast player info once LocalPlayer is confirmed.
     }
 
     public void SaveConfig()

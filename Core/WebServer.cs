@@ -47,8 +47,6 @@ public class WebServer : IAsyncDisposable
 
     private readonly SseManager _sseManager;
     private volatile string _lastChannelsJson = string.Empty;
-    private volatile string _currentPlayerName = string.Empty;
-    private volatile string _currentPlayerWorld = string.Empty;
 
     private FrontendSettings _frontendSettings = new();
     private string SettingsFilePath => Path.Combine(Plugin.Interface.ConfigDirectory.FullName, "frontend-settings.json");
@@ -154,8 +152,6 @@ Host.Routes.PreAuthentication.Static.Add(HttpMethod.GET, "/channels", HandleGetC
     {
         Receiver.History.Clear();
         _lastChannelsJson = string.Empty;
-        _currentPlayerName = string.Empty;
-        _currentPlayerWorld = string.Empty;
         _sseManager.Broadcast("data: {\"type\":\"reset\"}\n\n");
         PollAndBroadcastChannels();
     }
@@ -166,8 +162,6 @@ Host.Routes.PreAuthentication.Static.Add(HttpMethod.GET, "/channels", HandleGetC
     /// </summary>
     public void BroadcastPlayerInfo(string name, string world)
     {
-        _currentPlayerName = name;
-        _currentPlayerWorld = world;
         var payload = JsonSerializer.Serialize(new { type = "player-info", name, world });
         _sseManager.Broadcast($"data: {payload}\n\n");
     }
@@ -395,10 +389,10 @@ Host.Routes.PreAuthentication.Static.Add(HttpMethod.GET, "/channels", HandleGetC
                 await ctx.Response.SendChunk(System.Text.Encoding.UTF8.GetBytes($"data: {activeData}\n\n"), false, default);
             }
 
-            // Send player info if already known (e.g. on page reload after login)
-            if (!string.IsNullOrEmpty(_currentPlayerName))
+            // Send player info if the local player is already known (e.g. on page reload or mid-session connect)
+            if (!string.IsNullOrEmpty(Plugin.LocalPlayerName))
             {
-                var playerData = JsonSerializer.Serialize(new { type = "player-info", name = _currentPlayerName, world = _currentPlayerWorld });
+                var playerData = JsonSerializer.Serialize(new { type = "player-info", name = Plugin.LocalPlayerName, world = Plugin.LocalPlayerWorld });
                 await ctx.Response.SendChunk(System.Text.Encoding.UTF8.GetBytes($"data: {playerData}\n\n"), false, default);
             }
 
