@@ -2,7 +2,8 @@ import { useState, useRef, useEffect } from 'react';
 import {
   DndContext,
   DragOverlay,
-  PointerSensor,
+  MouseSensor,
+  TouchSensor,
   useSensor,
   useSensors,
   closestCenter,
@@ -225,7 +226,10 @@ export function Sidebar({
   const [dragActiveId, setDragActiveId] = useState<string | null>(null);
   const menuRef = useRef<HTMLDivElement>(null);
 
-  const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }));
+  const sensors = useSensors(
+    useSensor(MouseSensor, { activationConstraint: { distance: 5 } }),
+    useSensor(TouchSensor, { activationConstraint: { delay: 250, tolerance: 5 } }),
+  );
 
   // Close context menu on outside click
   useEffect(() => {
