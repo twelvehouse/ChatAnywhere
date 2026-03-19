@@ -34,6 +34,7 @@ public sealed class Plugin : IDalamudPlugin
     private const string CommandName = "/chatanywhere";
     private string _lastGameChannelPrefix = string.Empty;
     private DateTimeOffset _lastChannelPollTime = DateTimeOffset.MinValue;
+    private bool _pendingPlayerInfoBroadcast = false;
 
     public Plugin(
         IDalamudPluginInterface pluginInterface,
@@ -141,6 +142,16 @@ public sealed class Plugin : IDalamudPlugin
                 Server.SendActiveChannel(currentPrefix);
         }
 
+        // Broadcast player info once LocalPlayer is confirmed after login
+        if (_pendingPlayerInfoBroadcast && ObjectTable.LocalPlayer != null)
+        {
+            _pendingPlayerInfoBroadcast = false;
+            Server.BroadcastPlayerInfo(
+                ObjectTable.LocalPlayer.Name.TextValue,
+                ObjectTable.LocalPlayer.HomeWorld.ValueNullable?.Name.ToString() ?? string.Empty
+            );
+        }
+
         // Poll channel list once per second; broadcast only when it has changed
         var now = DateTimeOffset.UtcNow;
         if ((now - _lastChannelPollTime).TotalSeconds >= 1.0)
@@ -154,6 +165,7 @@ public sealed class Plugin : IDalamudPlugin
     {
         if (!Server.IsRunning) return;
         Server.BroadcastReset();
+        _pendingPlayerInfoBroadcast = true;
     }
 
     public void SaveConfig()

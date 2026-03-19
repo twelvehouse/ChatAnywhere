@@ -11,6 +11,8 @@ interface UseSSEOptions {
   setSelectedSendPrefix: Dispatch<SetStateAction<string>>;
   setUnreadMap: Dispatch<SetStateAction<Record<string, number>>>;
   setHasUnreadDown: Dispatch<SetStateAction<boolean>>;
+  setLocalPlayerName: Dispatch<SetStateAction<string>>;
+  setLocalPlayerWorld: Dispatch<SetStateAction<string>>;
   isNearBottomRef: RefObject<boolean>;
   activeFilterNameRef: RefObject<string>;
   filtersRef: RefObject<CustomFilter[]>;
@@ -23,6 +25,8 @@ export function useSSE({
   setSelectedSendPrefix,
   setUnreadMap,
   setHasUnreadDown,
+  setLocalPlayerName,
+  setLocalPlayerWorld,
   isNearBottomRef,
   activeFilterNameRef,
   filtersRef,
@@ -59,6 +63,14 @@ export function useSSE({
             setMessages([]);
             setUnreadMap({});
             setHasUnreadDown(false);
+            setLocalPlayerName('');
+            setLocalPlayerWorld('');
+            return;
+          }
+
+          if (data.type === 'player-info') {
+            setLocalPlayerName(data.name as string);
+            setLocalPlayerWorld(data.world as string);
             return;
           }
 
@@ -126,6 +138,8 @@ export function useSSE({
     setSelectedSendPrefix,
     setUnreadMap,
     setHasUnreadDown,
+    setLocalPlayerName,
+    setLocalPlayerWorld,
     activeFilterNameRef,
     filtersRef,
     isNearBottomRef,

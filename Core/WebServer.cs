@@ -47,6 +47,8 @@ public class WebServer : IAsyncDisposable
 
     private readonly SseManager _sseManager;
     private string _lastChannelsJson = string.Empty;
+    private string _currentPlayerName = string.Empty;
+    private string _currentPlayerWorld = string.Empty;
 
     private FrontendSettings _frontendSettings = new();
     private string SettingsFilePath => Path.Combine(Plugin.Interface.ConfigDirectory.FullName, "frontend-settings.json");
@@ -152,8 +154,22 @@ Host.Routes.PreAuthentication.Static.Add(HttpMethod.GET, "/channels", HandleGetC
     {
         Receiver.History.Clear();
         _lastChannelsJson = string.Empty;
+        _currentPlayerName = string.Empty;
+        _currentPlayerWorld = string.Empty;
         _sseManager.Broadcast("data: {\"type\":\"reset\"}\n\n");
         PollAndBroadcastChannels();
+    }
+
+    /// <summary>
+    /// Broadcasts the local player's name and home world to all SSE clients.
+    /// Called once LocalPlayer is confirmed non-null after login.
+    /// </summary>
+    public void BroadcastPlayerInfo(string name, string world)
+    {
+        _currentPlayerName = name;
+        _currentPlayerWorld = world;
+        var payload = JsonSerializer.Serialize(new { type = "player-info", name, world });
+        _sseManager.Broadcast($"data: {payload}\n\n");
     }
 
     private void HandleNewChatMessage(ReceivedChatMessage msg)
@@ -377,6 +393,13 @@ Host.Routes.PreAuthentication.Static.Add(HttpMethod.GET, "/channels", HandleGetC
             {
                 var activeData = JsonSerializer.Serialize(new { type = "active-channel", prefix = activePrefix });
                 await ctx.Response.SendChunk(System.Text.Encoding.UTF8.GetBytes($"data: {activeData}\n\n"), false, default);
+            }
+
+            // Send player info if already known (e.g. on page reload after login)
+            if (!string.IsNullOrEmpty(_currentPlayerName))
+            {
+                var playerData = JsonSerializer.Serialize(new { type = "player-info", name = _currentPlayerName, world = _currentPlayerWorld });
+                await ctx.Response.SendChunk(System.Text.Encoding.UTF8.GetBytes($"data: {playerData}\n\n"), false, default);
             }
 
             // Keep connection open

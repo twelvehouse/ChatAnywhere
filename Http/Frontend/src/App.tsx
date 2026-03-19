@@ -53,6 +53,10 @@ function App() {
     localStorage.getItem('sys-ctrl-enter-to-send') === 'true',
   );
 
+  // ── Player state ───────────────────────────────────────────────
+  const [localPlayerName, setLocalPlayerName] = useState('');
+  const [localPlayerWorld, setLocalPlayerWorld] = useState('');
+
   // ── Tell mode state ────────────────────────────────────────────
   const [replyTarget, setReplyTarget] = useState<{ name: string; world?: string } | null>(null);
   const [replyPinned, setReplyPinned] = useState(false);
@@ -137,6 +141,8 @@ function App() {
     setSelectedSendPrefix,
     setUnreadMap,
     setHasUnreadDown,
+    setLocalPlayerName,
+    setLocalPlayerWorld,
     isNearBottomRef,
     activeFilterNameRef,
     filtersRef,
@@ -231,6 +237,11 @@ function App() {
 
   // ── Tell mode handlers ─────────────────────────────────────────
   const handleReply = (name: string, world?: string) => {
+    if (
+      !localPlayerName ||
+      (name === localPlayerName && (!world || !localPlayerWorld || world === localPlayerWorld))
+    )
+      return;
     setReplyTarget({ name, world });
   };
   const handleClearReply = () => {
