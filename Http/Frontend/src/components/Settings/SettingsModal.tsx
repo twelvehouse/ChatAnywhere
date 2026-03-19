@@ -84,7 +84,10 @@ export function SettingsModal({
         )}
 
         <div className={`${styles['settings-sidebar']}${isSidebarOpen ? ` ${styles.open}` : ''}`}>
-          <div className={styles['settings-sidebar-title']}>Settings</div>
+          <div className={styles['settings-sidebar-title']}>
+            Settings
+            <span className={styles['version-label']}>v{__APP_VERSION__}</span>
+          </div>
           <nav className={styles['settings-nav']}>
             <button
               className={`${styles['settings-nav-item']}${category === 'appearance' ? ` ${styles.active}` : ''}`}
