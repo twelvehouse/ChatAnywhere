@@ -3,7 +3,7 @@
     "Author": "twelvehouse",
     "Name": "ChatAnywhere",
     "InternalName": "ChatAnywhere",
-    "AssemblyVersion": "0.1.2.0",
+    "AssemblyVersion": "0.1.3.0",
     "Description": "Host your chat on a web server so you can talk from anywhere.",
     "ApplicableVersion": "any",
     "DalamudApiLevel": 14,
@@ -22,7 +22,7 @@
     ],
     "IsHide": false,
     "IsTestingExclusive": false,
-    "DownloadLinkInstall": "https://github.com/twelvehouse/ChatAnywhere/releases/download/v0.1.2/ChatAnywhere.zip",
-    "DownloadLinkUpdate": "https://github.com/twelvehouse/ChatAnywhere/releases/download/v0.1.2/ChatAnywhere.zip"
+    "DownloadLinkInstall": "https://github.com/twelvehouse/ChatAnywhere/releases/download/v0.1.3/ChatAnywhere.zip",
+    "DownloadLinkUpdate": "https://github.com/twelvehouse/ChatAnywhere/releases/download/v0.1.3/ChatAnywhere.zip"
   }
 ]
