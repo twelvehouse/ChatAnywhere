@@ -140,10 +140,10 @@ export function FilterEditModal({
         <h2 className={styles.title}>{isEdit ? 'Edit Filter' : 'New Filter'}</h2>
 
         {/* ── Filter Name ── */}
-        <div className={styles.field}>
-          <label className={styles['field-label']}>Filter Name</label>
+        <div className="form-field">
+          <label className="form-field-label">Filter Name</label>
           <input
-            className={`${styles.input}${nameError ? ` ${styles['input-error']}` : ''}`}
+            className={`form-input${nameError ? ' form-input-error' : ''}`}
             type="text"
             value={name}
             onChange={(e) => {
@@ -157,17 +157,17 @@ export function FilterEditModal({
             maxLength={32}
             placeholder="e.g. RaidChat"
           />
-          {nameError && <span className={styles.error}>{nameError}</span>}
+          {nameError && <span className="form-error">{nameError}</span>}
           {!nameError && (
-            <span className={styles.hint}>Letters, numbers, hyphens, underscores (max 32)</span>
+            <span className="form-hint">Letters, numbers, hyphens, underscores (max 32)</span>
           )}
         </div>
 
         {/* ── Notification ── */}
-        <div className={styles.section}>
-          <div className={styles['section-title']}>Notification</div>
-          <div className={styles.row}>
-            <span className={styles['row-label']}>
+        <div className={`form-section ${styles['modal-section']}`}>
+          <div className="form-section-title">Notification</div>
+          <div className="form-row">
+            <span className="form-row-label">
               Sound
               <span className={styles['coming-soon-badge']}>In Development</span>
             </span>
@@ -175,14 +175,14 @@ export function FilterEditModal({
               <div className="toggle-knob" />
             </div>
           </div>
-          <div className={`${styles.row} ${styles['row-sub']}`}>
-            <span className={styles['row-label']}>SE</span>
-            <select className={styles.select} disabled>
+          <div className={`form-row ${styles['row-sub']}`}>
+            <span className="form-row-label">SE</span>
+            <select className="form-select" disabled>
               <option>SE1</option>
             </select>
           </div>
-          <div className={styles.row}>
-            <span className={styles['row-label']}>Badge (Unread)</span>
+          <div className="form-row">
+            <span className="form-row-label">Badge (Unread)</span>
             <button
               className={`toggle-switch${notifyUnread ? ' on' : ''}`}
               role="switch"
@@ -195,10 +195,10 @@ export function FilterEditModal({
         </div>
 
         {/* ── Default Send Channel ── */}
-        <div className={styles.section}>
-          <div className={styles['section-title']}>Default Send Channel</div>
+        <div className={`form-section ${styles['modal-section']}`}>
+          <div className="form-section-title">Default Send Channel</div>
           <select
-            className={styles.select}
+            className="form-select"
             value={defaultSendPrefix}
             onChange={(e) => setDefaultSendPrefix(e.target.value)}
           >
@@ -212,9 +212,9 @@ export function FilterEditModal({
         </div>
 
         {/* ── Show Channel Types ── */}
-        <div className={styles.section}>
+        <div className={`form-section ${styles['modal-section']}`}>
           <div className={styles['section-header']}>
-            <div className={styles['section-title']}>Show Channel Types</div>
+            <div className="form-section-title">Show Channel Types</div>
             <div className={styles['select-all-btns']}>
               <button
                 className={styles['text-btn']}
@@ -262,7 +262,7 @@ export function FilterEditModal({
         </div>
 
         {/* ── Actions ── */}
-        <div className={styles.actions}>
+        <div className="form-actions">
           <button className="btn btn-secondary" onClick={onClose}>
             Cancel
           </button>

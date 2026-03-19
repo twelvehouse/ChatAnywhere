@@ -19,7 +19,7 @@ export function SecuritySettings({ trustedDomains, setTrustedDomains }: Props) {
   };
 
   return (
-    <div className="settings-section">
+    <div className="form-section">
       <div className={styles['section-header-row']}>
         <div className={styles['section-header-titles']}>
           <span className={styles['section-label']}>SECURITY</span>

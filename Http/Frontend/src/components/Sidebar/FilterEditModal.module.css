@@ -18,65 +18,19 @@
   margin-bottom: 20px;
 }
 
-/* ── Field ── */
-.field {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-  margin-bottom: 20px;
-}
-
-.field-label {
-  font-size: 0.72rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.07em;
-  color: var(--text-muted);
-}
-
-.input {
-  background: var(--bg-tertiary);
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  padding: 8px 12px;
-  font-size: 0.875rem;
-  color: var(--text-primary);
-  font-family: inherit;
-  outline: none;
-  transition: border-color 0.15s;
-}
-
-.input:focus {
-  border-color: var(--border-focus);
-}
-
-.input:disabled {
-  opacity: 0.5;
-  cursor: default;
-}
-
-.input-error {
-  border-color: var(--offline);
-}
-
-.error {
-  font-size: 0.75rem;
-  color: var(--offline);
-  font-weight: 500;
-}
-
-.hint {
-  font-size: 0.72rem;
-  color: var(--text-muted);
-}
-
-/* ── Section ── */
-.section {
+/* ── Modal section: adds separator border above each section ── */
+.modal-section {
   border-top: 1px solid var(--border);
   padding-top: 14px;
   margin-bottom: 14px;
 }
 
+/* Tighter row spacing inside modal sections */
+.modal-section :global(.form-row + .form-row) {
+  margin-top: 8px;
+}
+
+/* ── Section header (title + select-all buttons) ── */
 .section-header {
   display: flex;
   align-items: center;
@@ -84,40 +38,17 @@
   margin-bottom: 10px;
 }
 
-.section-title {
-  font-size: 0.7rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: var(--text-muted);
-  margin-bottom: 10px;
-}
-
-.section-header .section-title {
+.section-header :global(.form-section-title) {
   margin-bottom: 0;
 }
 
-/* ── Row (toggle rows) ── */
-.row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 8px;
-}
-
+/* ── Sub-row (indented, dimmed) ── */
 .row-sub {
   padding-left: 16px;
   opacity: 0.5;
 }
 
-.row-label {
-  font-size: 0.85rem;
-  color: var(--text-secondary);
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
+/* ── Coming soon badge ── */
 .coming-soon-badge {
   font-size: 10px;
   font-weight: 600;
@@ -129,30 +60,6 @@
   text-transform: uppercase;
   letter-spacing: 0.04em;
   flex-shrink: 0;
-}
-
-/* ── Select ── */
-.select {
-  background: var(--bg-tertiary);
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  padding: 6px 10px;
-  font-size: 0.85rem;
-  color: var(--text-primary);
-  font-family: inherit;
-  outline: none;
-  cursor: pointer;
-  width: 100%;
-  margin-top: 2px;
-}
-
-.select:focus {
-  border-color: var(--border-focus);
-}
-
-.select:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
 }
 
 /* ── Select All buttons ── */
@@ -206,14 +113,4 @@
   height: 14px;
   cursor: pointer;
   flex-shrink: 0;
-}
-
-/* ── Actions ── */
-.actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 8px;
-  border-top: 1px solid var(--border);
-  padding-top: 16px;
-  margin-top: 4px;
 }

@@ -60,7 +60,7 @@ export function AppearanceSettings({
 
   return (
     <>
-      <div className="settings-section">
+      <div className="form-section">
         <MessageItem
           msg={shoutMsg}
           prevMsg={null}
@@ -85,7 +85,7 @@ export function AppearanceSettings({
         />
       </div>
 
-      <div className="settings-section">
+      <div className="form-section">
         <h3>Font</h3>
         <p>
           Change the main text font. FFXIV special characters use a dedicated font regardless of
@@ -94,7 +94,7 @@ export function AppearanceSettings({
         <div className={styles['font-input-container']}>
           <input
             list="font-list"
-            className={styles['settings-input']}
+            className="form-input"
             value={fontFamily}
             onChange={(e) => setFontFamily(e.target.value)}
             placeholder="Font name (e.g. Noto Sans JP)"
@@ -106,8 +106,8 @@ export function AppearanceSettings({
           </datalist>
         </div>
 
-        <div className="settings-inline-row" style={{ marginTop: '16px' }}>
-          <span className="settings-inline-label">Size</span>
+        <div className="form-row">
+          <span className="form-row-label">Size</span>
           <div
             style={{
               display: 'flex',
@@ -117,7 +117,7 @@ export function AppearanceSettings({
               justifyContent: 'flex-end',
             }}
           >
-            <span className="settings-inline-label" style={{ opacity: 0.7, fontSize: '0.85rem' }}>
+            <span className="form-row-label" style={{ opacity: 0.7 }}>
               {fontSize}px
             </span>
             <input
@@ -133,44 +133,24 @@ export function AppearanceSettings({
         </div>
 
         <div
-          className="settings-inline-row"
-          style={{ marginTop: '16px', cursor: 'pointer' }}
+          className="form-row"
+          style={{ cursor: 'pointer' }}
           onClick={() => setItalicizeSystem((v) => !v)}
         >
-          <span className="settings-inline-label">Italicize System & Emote</span>
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '12px',
-              flex: 1,
-              justifyContent: 'flex-end',
-            }}
-          >
-            <div className={`toggle-switch${italicizeSystem ? ' on' : ''}`}>
-              <div className="toggle-knob" />
-            </div>
+          <span className="form-row-label">Italicize System & Emote</span>
+          <div className={`toggle-switch${italicizeSystem ? ' on' : ''}`}>
+            <div className="toggle-knob" />
           </div>
         </div>
 
         <div
-          className="settings-inline-row"
-          style={{ marginTop: '16px', cursor: 'pointer' }}
+          className="form-row"
+          style={{ cursor: 'pointer' }}
           onClick={() => setUseColoredBackground((v) => !v)}
         >
-          <span className="settings-inline-label">Colorize backgrounds by type</span>
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '12px',
-              flex: 1,
-              justifyContent: 'flex-end',
-            }}
-          >
-            <div className={`toggle-switch${useColoredBackground ? ' on' : ''}`}>
-              <div className="toggle-knob" />
-            </div>
+          <span className="form-row-label">Colorize backgrounds by type</span>
+          <div className={`toggle-switch${useColoredBackground ? ' on' : ''}`}>
+            <div className="toggle-knob" />
           </div>
         </div>
       </div>

@@ -44,7 +44,7 @@ export function ChannelSettings({
 
   return (
     <>
-      <div className="settings-section">
+      <div className="form-section">
         <h3>Send Channel Visibility</h3>
         <p>
           Choose which channels appear in the send dropdown. Hiding unused channels helps prevent

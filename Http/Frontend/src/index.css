@@ -592,39 +592,148 @@ body {
   font-family: var(--chat-font);
 }
 
-/* ========== Shared: Settings Section ========== */
-/* Used in AppearanceSettings, ChannelSettings, OthersSettings */
-.settings-section {
-  margin-bottom: 24px;
+/* ========== Shared: Form / Settings UI Primitives ========== */
+/* Used across Settings tabs and modal forms (FilterEditModal, etc.) */
+
+/* Section */
+.form-section {
+  margin-bottom: 20px;
 }
 
-.settings-section:last-child {
+.form-section:last-child {
   margin-bottom: 0;
 }
 
-.settings-section h3 {
+.form-section h3 {
   font-size: 0.9rem;
   font-weight: 600;
   margin-bottom: 8px;
   color: var(--text-primary);
 }
 
-.settings-section p {
+.form-section p {
   font-size: 0.8rem;
   color: var(--text-muted);
   margin-bottom: 12px;
 }
 
-.settings-inline-row {
+.form-section-title {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  margin-bottom: 10px;
+}
+
+/* Labeled field (column layout) */
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin-bottom: 16px;
+}
+
+.form-field-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--text-muted);
+}
+
+/* Text input */
+.form-input {
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 8px 12px;
+  font-size: 0.875rem;
+  color: var(--text-primary);
+  font-family: inherit;
+  outline: none;
+  transition: border-color 0.15s;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.form-input:focus {
+  border-color: var(--border-focus);
+}
+
+.form-input:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.form-input-error {
+  border-color: var(--offline) !important;
+}
+
+/* Select */
+.form-select {
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 6px 10px;
+  font-size: 0.85rem;
+  color: var(--text-primary);
+  font-family: inherit;
+  outline: none;
+  cursor: pointer;
+  width: 100%;
+  margin-top: 2px;
+}
+
+.form-select:focus {
+  border-color: var(--border-focus);
+}
+
+.form-select:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* Error / hint text */
+.form-error {
+  font-size: 0.75rem;
+  color: var(--offline);
+  font-weight: 500;
+}
+
+.form-hint {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+}
+
+/* Toggle/control row (label + right-side control) */
+.form-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
 }
 
-.settings-inline-label {
+.form-row + .form-row {
+  margin-top: 16px;
+}
+
+.form-row-label {
   font-size: 0.85rem;
   color: var(--text-secondary);
   font-weight: 500;
   flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Actions footer (modal confirm/cancel buttons) */
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  border-top: 1px solid var(--border);
+  padding-top: 16px;
+  margin-top: 4px;
 }

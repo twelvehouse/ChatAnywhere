@@ -31,6 +31,8 @@ interface Props {
   // Others
   tellModeAll: boolean;
   setTellModeAll: Dispatch<SetStateAction<boolean>>;
+  ctrlEnterToSend: boolean;
+  setCtrlEnterToSend: Dispatch<SetStateAction<boolean>>;
   // Control
   onClose: () => void;
 }
@@ -53,6 +55,8 @@ export function SettingsModal({
   setTrustedDomains,
   tellModeAll,
   setTellModeAll,
+  ctrlEnterToSend,
+  setCtrlEnterToSend,
   onClose,
 }: Props) {
   const [category, setCategory] = useState<SettingsCategory>('appearance');
@@ -195,7 +199,12 @@ export function SettingsModal({
               />
             )}
             {category === 'others' && (
-              <OthersSettings tellModeAll={tellModeAll} setTellModeAll={setTellModeAll} />
+              <OthersSettings
+                tellModeAll={tellModeAll}
+                setTellModeAll={setTellModeAll}
+                ctrlEnterToSend={ctrlEnterToSend}
+                setCtrlEnterToSend={setCtrlEnterToSend}
+              />
             )}
           </div>
         </div>

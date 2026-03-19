@@ -49,6 +49,9 @@ function App() {
   const [tellModeAll, setTellModeAll] = useState(
     localStorage.getItem('sys-tell-mode-all') !== 'false',
   );
+  const [ctrlEnterToSend, setCtrlEnterToSend] = useState(
+    localStorage.getItem('sys-ctrl-enter-to-send') === 'true',
+  );
 
   // ── Tell mode state ────────────────────────────────────────────
   const [replyTarget, setReplyTarget] = useState<{ name: string; world?: string } | null>(null);
@@ -169,6 +172,9 @@ function App() {
   useEffect(() => {
     localStorage.setItem('sys-tell-mode-all', tellModeAll.toString());
   }, [tellModeAll]);
+  useEffect(() => {
+    localStorage.setItem('sys-ctrl-enter-to-send', ctrlEnterToSend.toString());
+  }, [ctrlEnterToSend]);
 
   useEffect(() => {
     if (styleLoaded.current) return;
@@ -263,6 +269,7 @@ function App() {
 
   const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
+      if (ctrlEnterToSend && !e.ctrlKey) return;
       e.preventDefault();
       sendMessage(inputText);
     }
@@ -397,6 +404,8 @@ function App() {
           setTrustedDomains={setTrustedDomains}
           tellModeAll={tellModeAll}
           setTellModeAll={setTellModeAll}
+          ctrlEnterToSend={ctrlEnterToSend}
+          setCtrlEnterToSend={setCtrlEnterToSend}
           onClose={() => setShowSettings(false)}
         />
       )}
