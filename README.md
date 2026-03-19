@@ -147,7 +147,6 @@ ChatAnywhere would not exist without these projects:
 | [OpenGraph-Net](https://github.com/ghorsey/OpenGraph-Net) | URL Open Graph preview metadata |
 | [Watson.Lite](https://github.com/jchristn/WatsonWebserver) | Embedded HTTP server and SSE support |
 | [@dnd-kit](https://dndkit.com/) | Drag-and-drop filter and folder reordering |
-| [@tanstack/react-virtual](https://tanstack.com/virtual) | Virtualised message list for large chat histories |
 
 <details>
 <summary>How it works (technical overview)</summary>
@@ -167,7 +166,6 @@ FFXIV game process
 
 Browser (React + TypeScript SPA, built with Vite)
  ├─ Connects to /events SSE stream on load
- ├─ Renders messages with a virtualised list (@tanstack/react-virtual)
  ├─ Filter sidebar with drag-and-drop reordering (@dnd-kit/sortable)
  ├─ FFXIV Lodestone font (SSF TTF) and icon sprites (GFD) loaded from the plugin server
  └─ Settings and filters persisted server-side via PUT /settings
