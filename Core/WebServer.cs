@@ -46,9 +46,9 @@ public class WebServer : IAsyncDisposable
     public int ActivePort { get; private set; }
 
     private readonly SseManager _sseManager;
-    private string _lastChannelsJson = string.Empty;
-    private string _currentPlayerName = string.Empty;
-    private string _currentPlayerWorld = string.Empty;
+    private volatile string _lastChannelsJson = string.Empty;
+    private volatile string _currentPlayerName = string.Empty;
+    private volatile string _currentPlayerWorld = string.Empty;
 
     private FrontendSettings _frontendSettings = new();
     private string SettingsFilePath => Path.Combine(Plugin.Interface.ConfigDirectory.FullName, "frontend-settings.json");

@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import type { Dispatch, SetStateAction, RefObject } from 'react';
 import { RELAY_ADDR } from '../constants/config';
 import type { ChatMessage, ChannelOption } from '../types/chat';
+import type { SseEvent } from '../types/sse';
 import type { CustomFilter } from '../types/filter';
 
 interface UseSSEOptions {
@@ -50,7 +51,7 @@ export function useSSE({
 
       sse.onmessage = (event) => {
         try {
-          const data = JSON.parse(event.data);
+          const data = JSON.parse(event.data) as SseEvent;
 
           if (data.type === 'connected') {
             setIsConnected(true);
