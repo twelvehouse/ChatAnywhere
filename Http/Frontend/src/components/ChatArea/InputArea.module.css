@@ -30,7 +30,7 @@
 
 .input-divider {
   width: 1px;
-  height: 18px;
+  height: calc(18px * var(--sys-scale, 1));
   background: var(--border);
   flex-shrink: 0;
 }
@@ -90,7 +90,7 @@
   background: transparent;
   border: none;
   color: var(--text-primary);
-  font-size: 1.2rem;
+  font-size: calc(18px * var(--sys-scale, 1));
   cursor: pointer;
   flex-shrink: 0;
   display: flex;
@@ -151,8 +151,8 @@
 }
 
 .tell-avatar {
-  width: 16px;
-  height: 16px;
+  width: calc(16px * var(--sys-scale, 1));
+  height: calc(16px * var(--sys-scale, 1));
   border-radius: 50%;
   overflow: hidden;
   flex-shrink: 0;
@@ -247,8 +247,8 @@
 
 /* ========== Send Button ========== */
 .send-btn {
-  width: 32px;
-  height: 32px;
+  width: calc(32px * var(--sys-scale, 1));
+  height: calc(32px * var(--sys-scale, 1));
   flex-shrink: 0;
   display: flex;
   align-items: center;
@@ -268,6 +268,11 @@
   background: var(--bg-hover);
   color: var(--text-muted);
   cursor: not-allowed;
+}
+
+.send-btn svg {
+  width: calc(16px * var(--sys-scale, 1));
+  height: calc(16px * var(--sys-scale, 1));
 }
 
 .send-btn:not(:disabled):hover {

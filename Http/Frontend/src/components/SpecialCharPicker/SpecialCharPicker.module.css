@@ -3,8 +3,8 @@
   position: absolute;
   bottom: calc(100% + 8px);
   right: 0;
-  width: 420px;
-  height: 400px;
+  width: calc(420px * var(--sys-scale, 1));
+  height: calc(400px * var(--sys-scale, 1));
   background: var(--bg-secondary);
   border: 1px solid var(--border);
   border-radius: 10px;
@@ -20,8 +20,8 @@
   display: flex;
   flex-direction: row;
   overflow-x: auto;
-  padding: 4px 8px;
-  gap: 2px;
+  padding: calc(4px * var(--sys-scale, 1)) calc(8px * var(--sys-scale, 1));
+  gap: calc(2px * var(--sys-scale, 1));
   flex-shrink: 0;
   scrollbar-width: none;
   border-bottom: 1px solid var(--border);
@@ -32,8 +32,8 @@
 }
 
 .scp-cat-btn {
-  width: 32px;
-  height: 32px;
+  width: calc(32px * var(--sys-scale, 1));
+  height: calc(32px * var(--sys-scale, 1));
   flex-shrink: 0;
   display: flex;
   align-items: center;
@@ -61,7 +61,7 @@
 
 .scp-cat-char {
   font-family: 'FFXIV-Lodestone', var(--sys-font), sans-serif;
-  font-size: 1.1rem;
+  font-size: calc(18px * var(--sys-scale, 1));
   line-height: 1;
   color: var(--text-primary);
 }
@@ -71,7 +71,7 @@
   flex: 1;
   overflow-y: auto;
   overflow-x: hidden;
-  padding: 8px 6px;
+  padding: calc(8px * var(--sys-scale, 1)) calc(6px * var(--sys-scale, 1));
   scrollbar-width: thin;
   scrollbar-color: var(--bg-tertiary) transparent;
 }
@@ -94,16 +94,17 @@
 }
 
 .scp-section {
-  margin-bottom: 8px;
+  margin-bottom: calc(8px * var(--sys-scale, 1));
 }
 
 .scp-section-label {
-  font-size: 0.7rem;
+  font-size: calc(11px * var(--sys-scale, 1));
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.08em;
   color: var(--text-muted);
-  padding: 8px 4px 4px;
+  padding: calc(8px * var(--sys-scale, 1)) calc(4px * var(--sys-scale, 1))
+    calc(4px * var(--sys-scale, 1));
   user-select: none;
 }
 
@@ -115,7 +116,7 @@
 
 .special-char-item {
   font-family: 'FFXIV-Lodestone', var(--sys-font), sans-serif;
-  font-size: 1.15rem;
+  font-size: calc(18px * var(--sys-scale, 1));
   width: 100%;
   aspect-ratio: 1;
   display: flex;
@@ -147,7 +148,7 @@
     right: 8px;
     left: 8px;
     width: auto;
-    height: 320px;
+    height: calc(320px * var(--sys-scale, 1));
   }
 
   .scp-grid {

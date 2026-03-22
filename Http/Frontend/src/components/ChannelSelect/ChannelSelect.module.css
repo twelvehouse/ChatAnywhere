@@ -2,6 +2,8 @@
 .ch-select {
   position: relative;
   flex-shrink: 0;
+  display: flex;
+  align-items: center;
 }
 
 /* trigger delegates appearance to the inner channel-badge */
@@ -14,6 +16,7 @@
   border-radius: 0;
   background: transparent;
   font-family: inherit;
+  font-size: inherit;
   cursor: pointer;
   transition:
     filter 0.15s,
@@ -21,15 +24,16 @@
     transform 0.15s ease;
 }
 
+/* trigger badge: same design as message badges, all calc values multiplied by 1.2 */
+.ch-select-trigger :global(.channel-badge) {
+  min-width: calc(52px * var(--sys-scale, 1) * 1.2);
+  width: calc(52px * var(--sys-scale, 1) * 1.2);
+  font-size: calc(9.45px * var(--sys-scale, 1) * 1.2);
+}
+
 .ch-select-trigger:hover {
   filter: brightness(1.2);
   opacity: 0.8;
-}
-
-/* channel-badge inside the trigger */
-.ch-select-trigger :global(.channel-badge) {
-  font-size: 0.72rem;
-  padding: 2px 4px;
 }
 
 .ch-select-chevron {
@@ -62,7 +66,7 @@
   background: var(--bg-secondary);
   border: 1px solid var(--border);
   border-radius: 8px;
-  padding: 4px;
+  padding: calc(4px * var(--sys-scale, 1));
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
   backdrop-filter: blur(8px);
   z-index: 50;
@@ -72,13 +76,14 @@
 .ch-select-item {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: calc(8px * var(--sys-scale, 1));
   width: 100%;
-  padding: 5px 10px;
+  padding: calc(5px * var(--sys-scale, 1)) calc(10px * var(--sys-scale, 1));
   border: none;
   border-radius: 5px;
   background: transparent;
   font-family: inherit;
+  font-size: inherit;
   cursor: pointer;
   text-align: left;
   transition: background 0.12s;
@@ -96,11 +101,11 @@
 /* short badge label within a dropdown item */
 .ch-select-item-badge {
   flex-shrink: 0;
-  font-size: 0.63rem;
+  font-size: 0.63em;
   font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  min-width: 44px;
+  min-width: calc(44px * var(--sys-scale, 1));
   text-align: center;
   opacity: 0.9;
 }
@@ -108,7 +113,7 @@
 /* full channel name label */
 .ch-select-item-label {
   flex: 1;
-  font-size: 0.82rem;
+  font-size: 0.82em;
   font-weight: 500;
   color: var(--text-secondary);
   white-space: nowrap;

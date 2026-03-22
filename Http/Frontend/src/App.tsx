@@ -158,6 +158,7 @@ function App() {
     localStorage.setItem('sys-font-size', fontSize.toString());
     document.documentElement.style.setProperty('--sys-font', `"${fontFamily}"`);
     document.documentElement.style.setProperty('--sys-font-size', `${fontSize}px`);
+    document.documentElement.style.setProperty('--sys-scale', `${fontSize / 15}`);
 
     const fontId = `gfont-${fontFamily.replace(/\s+/g, '')}`;
     if (!document.getElementById(fontId)) {
