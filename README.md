@@ -85,7 +85,7 @@ You can whitelist trusted domains so subsequent clicks open immediately without 
 Open **Dalamud Settings → Experimental** and paste the following URL into **Custom Plugin Repositories**:
 
 ```
-https://raw.githubusercontent.com/twelvehouse/ChatAnywhere/main/pluginmaster.json
+https://raw.githubusercontent.com/twelvehouse/DalamudPlugins/main/pluginmaster.json
 ```
 
 Click **+**, save, then search for **ChatAnywhere** in the plugin browser and install it.

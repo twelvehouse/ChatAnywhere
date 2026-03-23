@@ -65,19 +65,14 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Update pluginmaster.json
+      - name: Update DalamudPlugins repo
         if: startsWith(github.ref, 'refs/tags/')
         run: |
-          TAG="${{ github.ref_name }}"
-          VERSION="${TAG#v}"
-          IFS='.' read -ra P <<< "$VERSION"
-          while [ ${#P[@]} -lt 4 ]; do P+=("0"); done
-          ASSEMBLY_VERSION="${P[0]}.${P[1]}.${P[2]}.${P[3]}"
-          DOWNLOAD_URL="https://github.com/${{ github.repository }}/releases/download/$TAG/ChatAnywhere.zip"
-          jq --arg v "$ASSEMBLY_VERSION" --arg u "$DOWNLOAD_URL" \
-            '.[0].AssemblyVersion = $v | .[0].DownloadLinkInstall = $u | .[0].DownloadLinkUpdate = $u' \
-            pluginmaster.json > tmp.json && mv tmp.json pluginmaster.json
+          git clone https://x-access-token:${{ secrets.PLUGINS_REPO_TOKEN }}@github.com/twelvehouse/DalamudPlugins.git dalamud-plugins
+          mkdir -p dalamud-plugins/plugins/ChatAnywhere
+          cp ChatAnywhere.zip dalamud-plugins/plugins/ChatAnywhere/latest.zip
+          cd dalamud-plugins
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add pluginmaster.json
-          git diff --cached --quiet || git commit -m "chore: update pluginmaster.json for $TAG" && git push origin HEAD:refs/heads/main
+          git add plugins/ChatAnywhere/latest.zip
+          git diff --cached --quiet || git commit -m "chore: update ChatAnywhere ${{ github.ref_name }}" && git push
