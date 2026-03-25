@@ -161,18 +161,23 @@ FFXIV game process
  └─ Dalamud plugin (C#)
       ├─ Subscribes to Dalamud chat events
       ├─ Watson.Lite HTTP server (default: port 3000)
-      │    ├─ GET  /          → serves the React SPA (bundled into the plugin output at build time)
-      │    ├─ GET  /events    → SSE stream; pushes chat messages as JSON in real time
-      │    ├─ GET  /history   → paginated message history (loaded on scroll-up)
-      │    ├─ POST /send      → injects a message into the game's chat input
-      │    └─ GET/PUT /settings → persists filters, folders, and appearance config
-      └─ Lodestone character lookups via NetStone for avatar images
-           (results cached in browser sessionStorage)
+      │    ├─ GET        /           → serves the React SPA (dist folder bundled into the plugin at build time)
+      │    ├─ GET        /sse        → SSE stream; pushes chat messages as JSON in real time
+      │    ├─ GET        /history    → paginated message history (loaded on scroll-up)
+      │    ├─ GET        /channels   → list of available chat channels for the logged-in character
+      │    ├─ POST       /send       → injects a message into the game's chat input
+      │    ├─ GET        /emotes     → list of emotes available to the logged-in character
+      │    ├─ GET        /icon/{id}  → emote icon served as PNG from game data
+      │    ├─ GET        /avatar     → Lodestone character avatar lookup (proxied via NetStone)
+      │    ├─ GET        /ogp        → Open Graph metadata for URL link preview cards
+      │    ├─ GET/PUT    /settings   → persists filters, folders, and appearance config
+      │    └─ GET        /files/*    → static game data files (SSF font, GFD icon data, PS5 fonticon texture)
+      └─ Avatar results cached in browser sessionStorage
 
 Browser (React + TypeScript SPA, built with Vite)
- ├─ Connects to /events SSE stream on load
+ ├─ Connects to /sse SSE stream on load
  ├─ Filter sidebar with drag-and-drop reordering (@dnd-kit/sortable)
- ├─ FFXIV Lodestone font (SSF TTF) and icon sprites (GFD) loaded from the plugin server
+ ├─ FFXIV Lodestone font (SSF TTF), GFD icon data, and PS5 fonticon texture loaded from the plugin server
  └─ Settings and filters persisted server-side via PUT /settings
 ```
 
