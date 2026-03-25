@@ -49,11 +49,16 @@ Click any sender's name to enter **Tell mode** and reply to them directly.
 - Use the **channel switcher** to switch between Tell and any other channel mid-session
 - Recent Tell partners appear in the **Direct Messages** section of the sidebar
 
-### FFXIV special characters
+### Emote & symbol picker
 
-The built-in character picker gives quick access to every FFXIV private-use symbol —
-party numbers ①–⑧, raid signs (Attack / Bind / Circle etc.), instance markers, time icons, and more —
-so you can type naturally without memorising character codes.
+A built-in picker lets you perform emotes or insert FFXIV special characters without ever leaving the chat window.
+
+**Emotes tab** — lists every emote you own, pulled live from your game data.
+Search by name or `/command`, see your recently used emotes at the top, and toggle whether the emote appears in the chat log (with or without the `motion` suffix).
+Enable *Confirm mode* in Settings to require a second tap before the emote fires — handy on touchscreens.
+
+**Symbols tab** — gives quick access to every FFXIV private-use symbol:
+party numbers ①–⑧, raid signs (Attack / Bind / Circle etc.), instance markers, time icons, and more.
 
 ### Link preview
 
