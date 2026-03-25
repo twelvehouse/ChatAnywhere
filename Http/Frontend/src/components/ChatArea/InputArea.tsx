@@ -2,7 +2,7 @@ import { useRef } from 'react';
 import type { KeyboardEvent } from 'react';
 import styles from './InputArea.module.css';
 import { ChannelSelect } from '../ChannelSelect/ChannelSelect';
-import { SpecialCharPicker } from '../SpecialCharPicker/SpecialCharPicker';
+import { EmoteSymbolPicker } from '../EmoteSymbolPicker/EmoteSymbolPicker';
 import { AvatarImage } from './AvatarImage';
 import { getBadgeInfoByPrefix } from '../../lib/channelUtils';
 import type { ChannelOption } from '../../types/chat';
@@ -33,6 +33,8 @@ interface Props {
   onKeyDown: (e: KeyboardEvent<HTMLInputElement>) => void;
   onSendClick: () => void;
   onToggleCharPicker: () => void;
+  onExecuteEmote: (command: string) => void;
+  emoteConfirm: boolean;
   replyTarget: { name: string; world?: string } | null;
   replyPinned: boolean;
   onClearReply: () => void;
@@ -50,13 +52,14 @@ export function InputArea({
   onKeyDown,
   onSendClick,
   onToggleCharPicker,
+  onExecuteEmote,
+  emoteConfirm,
   replyTarget,
   replyPinned,
   onClearReply,
   onToggleReplyPin,
 }: Props) {
   const inputAreaRef = useRef<HTMLDivElement>(null);
-  const charPickerRef = useRef<HTMLDivElement>(null);
 
   const currentChannel =
     sendChannels.find((c) => c.prefix === selectedSendPrefix) ?? sendChannels[0];
@@ -102,8 +105,8 @@ export function InputArea({
         className={styles['char-picker-btn']}
         onMouseDown={(e) => e.stopPropagation()}
         onClick={onToggleCharPicker}
-        aria-label="Special Characters"
-        data-tooltip="Special Characters"
+        aria-label="Emotes & Symbols"
+        data-tooltip="Emotes & Symbols"
         data-picker-open={showCharPicker ? 'true' : undefined}
       >
         <span className={styles['char-picker-icon']}>&#xE03E;</span>
@@ -127,9 +130,10 @@ export function InputArea({
         </svg>
       </button>
       {showCharPicker && (
-        <SpecialCharPicker
-          onSelect={(char) => onInputChange(inputText + char)}
-          containerRef={charPickerRef}
+        <EmoteSymbolPicker
+          onInsert={(text) => onInputChange(inputText + text)}
+          onExecute={onExecuteEmote}
+          emoteConfirm={emoteConfirm}
         />
       )}
     </div>

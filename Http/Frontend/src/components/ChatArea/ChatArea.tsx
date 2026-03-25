@@ -48,6 +48,8 @@ interface Props {
   onKeyDown: (e: KeyboardEvent<HTMLInputElement>) => void;
   onSendClick: () => void;
   onToggleCharPicker: () => void;
+  onExecuteEmote: (command: string) => void;
+  emoteConfirm: boolean;
 }
 
 export function ChatArea({
@@ -88,6 +90,8 @@ export function ChatArea({
   onKeyDown,
   onSendClick,
   onToggleCharPicker,
+  onExecuteEmote,
+  emoteConfirm,
 }: Props) {
   return (
     <div className={styles['chat-area']}>
@@ -132,6 +136,8 @@ export function ChatArea({
         onKeyDown={onKeyDown}
         onSendClick={onSendClick}
         onToggleCharPicker={onToggleCharPicker}
+        onExecuteEmote={onExecuteEmote}
+        emoteConfirm={emoteConfirm}
         replyTarget={replyTarget}
         replyPinned={replyPinned}
         onClearReply={onClearReply}

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Concurrent;
 using System.IO;
+using System.IO.Compression;
 using System.Net.Http;
 using System.Text.Json;
 using System.Text.RegularExpressions;
@@ -27,6 +28,9 @@ public class WebServer : IAsyncDisposable
     private static LodestoneClient? _lodestoneClient;
     private static readonly ConcurrentDictionary<string, string> AvatarCache = new();
     private static readonly ConcurrentDictionary<string, string> OgpCache = new();
+
+    // Cached emote list JSON, built on the game framework thread and served to HTTP clients.
+    private volatile string _cachedEmoteJson = "{\"emotes\":[]}";
     private static readonly HttpClient OgpHttpClient = CreateOgpHttpClient();
 
     private static HttpClient CreateOgpHttpClient()
@@ -88,6 +92,7 @@ Host.Routes.PreAuthentication.Static.Add(HttpMethod.GET, "/channels", HandleGetC
             Host.Routes.PreAuthentication.Static.Add(HttpMethod.GET, "/files/gfdata.gfd", GetGfdData, ExceptionRoute);
             Host.Routes.PreAuthentication.Static.Add(HttpMethod.GET, "/files/fonticon_ps5.tex", GetTexData, ExceptionRoute);
             Host.Routes.PreAuthentication.Static.Add(HttpMethod.GET, "/files/FFXIV_Lodestone_SSF.ttf", GetLodestoneFont, ExceptionRoute);
+            Host.Routes.PreAuthentication.Static.Add(HttpMethod.GET, "/emotes", HandleGetEmotes, ExceptionRoute);
 
             // Optional static frontend serving logic can be added later
             
@@ -414,8 +419,105 @@ Host.Routes.PreAuthentication.Static.Add(HttpMethod.GET, "/channels", HandleGetC
         }
     }
 
+    /// <summary>
+    /// Builds the emote list from game data and caches it as JSON.
+    /// Must be called on the game framework thread (UIState access).
+    /// </summary>
+    public unsafe void RefreshEmoteList()
+    {
+        try
+        {
+            var sheet = Plugin.DataManager.GetExcelSheet<Lumina.Excel.Sheets.Emote>(Plugin.ClientState.ClientLanguage);
+            if (sheet == null) { Log.Warning("[Emotes] Sheet not available."); return; }
+
+            var uiState = FFXIVClientStructs.FFXIV.Client.Game.UI.UIState.Instance();
+            var entries = new System.Collections.Generic.List<object>();
+
+            foreach (var row in sheet)
+            {
+                var name = row.Name.ToString();
+                var command = row.TextCommand.Value.Command.ToString();
+
+                if (row.Icon == 0 || string.IsNullOrEmpty(name) || string.IsNullOrEmpty(command))
+                    continue;
+
+                var isOwned = row.UnlockLink == 0 || (uiState != null && uiState->IsUnlockLinkUnlocked(row.UnlockLink));
+                entries.Add(new { id = (int)row.RowId, name, command, iconId = (int)row.Icon, isOwned });
+            }
+
+            _cachedEmoteJson = JsonSerializer.Serialize(new { emotes = entries });
+            Log.Info($"[Emotes] Cached {entries.Count} emotes.");
+        }
+        catch (Exception ex)
+        {
+            Log.Error(ex, "[Emotes] Failed to refresh emote list.");
+        }
+    }
+
+    private async Task HandleGetEmotes(HttpContextBase ctx)
+    {
+        ctx.Response.StatusCode = 200;
+        ctx.Response.Headers.Add("Access-Control-Allow-Origin", "*");
+        ctx.Response.Headers.Add("Content-Type", "application/json");
+        await ctx.Response.Send(_cachedEmoteJson);
+    }
+
+    private async Task HandleGetIcon(HttpContextBase ctx, string iconIdStr)
+    {
+        if (!int.TryParse(iconIdStr, out var iconId) || iconId <= 0)
+        {
+            ctx.Response.StatusCode = 400;
+            ctx.Response.Headers.Add("Access-Control-Allow-Origin", "*");
+            await ctx.Response.Send("Bad Request");
+            return;
+        }
+
+        try
+        {
+            var folder = (iconId / 1000) * 1000;
+            var texPath = $"ui/icon/{folder:D6}/{iconId:D6}_hr1.tex";
+            var file = Plugin.DataManager.GetFile<Lumina.Data.Files.TexFile>(texPath);
+
+            if (file == null)
+            {
+                ctx.Response.StatusCode = 404;
+                ctx.Response.Headers.Add("Access-Control-Allow-Origin", "*");
+                await ctx.Response.Send("Not Found");
+                return;
+            }
+
+            var bgra = file.ImageData; // BGRA byte order (B8G8R8A8)
+            var width = file.Header.Width;
+            var height = file.Header.Height;
+            var png = PngEncoder.Encode(bgra, width, height);
+
+            ctx.Response.StatusCode = 200;
+            ctx.Response.Headers.Add("Access-Control-Allow-Origin", "*");
+            ctx.Response.Headers.Add("Content-Type", "image/png");
+            ctx.Response.Headers.Add("Cache-Control", "public, max-age=86400");
+            await ctx.Response.Send(png);
+        }
+        catch (Exception ex)
+        {
+            Log.Error(ex, $"[Icon] Failed to serve icon {iconId}.");
+            ctx.Response.StatusCode = 500;
+            ctx.Response.Headers.Add("Access-Control-Allow-Origin", "*");
+            await ctx.Response.Send("Internal Server Error");
+        }
+    }
+
     private async Task<bool> DefaultRoute(HttpContextBase ctx)
     {
+        var rawPath = ctx.Request.Url.RawWithoutQuery.TrimStart('/');
+
+        // Handle /icon/{iconId} — serve emote icons from game data as PNG
+        // (checked before dist, so icons work even when dist directory is absent)
+        if (rawPath.StartsWith("icon/", StringComparison.Ordinal))
+        {
+            await HandleGetIcon(ctx, rawPath[5..]);
+            return true;
+        }
+
         var distRoot = Path.GetFullPath(Path.Combine(Plugin.Interface.AssemblyLocation.DirectoryName!, "dist"));
         if (!Directory.Exists(distRoot))
         {
@@ -423,7 +525,6 @@ Host.Routes.PreAuthentication.Static.Add(HttpMethod.GET, "/channels", HandleGetC
             return await ctx.Response.Send("Not Found");
         }
 
-        var rawPath = ctx.Request.Url.RawWithoutQuery.TrimStart('/');
         if (string.IsNullOrEmpty(rawPath))
             rawPath = "index.html";
 

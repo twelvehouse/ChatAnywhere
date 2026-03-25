@@ -52,6 +52,9 @@ function App() {
   const [ctrlEnterToSend, setCtrlEnterToSend] = useState(
     localStorage.getItem('sys-ctrl-enter-to-send') === 'true',
   );
+  const [emoteConfirm, setEmoteConfirm] = useState(
+    localStorage.getItem('sys-emote-confirm') !== 'false',
+  );
 
   // ── Player state ───────────────────────────────────────────────
   const [localPlayerName, setLocalPlayerName] = useState('');
@@ -182,6 +185,9 @@ function App() {
   useEffect(() => {
     localStorage.setItem('sys-ctrl-enter-to-send', ctrlEnterToSend.toString());
   }, [ctrlEnterToSend]);
+  useEffect(() => {
+    localStorage.setItem('sys-emote-confirm', emoteConfirm.toString());
+  }, [emoteConfirm]);
 
   useEffect(() => {
     if (styleLoaded.current) return;
@@ -212,7 +218,7 @@ function App() {
   useEffect(() => {
     if (!showCharPicker) return;
     const handler = (e: MouseEvent) => {
-      const picker = document.querySelector('[data-special-char-picker]');
+      const picker = document.querySelector('[data-emote-symbol-picker]');
       if (picker && !picker.contains(e.target as Node)) {
         setShowCharPicker(false);
       }
@@ -278,6 +284,8 @@ function App() {
       console.error('Send failed:', e);
     }
   };
+
+  const handleExecuteEmote = (command: string) => sendMessage(command);
 
   const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
@@ -387,6 +395,8 @@ function App() {
         onKeyDown={handleKeyDown}
         onSendClick={() => sendMessage(inputText)}
         onToggleCharPicker={() => setShowCharPicker((o) => !o)}
+        onExecuteEmote={handleExecuteEmote}
+        emoteConfirm={emoteConfirm}
         onEditFilter={handleEditFilter}
         replyTarget={replyTarget}
         replyPinned={replyPinned}
@@ -418,6 +428,8 @@ function App() {
           setTellModeAll={setTellModeAll}
           ctrlEnterToSend={ctrlEnterToSend}
           setCtrlEnterToSend={setCtrlEnterToSend}
+          emoteConfirm={emoteConfirm}
+          setEmoteConfirm={setEmoteConfirm}
           onClose={() => setShowSettings(false)}
         />
       )}

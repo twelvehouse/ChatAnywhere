@@ -81,6 +81,9 @@ public sealed class Plugin : IDalamudPlugin
         if (Config.WebinterfaceEnabled)
             Server.Start();
 
+        // Build the emote list cache on the framework thread (UIState access required).
+        Framework.RunOnTick(() => Server.RefreshEmoteList());
+
         CommandManager.AddHandler(CommandName, new CommandInfo(OnCommand)
         {
             HelpMessage = "Open ChatAnywhere settings. Use 'start' or 'stop' to control the server.",
@@ -177,6 +180,7 @@ public sealed class Plugin : IDalamudPlugin
         LocalPlayerName = string.Empty;
         LocalPlayerWorld = string.Empty;
         Server.BroadcastReset();
+        Server.RefreshEmoteList();
         // LocalPlayerName being empty re-arms the OnFrameworkUpdate check,
         // which will broadcast player info once LocalPlayer is confirmed.
     }

@@ -1,0 +1,63 @@
+/* ========== EmoteSymbolPicker: outer container ========== */
+.picker {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  right: 0;
+  width: calc(420px * var(--sys-scale, 1));
+  height: calc(400px * var(--sys-scale, 1));
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  z-index: 200;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  overflow: hidden;
+}
+
+/* ========== Tab bar ========== */
+.tab-bar {
+  display: flex;
+  flex-direction: row;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.tab-btn {
+  flex: 1;
+  padding: calc(9px * var(--sys-scale, 1)) calc(12px * var(--sys-scale, 1));
+  border: none;
+  border-bottom: 2px solid transparent;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: calc(11px * var(--sys-scale, 1));
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition:
+    color 0.15s,
+    border-color 0.15s;
+  margin-bottom: -1px;
+}
+
+.tab-btn:hover {
+  color: var(--text-secondary);
+}
+
+.tab-btn.active {
+  color: var(--text-primary);
+  border-bottom-color: var(--accent, #5865f2);
+}
+
+/* Smartphone */
+@media (max-width: 600px) {
+  .picker {
+    position: fixed;
+    bottom: 72px;
+    right: 8px;
+    left: 8px;
+    width: auto;
+    height: calc(400px * var(--sys-scale, 1));
+  }
+}

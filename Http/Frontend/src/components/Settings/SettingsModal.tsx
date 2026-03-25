@@ -33,6 +33,8 @@ interface Props {
   setTellModeAll: Dispatch<SetStateAction<boolean>>;
   ctrlEnterToSend: boolean;
   setCtrlEnterToSend: Dispatch<SetStateAction<boolean>>;
+  emoteConfirm: boolean;
+  setEmoteConfirm: Dispatch<SetStateAction<boolean>>;
   // Control
   onClose: () => void;
 }
@@ -57,6 +59,8 @@ export function SettingsModal({
   setTellModeAll,
   ctrlEnterToSend,
   setCtrlEnterToSend,
+  emoteConfirm,
+  setEmoteConfirm,
   onClose,
 }: Props) {
   const [category, setCategory] = useState<SettingsCategory>('appearance');
@@ -207,6 +211,8 @@ export function SettingsModal({
                 setTellModeAll={setTellModeAll}
                 ctrlEnterToSend={ctrlEnterToSend}
                 setCtrlEnterToSend={setCtrlEnterToSend}
+                emoteConfirm={emoteConfirm}
+                setEmoteConfirm={setEmoteConfirm}
               />
             )}
           </div>

@@ -1,0 +1,254 @@
+/* ========== Emote Tab: outer wrapper ========== */
+.emote-tab {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+/* ========== Search bar ========== */
+.search-bar {
+  display: flex;
+  align-items: center;
+  gap: calc(6px * var(--sys-scale, 1));
+  padding: calc(7px * var(--sys-scale, 1)) calc(10px * var(--sys-scale, 1));
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.search-input {
+  flex: 1;
+  min-width: 0;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text-primary);
+  font-family: inherit;
+  font-size: calc(15px * var(--sys-scale, 1));
+  padding: calc(4px * var(--sys-scale, 1)) calc(8px * var(--sys-scale, 1));
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.search-input::placeholder {
+  color: var(--text-muted);
+}
+
+.search-input:focus {
+  border-color: var(--border-focus);
+}
+
+/* ========== Log output toggle ========== */
+.log-toggle-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: calc(5px * var(--sys-scale, 1));
+  flex-shrink: 0;
+  cursor: pointer;
+  user-select: none;
+  background: none;
+  border: none;
+  padding: 0;
+  color: inherit;
+}
+
+.log-toggle-wrapper:hover::after {
+  opacity: 1;
+}
+
+.log-icon {
+  width: calc(22px * var(--sys-scale, 1));
+  height: calc(22px * var(--sys-scale, 1));
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+/* Smaller toggle specifically for the emote search bar */
+.log-toggle-wrapper :global(.toggle-switch) {
+  width: calc(36px * var(--sys-scale, 1));
+  height: calc(20px * var(--sys-scale, 1));
+  border-radius: calc(10px * var(--sys-scale, 1));
+}
+
+.log-toggle-wrapper :global(.toggle-knob) {
+  width: calc(14px * var(--sys-scale, 1));
+  height: calc(14px * var(--sys-scale, 1));
+}
+
+/* ========== Scrollable emote list ========== */
+.emote-list {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: thin;
+  scrollbar-color: var(--bg-tertiary) transparent;
+}
+
+.emote-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.emote-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.emote-list::-webkit-scrollbar-thumb {
+  background: var(--bg-tertiary);
+  border-radius: 3px;
+}
+
+.emote-list::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted);
+}
+
+/* ========== Individual emote row ========== */
+.emote-row {
+  display: flex;
+  align-items: center;
+  gap: calc(10px * var(--sys-scale, 1));
+  width: 100%;
+  padding: calc(8px * var(--sys-scale, 1)) calc(10px * var(--sys-scale, 1));
+  border: none;
+  background: transparent;
+  color: var(--text-primary);
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.1s;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+.emote-row:hover {
+  background: var(--bg-hover);
+}
+
+.emote-row:active {
+  background: var(--bg-active);
+}
+
+.emote-row.pending {
+  background: var(--accent-dim);
+}
+
+.emote-icon {
+  width: calc(30px * var(--sys-scale, 1));
+  height: calc(30px * var(--sys-scale, 1));
+  border-radius: 5px;
+  flex-shrink: 0;
+  object-fit: contain;
+}
+
+/* Shown when the icon image fails to load. */
+.emote-icon-fallback {
+  width: calc(30px * var(--sys-scale, 1));
+  height: calc(30px * var(--sys-scale, 1));
+  border-radius: 5px;
+  flex-shrink: 0;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+}
+
+.emote-name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: calc(15px * var(--sys-scale, 1));
+  font-family: var(--chat-font);
+}
+
+.emote-command {
+  flex-shrink: 0;
+  font-size: calc(13px * var(--sys-scale, 1));
+  font-family: monospace;
+  color: var(--text-muted);
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 2px calc(6px * var(--sys-scale, 1));
+}
+
+.emote-play {
+  flex-shrink: 0;
+  font-size: calc(11px * var(--sys-scale, 1));
+  font-weight: 600;
+  background: var(--accent, #5865f2);
+  color: #fff;
+  border-radius: 4px;
+  padding: calc(2px * var(--sys-scale, 1)) calc(7px * var(--sys-scale, 1));
+  line-height: 1.4;
+  letter-spacing: 0.02em;
+}
+
+/* ========== History section ========== */
+.history-heading {
+  padding: calc(6px * var(--sys-scale, 1)) calc(10px * var(--sys-scale, 1))
+    calc(2px * var(--sys-scale, 1));
+  font-size: calc(10px * var(--sys-scale, 1));
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.history-divider {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.15);
+  margin: calc(4px * var(--sys-scale, 1)) calc(10px * var(--sys-scale, 1));
+}
+
+/* ========== Skeleton loading ========== */
+@keyframes skeleton-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.4;
+  }
+}
+
+.skeleton-row {
+  display: flex;
+  align-items: center;
+  gap: calc(10px * var(--sys-scale, 1));
+  padding: calc(8px * var(--sys-scale, 1)) calc(10px * var(--sys-scale, 1));
+  animation: skeleton-pulse 1.4s ease-in-out infinite;
+}
+
+.skeleton-icon {
+  width: calc(30px * var(--sys-scale, 1));
+  height: calc(30px * var(--sys-scale, 1));
+  border-radius: 5px;
+  background: var(--bg-tertiary);
+  flex-shrink: 0;
+}
+
+.skeleton-name-wrap {
+  flex: 1;
+  min-width: 0;
+}
+
+.skeleton-name {
+  height: calc(13px * var(--sys-scale, 1));
+  border-radius: 4px;
+  background: var(--bg-tertiary);
+}
+
+.skeleton-command {
+  width: calc(60px * var(--sys-scale, 1));
+  height: calc(20px * var(--sys-scale, 1));
+  border-radius: 4px;
+  background: var(--bg-tertiary);
+  flex-shrink: 0;
+}
+
+/* ========== Empty state ========== */
+.emote-empty {
+  padding: calc(24px * var(--sys-scale, 1));
+  text-align: center;
+  color: var(--text-muted);
+  font-size: calc(12px * var(--sys-scale, 1));
+}
