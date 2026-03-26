@@ -52,7 +52,7 @@ public class WebServer : IAsyncDisposable
     private readonly SseManager _sseManager;
     private volatile string _lastChannelsJson = string.Empty;
 
-    private FrontendSettings _frontendSettings = new();
+    private string _frontendSettingsJson = "{}";
     private string SettingsFilePath => Path.Combine(Plugin.Interface.ConfigDirectory.FullName, "frontend-settings.json");
 
     public WebServer(Plugin plugin, ChatSender sender, ChatReceiver receiver, IPluginLog log)
@@ -242,14 +242,15 @@ Host.Routes.PreAuthentication.Static.Add(HttpMethod.GET, "/channels", HandleGetC
             if (File.Exists(SettingsFilePath))
             {
                 var json = File.ReadAllText(SettingsFilePath);
-                _frontendSettings = JsonSerializer.Deserialize<FrontendSettings>(json) ?? new FrontendSettings();
+                JsonDocument.Parse(json).Dispose(); // validate
+                _frontendSettingsJson = json;
                 Log.Debug("Frontend settings loaded.");
             }
         }
         catch (Exception ex)
         {
             Log.Error(ex, "Failed to load frontend settings.");
-            _frontendSettings = new FrontendSettings();
+            _frontendSettingsJson = "{}";
         }
     }
 
@@ -257,8 +258,7 @@ Host.Routes.PreAuthentication.Static.Add(HttpMethod.GET, "/channels", HandleGetC
     {
         try
         {
-            var json = JsonSerializer.Serialize(_frontendSettings, new JsonSerializerOptions { WriteIndented = true });
-            File.WriteAllText(SettingsFilePath, json);
+            File.WriteAllText(SettingsFilePath, _frontendSettingsJson);
         }
         catch (Exception ex)
         {
@@ -268,11 +268,10 @@ Host.Routes.PreAuthentication.Static.Add(HttpMethod.GET, "/channels", HandleGetC
 
     private async Task HandleGetSettings(HttpContextBase ctx)
     {
-        var json = JsonSerializer.Serialize(_frontendSettings, new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase });
         ctx.Response.StatusCode = 200;
         ctx.Response.Headers.Add("Access-Control-Allow-Origin", "*");
         ctx.Response.Headers.Add("Content-Type", "application/json");
-        await ctx.Response.Send(json);
+        await ctx.Response.Send(_frontendSettingsJson);
     }
 
     private async Task HandlePutSettings(HttpContextBase ctx)
@@ -293,17 +292,22 @@ Host.Routes.PreAuthentication.Static.Add(HttpMethod.GET, "/channels", HandleGetC
                 body = System.Text.Encoding.UTF8.GetString(buffer, 0, totalRead);
             }
 
-            var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
-            var settings = string.IsNullOrEmpty(body) ? null : JsonSerializer.Deserialize<FrontendSettings>(body, options);
-            if (settings != null)
+            if (!string.IsNullOrEmpty(body))
             {
-                _frontendSettings = settings;
+                JsonDocument.Parse(body).Dispose(); // validate JSON before storing
+                _frontendSettingsJson = body;
                 SaveFrontendSettings();
             }
 
             ctx.Response.StatusCode = 200;
             ctx.Response.Headers.Add("Access-Control-Allow-Origin", "*");
             await ctx.Response.Send("OK");
+        }
+        catch (JsonException)
+        {
+            ctx.Response.StatusCode = 400;
+            ctx.Response.Headers.Add("Access-Control-Allow-Origin", "*");
+            await ctx.Response.Send("Invalid JSON");
         }
         catch (Exception ex)
         {
@@ -885,28 +889,3 @@ public class SendMessagePayload
     public string Message { get; set; } = string.Empty;
 }
 
-public class FrontendSettings
-{
-    public string FontFamily { get; set; } = "Inter";
-    public int FontSize { get; set; } = 14;
-    public bool ItalicizeSystem { get; set; } = true;
-    public bool UseColoredBackground { get; set; } = false;
-    public List<string> DisabledChannels { get; set; } = [];
-    public List<string> TrustedDomains { get; set; } = [];
-    public List<CustomFilter> Filters { get; set; } = [];
-    public List<FilterFolder> Folders { get; set; } = [];
-}
-
-public class CustomFilter
-{
-    public string Name { get; set; } = string.Empty;
-    public List<int> ShowChannelTypes { get; set; } = [];
-    public string? DefaultSendPrefix { get; set; } = null;
-    public bool NotifyUnread { get; set; } = false;
-}
-
-public class FilterFolder
-{
-    public string Name { get; set; } = string.Empty;
-    public List<string> Filters { get; set; } = [];
-}

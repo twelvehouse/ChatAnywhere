@@ -1,6 +1,5 @@
 import type { Dispatch, SetStateAction } from 'react';
 import styles from './SecuritySettings.module.css';
-import { saveTrustedDomains } from '../../lib/storageUtils';
 import { BUILT_IN_TRUSTED_DOMAINS } from '../../constants/trustedDomains';
 
 interface Props {
@@ -13,7 +12,6 @@ export function SecuritySettings({ trustedDomains, setTrustedDomains }: Props) {
     setTrustedDomains((prev) => {
       const next = new Set(prev);
       next.delete(domain);
-      saveTrustedDomains(next);
       return next;
     });
   };

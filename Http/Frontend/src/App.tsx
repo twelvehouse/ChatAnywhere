@@ -5,7 +5,6 @@ import { addGfdStylesheet } from './lib/gfd';
 import { usePaginatedHistory } from './hooks/useHistory';
 import { useScrollBehavior } from './hooks/useScrollBehavior';
 import { useSSE } from './hooks/useSSE';
-import { loadDisabledChannels, loadTrustedDomains } from './lib/storageUtils';
 import { useSettingsSync } from './hooks/useSettingsSync';
 import { useFilterManagement } from './hooks/useFilterManagement';
 import { DEFAULT_CHANNELS } from './constants/channels';
@@ -37,24 +36,14 @@ function App() {
 
   // ── Settings state ─────────────────────────────────────────────
   const [showSettings, setShowSettings] = useState(false);
-  const [fontFamily, setFontFamily] = useState(localStorage.getItem('sys-font') ?? 'Inter');
-  const [fontSize, setFontSize] = useState(Number(localStorage.getItem('sys-font-size')) || 14);
-  const [disabledChannels, setDisabledChannels] = useState<Set<string>>(loadDisabledChannels);
-  const [italicizeSystem, setItalicizeSystem] = useState(
-    localStorage.getItem('sys-italic-system') !== 'false',
-  );
-  const [useColoredBackground, setUseColoredBackground] = useState(
-    localStorage.getItem('sys-colored-bg') === 'true',
-  );
-  const [tellModeAll, setTellModeAll] = useState(
-    localStorage.getItem('sys-tell-mode-all') !== 'false',
-  );
-  const [ctrlEnterToSend, setCtrlEnterToSend] = useState(
-    localStorage.getItem('sys-ctrl-enter-to-send') === 'true',
-  );
-  const [emoteConfirm, setEmoteConfirm] = useState(
-    localStorage.getItem('sys-emote-confirm') !== 'false',
-  );
+  const [fontFamily, setFontFamily] = useState('Inter');
+  const [fontSize, setFontSize] = useState(14);
+  const [disabledChannels, setDisabledChannels] = useState<Set<string>>(new Set());
+  const [italicizeSystem, setItalicizeSystem] = useState(true);
+  const [useColoredBackground, setUseColoredBackground] = useState(false);
+  const [tellModeAll, setTellModeAll] = useState(true);
+  const [ctrlEnterToSend, setCtrlEnterToSend] = useState(false);
+  const [emoteConfirm, setEmoteConfirm] = useState(true);
 
   // ── Player state ───────────────────────────────────────────────
   const [localPlayerName, setLocalPlayerName] = useState('');
@@ -67,7 +56,7 @@ function App() {
   // ── Link modal state ───────────────────────────────────────────
   const [confirmLink, setConfirmLink] = useState<string | null>(null);
   const [trustDomain, setTrustDomain] = useState(false);
-  const [trustedDomains, setTrustedDomains] = useState<Set<string>>(loadTrustedDomains);
+  const [trustedDomains, setTrustedDomains] = useState<Set<string>>(new Set());
 
   // ── Sidebar state ──────────────────────────────────────────────
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -107,6 +96,9 @@ function App() {
     trustedDomains,
     filters,
     folders,
+    tellModeAll,
+    ctrlEnterToSend,
+    emoteConfirm,
     setFontFamily,
     setFontSize,
     setItalicizeSystem,
@@ -115,6 +107,9 @@ function App() {
     setTrustedDomains,
     setFilters,
     setFolders,
+    setTellModeAll,
+    setCtrlEnterToSend,
+    setEmoteConfirm,
     onFiltersReady: (loadedFilters) => {
       const urlFilterName = new URL(window.location.href).searchParams.get('filter');
       const targetName =
@@ -157,8 +152,6 @@ function App() {
   }, []);
 
   useEffect(() => {
-    localStorage.setItem('sys-font', fontFamily);
-    localStorage.setItem('sys-font-size', fontSize.toString());
     document.documentElement.style.setProperty('--sys-font', `"${fontFamily}"`);
     document.documentElement.style.setProperty('--sys-font-size', `${fontSize}px`);
     document.documentElement.style.setProperty('--sys-scale', `${fontSize / 15}`);
@@ -172,22 +165,6 @@ function App() {
       document.head.appendChild(link);
     }
   }, [fontFamily, fontSize]);
-
-  useEffect(() => {
-    localStorage.setItem('sys-italic-system', italicizeSystem.toString());
-  }, [italicizeSystem]);
-  useEffect(() => {
-    localStorage.setItem('sys-colored-bg', useColoredBackground.toString());
-  }, [useColoredBackground]);
-  useEffect(() => {
-    localStorage.setItem('sys-tell-mode-all', tellModeAll.toString());
-  }, [tellModeAll]);
-  useEffect(() => {
-    localStorage.setItem('sys-ctrl-enter-to-send', ctrlEnterToSend.toString());
-  }, [ctrlEnterToSend]);
-  useEffect(() => {
-    localStorage.setItem('sys-emote-confirm', emoteConfirm.toString());
-  }, [emoteConfirm]);
 
   useEffect(() => {
     if (styleLoaded.current) return;

@@ -1,7 +1,6 @@
 import { useEffect, useRef } from 'react';
 import type { Dispatch, SetStateAction } from 'react';
 import { RELAY_ADDR } from '../constants/config';
-import { saveDisabledChannels, saveTrustedDomains } from '../lib/storageUtils';
 import type { CustomFilter, FilterFolder } from '../types/filter';
 import { TRACKED_CHANNEL_TYPES } from '../constants/channels';
 
@@ -14,6 +13,9 @@ interface Props {
   trustedDomains: Set<string>;
   filters: CustomFilter[];
   folders: FilterFolder[];
+  tellModeAll: boolean;
+  ctrlEnterToSend: boolean;
+  emoteConfirm: boolean;
   setFontFamily: Dispatch<SetStateAction<string>>;
   setFontSize: Dispatch<SetStateAction<number>>;
   setItalicizeSystem: Dispatch<SetStateAction<boolean>>;
@@ -22,6 +24,9 @@ interface Props {
   setTrustedDomains: Dispatch<SetStateAction<Set<string>>>;
   setFilters: Dispatch<SetStateAction<CustomFilter[]>>;
   setFolders: Dispatch<SetStateAction<FilterFolder[]>>;
+  setTellModeAll: Dispatch<SetStateAction<boolean>>;
+  setCtrlEnterToSend: Dispatch<SetStateAction<boolean>>;
+  setEmoteConfirm: Dispatch<SetStateAction<boolean>>;
   onFiltersReady: (filters: CustomFilter[], folders: FilterFolder[]) => void;
 }
 
@@ -34,6 +39,9 @@ export function useSettingsSync({
   trustedDomains,
   filters,
   folders,
+  tellModeAll,
+  ctrlEnterToSend,
+  emoteConfirm,
   setFontFamily,
   setFontSize,
   setItalicizeSystem,
@@ -42,12 +50,15 @@ export function useSettingsSync({
   setTrustedDomains,
   setFilters,
   setFolders,
+  setTellModeAll,
+  setCtrlEnterToSend,
+  setEmoteConfirm,
   onFiltersReady,
 }: Props) {
   const serverLoadedRef = useRef(false);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Load from server on mount; override localStorage with server values
+  // Load from server on mount
   useEffect(() => {
     fetch(`${RELAY_ADDR}/settings`)
       .then((r) => (r.ok ? r.json() : Promise.reject()))
@@ -57,16 +68,13 @@ export function useSettingsSync({
         if (typeof data.italicizeSystem === 'boolean') setItalicizeSystem(data.italicizeSystem);
         if (typeof data.useColoredBackground === 'boolean')
           setUseColoredBackground(data.useColoredBackground);
-        if (Array.isArray(data.disabledChannels)) {
-          const next = new Set<string>(data.disabledChannels as string[]);
-          setDisabledChannels(next);
-          saveDisabledChannels(next);
-        }
-        if (Array.isArray(data.trustedDomains)) {
-          const next = new Set<string>(data.trustedDomains as string[]);
-          setTrustedDomains(next);
-          saveTrustedDomains(next);
-        }
+        if (Array.isArray(data.disabledChannels))
+          setDisabledChannels(new Set<string>(data.disabledChannels as string[]));
+        if (Array.isArray(data.trustedDomains))
+          setTrustedDomains(new Set<string>(data.trustedDomains as string[]));
+        if (typeof data.tellModeAll === 'boolean') setTellModeAll(data.tellModeAll);
+        if (typeof data.ctrlEnterToSend === 'boolean') setCtrlEnterToSend(data.ctrlEnterToSend);
+        if (typeof data.emoteConfirm === 'boolean') setEmoteConfirm(data.emoteConfirm);
 
         // Restore filters / folders, or initialize with defaults if both are empty
         const loadedFilters: CustomFilter[] = Array.isArray(data.filters)
@@ -77,7 +85,6 @@ export function useSettingsSync({
           : [];
 
         if (loadedFilters.length === 0 && loadedFolders.length === 0) {
-          // Neither filters nor folders exist — generate defaults
           const defaultFilter: CustomFilter = {
             name: 'General',
             showChannelTypes: TRACKED_CHANNEL_TYPES,
@@ -136,6 +143,9 @@ export function useSettingsSync({
           trustedDomains: Array.from(trustedDomains),
           filters,
           folders,
+          tellModeAll,
+          ctrlEnterToSend,
+          emoteConfirm,
         }),
       }).catch(() => {});
     }, 500);
@@ -152,5 +162,8 @@ export function useSettingsSync({
     trustedDomains,
     filters,
     folders,
+    tellModeAll,
+    ctrlEnterToSend,
+    emoteConfirm,
   ]);
 }

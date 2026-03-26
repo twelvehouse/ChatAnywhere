@@ -2,7 +2,6 @@ import type { Dispatch, SetStateAction } from 'react';
 import styles from './ChannelSettings.module.css';
 import { ALL_CHANNELS } from '../../constants/channels';
 import { getBadgeInfoByPrefix } from '../../lib/channelUtils';
-import { saveDisabledChannels } from '../../lib/storageUtils';
 import type { ChannelOption } from '../../types/chat';
 
 interface Props {
@@ -33,7 +32,6 @@ export function ChannelSettings({
       } else {
         next.add(prefix);
       }
-      saveDisabledChannels(next);
       if (next.has(selectedSendPrefix)) {
         const first = mergedChannels.find((c) => !next.has(c.prefix));
         if (first) setSelectedSendPrefix(first.prefix);

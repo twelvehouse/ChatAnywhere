@@ -1,4 +1,3 @@
-import { saveTrustedDomains } from '../../lib/storageUtils';
 import type { Dispatch, SetStateAction } from 'react';
 import styles from './LinkConfirmModal.module.css';
 
@@ -21,11 +20,7 @@ export function LinkConfirmModal({
     if (trustDomain) {
       try {
         const { hostname } = new URL(confirmLink);
-        setTrustedDomains((prev) => {
-          const next = new Set(prev).add(hostname);
-          saveTrustedDomains(next);
-          return next;
-        });
+        setTrustedDomains((prev) => new Set(prev).add(hostname));
       } catch {
         /* invalid URL — skip saving domain */
       }
