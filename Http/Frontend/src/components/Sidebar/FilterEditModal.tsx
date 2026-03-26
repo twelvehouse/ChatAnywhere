@@ -209,6 +209,10 @@ export function FilterEditModal({
               </option>
             ))}
           </select>
+          <span className="form-hint">
+            If the selected channel is unavailable (disabled or not joined in-game), the filter will
+            sync with the in-game channel instead.
+          </span>
         </div>
 
         {/* ── Show Channel Types ── */}

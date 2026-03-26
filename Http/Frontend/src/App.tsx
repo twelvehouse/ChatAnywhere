@@ -280,17 +280,24 @@ function App() {
 
   // ── Sidebar filter selection ───────────────────────────────────
   const handleSelectFilter = (name: string) => {
-    // Save current send prefix when leaving a sync tab
+    // Save current send prefix when leaving a sync tab (null prefix or unavailable channel)
     const currentFilter = filters.find((f) => f.name === activeFilterName);
-    if (currentFilter && currentFilter.defaultSendPrefix === null) {
+    const currentIsSync =
+      currentFilter &&
+      (currentFilter.defaultSendPrefix === null ||
+        !sendChannels.some((c) => c.prefix === currentFilter.defaultSendPrefix));
+    if (currentIsSync) {
       setSyncTabPrefixMap((prev) => ({ ...prev, [activeFilterName]: selectedSendPrefix }));
     }
 
     const filter = filters.find((f) => f.name === name);
     if (filter) {
-      if (filter.defaultSendPrefix !== null) {
-        setSelectedSendPrefix(filter.defaultSendPrefix);
+      const prefix = filter.defaultSendPrefix;
+      const isAvailable = prefix !== null && sendChannels.some((c) => c.prefix === prefix);
+      if (isAvailable) {
+        setSelectedSendPrefix(prefix);
       } else if (retainSyncSendPrefix) {
+        // Treat unavailable channel as Sync: restore saved prefix if available
         const saved = syncTabPrefixMap[name];
         if (saved !== undefined) setSelectedSendPrefix(saved);
       }
