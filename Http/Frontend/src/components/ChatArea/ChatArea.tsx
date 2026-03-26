@@ -23,6 +23,7 @@ interface Props {
   hasMore: boolean;
   isLoadingOlder: boolean;
   messagesContainerRef: React.RefObject<HTMLDivElement>;
+  messagesInnerRef: React.RefObject<HTMLDivElement>;
   scrollToBottomRef: React.MutableRefObject<(() => void) | null>;
   onScroll: (e: UIEvent<HTMLDivElement>) => void;
   onDismissBanner: () => void;
@@ -65,6 +66,7 @@ export function ChatArea({
   hasMore,
   isLoadingOlder,
   messagesContainerRef,
+  messagesInnerRef,
   scrollToBottomRef,
   onScroll,
   onDismissBanner,
@@ -109,6 +111,7 @@ export function ChatArea({
         hasMore={hasMore}
         isLoadingOlder={isLoadingOlder}
         messagesContainerRef={messagesContainerRef}
+        messagesInnerRef={messagesInnerRef}
         scrollToBottomRef={scrollToBottomRef}
         onScroll={onScroll}
         onDismissBanner={onDismissBanner}

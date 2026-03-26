@@ -97,6 +97,7 @@ interface Props {
   hasMore: boolean;
   isLoadingOlder: boolean;
   messagesContainerRef: React.RefObject<HTMLDivElement>;
+  messagesInnerRef: React.RefObject<HTMLDivElement>;
   scrollToBottomRef: React.MutableRefObject<(() => void) | null>;
   onScroll: (e: UIEvent<HTMLDivElement>) => void;
   onDismissBanner: () => void;
@@ -118,6 +119,7 @@ export function MessageList({
   hasMore,
   isLoadingOlder,
   messagesContainerRef,
+  messagesInnerRef,
   scrollToBottomRef,
   onScroll,
   onDismissBanner,
@@ -216,33 +218,37 @@ export function MessageList({
 
       <ErrorBoundary>
         <div className={styles.messages} ref={messagesContainerRef} onScroll={onScroll}>
-          {hasMore && <div ref={topSentinelRef} className={styles['load-more-sentinel']} />}
-          {isLoadingOlder && <div className={styles['loading-older']}>Loading older messages…</div>}
+          <div ref={messagesInnerRef} className={styles['messages-inner']}>
+            {hasMore && <div ref={topSentinelRef} className={styles['load-more-sentinel']} />}
+            {isLoadingOlder && (
+              <div className={styles['loading-older']}>Loading older messages…</div>
+            )}
 
-          {messages.length === 0 && (
-            <div className={styles['messages-empty']}>
-              <div className={styles['messages-empty-icon']}>💬</div>
-              <div>
-                {isConnected ? 'No messages in this filter.' : 'Waiting for chat stream...'}
+            {messages.length === 0 && (
+              <div className={styles['messages-empty']}>
+                <div className={styles['messages-empty-icon']}>💬</div>
+                <div>
+                  {isConnected ? 'No messages in this filter.' : 'Waiting for chat stream...'}
+                </div>
               </div>
-            </div>
-          )}
+            )}
 
-          {messages.map((msg, index) => (
-            <MessageItem
-              key={`${msg.Timestamp}-${msg.Type}-${msg.SenderName}-${index}`}
-              msg={msg}
-              prevMsg={index > 0 ? messages[index - 1] : null}
-              nextMsg={index < messages.length - 1 ? messages[index + 1] : null}
-              tellRef={tellRefs[index]}
-              onLinkClick={onLinkClick}
-              italicizeSystem={italicizeSystem}
-              useColoredBackground={useColoredBackground}
-              tellModeAll={tellModeAll}
-              onReply={onReply}
-              trustedDomains={trustedDomains}
-            />
-          ))}
+            {messages.map((msg, index) => (
+              <MessageItem
+                key={`${msg.Timestamp}-${msg.Type}-${msg.SenderName}-${index}`}
+                msg={msg}
+                prevMsg={index > 0 ? messages[index - 1] : null}
+                nextMsg={index < messages.length - 1 ? messages[index + 1] : null}
+                tellRef={tellRefs[index]}
+                onLinkClick={onLinkClick}
+                italicizeSystem={italicizeSystem}
+                useColoredBackground={useColoredBackground}
+                tellModeAll={tellModeAll}
+                onReply={onReply}
+                trustedDomains={trustedDomains}
+              />
+            ))}
+          </div>
         </div>
       </ErrorBoundary>
 

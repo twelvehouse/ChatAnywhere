@@ -139,6 +139,7 @@ function App() {
 
   const {
     messagesContainerRef,
+    messagesInnerRef,
     scrollToBottomRef,
     isNearBottomRef,
     handleScroll,
@@ -376,6 +377,7 @@ function App() {
         hasMore={hasMore}
         isLoadingOlder={isLoadingOlder}
         messagesContainerRef={messagesContainerRef}
+        messagesInnerRef={messagesInnerRef}
         scrollToBottomRef={scrollToBottomRef}
         onScroll={handleScroll}
         onDismissBanner={() => setBannerCount(0)}

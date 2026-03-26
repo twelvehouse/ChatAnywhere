@@ -8,6 +8,7 @@ interface Options {
 
 interface Result {
   messagesContainerRef: React.RefObject<HTMLDivElement>;
+  messagesInnerRef: React.RefObject<HTMLDivElement>;
   scrollToBottomRef: React.MutableRefObject<(() => void) | null>;
   isNearBottomRef: React.RefObject<boolean>;
   handleScroll: (e: UIEvent<HTMLDivElement>) => void;
@@ -17,6 +18,7 @@ interface Result {
 
 export function useScrollBehavior({ activeFilterName, filteredMessagesLength }: Options): Result {
   const messagesContainerRef = useRef<HTMLDivElement>(null);
+  const messagesInnerRef = useRef<HTMLDivElement>(null);
   const isNearBottomRef = useRef(true);
   // Populated by MessageList once the virtualizer is ready (MutableRefObject to allow writes)
   const scrollToBottomRef = useRef<(() => void) | null>(null);
@@ -54,8 +56,20 @@ export function useScrollBehavior({ activeFilterName, filteredMessagesLength }: 
       }
     });
 
-    observer.observe(el);
-    return () => observer.disconnect();
+    const innerEl = messagesInnerRef.current;
+    if (innerEl) observer.observe(innerEl);
+
+    const handleImageLoad = () => {
+      if (isNearBottomRef.current) {
+        scrollToBottom();
+      }
+    };
+    el.addEventListener('load', handleImageLoad, true);
+
+    return () => {
+      observer.disconnect();
+      el.removeEventListener('load', handleImageLoad, true);
+    };
   }, []);
 
   const handleScroll = (e: UIEvent<HTMLDivElement>) => {
@@ -69,6 +83,7 @@ export function useScrollBehavior({ activeFilterName, filteredMessagesLength }: 
 
   return {
     messagesContainerRef,
+    messagesInnerRef,
     scrollToBottomRef,
     isNearBottomRef,
     handleScroll,
