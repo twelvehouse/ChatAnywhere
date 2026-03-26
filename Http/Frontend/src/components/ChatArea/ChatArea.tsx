@@ -1,4 +1,4 @@
-import type { KeyboardEvent, UIEvent } from 'react';
+import type { UIEvent } from 'react';
 import styles from './ChatArea.module.css';
 import { ChatHeader } from './ChatHeader';
 import { MessageList } from './MessageList';
@@ -39,14 +39,12 @@ interface Props {
   onToggleReplyPin: () => void;
   trustedDomains: Set<string>;
   // Input
-  inputText: string;
   sendChannels: ChannelOption[];
   selectedSendPrefix: string;
   showCharPicker: boolean;
-  onInputChange: (text: string) => void;
+  ctrlEnterToSend: boolean;
+  onSend: (text: string) => void;
   onSendPrefixChange: (prefix: string) => void;
-  onKeyDown: (e: KeyboardEvent<HTMLInputElement>) => void;
-  onSendClick: () => void;
   onToggleCharPicker: () => void;
   onExecuteEmote: (command: string) => void;
   emoteConfirm: boolean;
@@ -81,14 +79,12 @@ export function ChatArea({
   onClearReply,
   onToggleReplyPin,
   trustedDomains,
-  inputText,
   sendChannels,
   selectedSendPrefix,
   showCharPicker,
-  onInputChange,
+  ctrlEnterToSend,
+  onSend,
   onSendPrefixChange,
-  onKeyDown,
-  onSendClick,
   onToggleCharPicker,
   onExecuteEmote,
   emoteConfirm,
@@ -126,15 +122,13 @@ export function ChatArea({
       />
 
       <InputArea
-        inputText={inputText}
         isConnected={isConnected}
         sendChannels={sendChannels}
         selectedSendPrefix={selectedSendPrefix}
         showCharPicker={showCharPicker}
-        onInputChange={onInputChange}
+        ctrlEnterToSend={ctrlEnterToSend}
+        onSend={onSend}
         onSendPrefixChange={onSendPrefixChange}
-        onKeyDown={onKeyDown}
-        onSendClick={onSendClick}
         onToggleCharPicker={onToggleCharPicker}
         onExecuteEmote={onExecuteEmote}
         emoteConfirm={emoteConfirm}

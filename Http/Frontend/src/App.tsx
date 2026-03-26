@@ -1,5 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
-import type { KeyboardEvent } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import styles from './App.module.css';
 import { addGfdStylesheet } from './lib/gfd';
 import { usePaginatedHistory } from './hooks/useHistory';
@@ -31,7 +30,6 @@ function App() {
   const [bannerCount, setBannerCount] = useState(0);
 
   // ── Input state ────────────────────────────────────────────────
-  const [inputText, setInputText] = useState('');
   const [showCharPicker, setShowCharPicker] = useState(false);
 
   // ── Settings state ─────────────────────────────────────────────
@@ -76,11 +74,21 @@ function App() {
   });
 
   // ── Derived state ──────────────────────────────────────────────
-  const sendChannels = serverChannels.filter((c) => !disabledChannels.has(c.prefix));
-  const activeFilter = filters.find((f) => f.name === activeFilterName) ?? null;
-  const filteredMessages = activeFilter
-    ? messages.filter((m) => activeFilter.showChannelTypes.includes(m.Type))
-    : messages;
+  const sendChannels = useMemo(
+    () => serverChannels.filter((c) => !disabledChannels.has(c.prefix)),
+    [serverChannels, disabledChannels],
+  );
+  const activeFilter = useMemo(
+    () => filters.find((f) => f.name === activeFilterName) ?? null,
+    [filters, activeFilterName],
+  );
+  const filteredMessages = useMemo(
+    () =>
+      activeFilter
+        ? messages.filter((m) => activeFilter.showChannelTypes.includes(m.Type))
+        : messages,
+    [activeFilter, messages],
+  );
 
   // ── URL-driven filter selection ────────────────────────────────
   const selectFilter = (name: string) => {
@@ -255,7 +263,6 @@ function App() {
     } else {
       payloadText = isCommand ? text : `${selectedSendPrefix}${text}`;
     }
-    setInputText('');
     if (replyTarget && !replyPinned) setReplyTarget(null);
     try {
       await fetch(`${RELAY_ADDR}/send`, {
@@ -269,14 +276,6 @@ function App() {
   };
 
   const handleExecuteEmote = (command: string) => sendMessage(command);
-
-  const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') {
-      if (ctrlEnterToSend && !e.ctrlKey) return;
-      e.preventDefault();
-      sendMessage(inputText);
-    }
-  };
 
   // ── Sidebar filter selection ───────────────────────────────────
   const handleSelectFilter = (name: string) => {
@@ -387,14 +386,12 @@ function App() {
         onLinkClick={openLink}
         italicizeSystem={italicizeSystem}
         useColoredBackground={useColoredBackground}
-        inputText={inputText}
         sendChannels={sendChannels}
         selectedSendPrefix={selectedSendPrefix}
         showCharPicker={showCharPicker}
-        onInputChange={setInputText}
+        ctrlEnterToSend={ctrlEnterToSend}
+        onSend={sendMessage}
         onSendPrefixChange={setSelectedSendPrefix}
-        onKeyDown={handleKeyDown}
-        onSendClick={() => sendMessage(inputText)}
         onToggleCharPicker={() => setShowCharPicker((o) => !o)}
         onExecuteEmote={handleExecuteEmote}
         emoteConfirm={emoteConfirm}

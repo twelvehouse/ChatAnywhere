@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import type { KeyboardEvent } from 'react';
 import styles from './InputArea.module.css';
 import { ChannelSelect } from '../ChannelSelect/ChannelSelect';
@@ -23,15 +23,13 @@ function PinIcon() {
 }
 
 interface Props {
-  inputText: string;
   isConnected: boolean;
   sendChannels: ChannelOption[];
   selectedSendPrefix: string;
   showCharPicker: boolean;
-  onInputChange: (text: string) => void;
+  ctrlEnterToSend: boolean;
+  onSend: (text: string) => void;
   onSendPrefixChange: (prefix: string) => void;
-  onKeyDown: (e: KeyboardEvent<HTMLInputElement>) => void;
-  onSendClick: () => void;
   onToggleCharPicker: () => void;
   onExecuteEmote: (command: string) => void;
   emoteConfirm: boolean;
@@ -42,15 +40,13 @@ interface Props {
 }
 
 export function InputArea({
-  inputText,
   isConnected,
   sendChannels,
   selectedSendPrefix,
   showCharPicker,
-  onInputChange,
+  ctrlEnterToSend,
+  onSend,
   onSendPrefixChange,
-  onKeyDown,
-  onSendClick,
   onToggleCharPicker,
   onExecuteEmote,
   emoteConfirm,
@@ -60,6 +56,7 @@ export function InputArea({
   onToggleReplyPin,
 }: Props) {
   const inputAreaRef = useRef<HTMLDivElement>(null);
+  const [inputText, setInputText] = useState('');
 
   const currentChannel =
     sendChannels.find((c) => c.prefix === selectedSendPrefix) ?? sendChannels[0];
@@ -80,6 +77,20 @@ export function InputArea({
     if (inTellMode) onClearReply();
   };
 
+  const handleSend = () => {
+    if (!inputText.trim() || !isConnected) return;
+    onSend(inputText);
+    setInputText('');
+  };
+
+  const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      if (ctrlEnterToSend && !e.ctrlKey) return;
+      e.preventDefault();
+      handleSend();
+    }
+  };
+
   // Shared input row content
   const inputRowContent = (innerClass: string) => (
     <div className={innerClass}>
@@ -95,8 +106,8 @@ export function InputArea({
         className={styles['chat-input']}
         placeholder={placeholder}
         value={inputText}
-        onChange={(e) => onInputChange(e.target.value)}
-        onKeyDown={onKeyDown}
+        onChange={(e) => setInputText(e.target.value)}
+        onKeyDown={handleKeyDown}
         disabled={!isConnected}
         autoFocus
       />
@@ -114,7 +125,7 @@ export function InputArea({
       <button
         type="button"
         className={styles['send-btn']}
-        onClick={onSendClick}
+        onClick={handleSend}
         disabled={!inputText.trim() || !isConnected}
         aria-label="Send"
         data-tooltip="Send Message"
@@ -131,7 +142,7 @@ export function InputArea({
       </button>
       {showCharPicker && (
         <EmoteSymbolPicker
-          onInsert={(text) => onInputChange(inputText + text)}
+          onInsert={(text) => setInputText((prev) => prev + text)}
           onExecute={onExecuteEmote}
           emoteConfirm={emoteConfirm}
         />
