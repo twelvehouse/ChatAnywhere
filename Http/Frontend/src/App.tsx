@@ -130,7 +130,17 @@ function App() {
         urlFilterName && loadedFilters.some((f) => f.name === urlFilterName)
           ? urlFilterName
           : (loadedFilters[0]?.name ?? '');
-      if (targetName) selectFilter(targetName);
+      if (targetName) {
+        // Update refs immediately so SSE handlers see correct values before re-render
+        activeFilterNameRef.current = targetName;
+        filtersRef.current = loadedFilters;
+
+        selectFilter(targetName);
+        const defaultPrefix = loadedFilters.find((f) => f.name === targetName)?.defaultSendPrefix;
+        if (defaultPrefix != null) {
+          setSelectedSendPrefix(defaultPrefix);
+        }
+      }
     },
   });
 
