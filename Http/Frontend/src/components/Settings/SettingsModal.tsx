@@ -35,6 +35,8 @@ interface Props {
   setCtrlEnterToSend: Dispatch<SetStateAction<boolean>>;
   emoteConfirm: boolean;
   setEmoteConfirm: Dispatch<SetStateAction<boolean>>;
+  retainSyncSendPrefix: boolean;
+  setRetainSyncSendPrefix: Dispatch<SetStateAction<boolean>>;
   // Control
   onClose: () => void;
 }
@@ -61,6 +63,8 @@ export function SettingsModal({
   setCtrlEnterToSend,
   emoteConfirm,
   setEmoteConfirm,
+  retainSyncSendPrefix,
+  setRetainSyncSendPrefix,
   onClose,
 }: Props) {
   const [category, setCategory] = useState<SettingsCategory>('appearance');
@@ -213,6 +217,8 @@ export function SettingsModal({
                 setCtrlEnterToSend={setCtrlEnterToSend}
                 emoteConfirm={emoteConfirm}
                 setEmoteConfirm={setEmoteConfirm}
+                retainSyncSendPrefix={retainSyncSendPrefix}
+                setRetainSyncSendPrefix={setRetainSyncSendPrefix}
               />
             )}
           </div>

@@ -7,6 +7,8 @@ interface Props {
   setCtrlEnterToSend: Dispatch<SetStateAction<boolean>>;
   emoteConfirm: boolean;
   setEmoteConfirm: Dispatch<SetStateAction<boolean>>;
+  retainSyncSendPrefix: boolean;
+  setRetainSyncSendPrefix: Dispatch<SetStateAction<boolean>>;
 }
 
 export function OthersSettings({
@@ -16,6 +18,8 @@ export function OthersSettings({
   setCtrlEnterToSend,
   emoteConfirm,
   setEmoteConfirm,
+  retainSyncSendPrefix,
+  setRetainSyncSendPrefix,
 }: Props) {
   return (
     <>
@@ -52,6 +56,22 @@ export function OthersSettings({
         >
           <span className="form-row-label">Confirm before executing emote</span>
           <div className={`toggle-switch${emoteConfirm ? ' on' : ''}`}>
+            <div className="toggle-knob" />
+          </div>
+        </div>
+      </div>
+
+      <div className="form-section">
+        <div className="form-section-title">SEND DESTINATION</div>
+        <div
+          className="form-row"
+          style={{ cursor: 'pointer' }}
+          onClick={() => setRetainSyncSendPrefix((v) => !v)}
+        >
+          <span className="form-row-label">
+            Retain send destination when returning to a Sync tab
+          </span>
+          <div className={`toggle-switch${retainSyncSendPrefix ? ' on' : ''}`}>
             <div className="toggle-knob" />
           </div>
         </div>

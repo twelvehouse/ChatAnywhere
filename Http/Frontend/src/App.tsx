@@ -44,6 +44,10 @@ function App() {
   const [tellModeAll, setTellModeAll] = useState(true);
   const [ctrlEnterToSend, setCtrlEnterToSend] = useState(false);
   const [emoteConfirm, setEmoteConfirm] = useState(true);
+  const [retainSyncSendPrefix, setRetainSyncSendPrefix] = useState(true);
+
+  // ── Sync tab prefix map (session only) ─────────────────────────
+  const [syncTabPrefixMap, setSyncTabPrefixMap] = useState<Record<string, string>>({});
 
   // ── Player state ───────────────────────────────────────────────
   const [localPlayerName, setLocalPlayerName] = useState('');
@@ -99,6 +103,7 @@ function App() {
     tellModeAll,
     ctrlEnterToSend,
     emoteConfirm,
+    retainSyncSendPrefix,
     setFontFamily,
     setFontSize,
     setItalicizeSystem,
@@ -110,6 +115,7 @@ function App() {
     setTellModeAll,
     setCtrlEnterToSend,
     setEmoteConfirm,
+    setRetainSyncSendPrefix,
     onFiltersReady: (loadedFilters) => {
       const urlFilterName = new URL(window.location.href).searchParams.get('filter');
       const targetName =
@@ -274,9 +280,20 @@ function App() {
 
   // ── Sidebar filter selection ───────────────────────────────────
   const handleSelectFilter = (name: string) => {
+    // Save current send prefix when leaving a sync tab
+    const currentFilter = filters.find((f) => f.name === activeFilterName);
+    if (currentFilter && currentFilter.defaultSendPrefix === null) {
+      setSyncTabPrefixMap((prev) => ({ ...prev, [activeFilterName]: selectedSendPrefix }));
+    }
+
     const filter = filters.find((f) => f.name === name);
-    if (filter && filter.defaultSendPrefix !== null) {
-      setSelectedSendPrefix(filter.defaultSendPrefix);
+    if (filter) {
+      if (filter.defaultSendPrefix !== null) {
+        setSelectedSendPrefix(filter.defaultSendPrefix);
+      } else if (retainSyncSendPrefix) {
+        const saved = syncTabPrefixMap[name];
+        if (saved !== undefined) setSelectedSendPrefix(saved);
+      }
     }
     selectFilter(name);
     setReplyTarget(null);
@@ -407,6 +424,8 @@ function App() {
           setCtrlEnterToSend={setCtrlEnterToSend}
           emoteConfirm={emoteConfirm}
           setEmoteConfirm={setEmoteConfirm}
+          retainSyncSendPrefix={retainSyncSendPrefix}
+          setRetainSyncSendPrefix={setRetainSyncSendPrefix}
           onClose={() => setShowSettings(false)}
         />
       )}

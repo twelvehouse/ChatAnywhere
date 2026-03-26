@@ -16,6 +16,7 @@ interface Props {
   tellModeAll: boolean;
   ctrlEnterToSend: boolean;
   emoteConfirm: boolean;
+  retainSyncSendPrefix: boolean;
   setFontFamily: Dispatch<SetStateAction<string>>;
   setFontSize: Dispatch<SetStateAction<number>>;
   setItalicizeSystem: Dispatch<SetStateAction<boolean>>;
@@ -27,6 +28,7 @@ interface Props {
   setTellModeAll: Dispatch<SetStateAction<boolean>>;
   setCtrlEnterToSend: Dispatch<SetStateAction<boolean>>;
   setEmoteConfirm: Dispatch<SetStateAction<boolean>>;
+  setRetainSyncSendPrefix: Dispatch<SetStateAction<boolean>>;
   onFiltersReady: (filters: CustomFilter[], folders: FilterFolder[]) => void;
 }
 
@@ -42,6 +44,7 @@ export function useSettingsSync({
   tellModeAll,
   ctrlEnterToSend,
   emoteConfirm,
+  retainSyncSendPrefix,
   setFontFamily,
   setFontSize,
   setItalicizeSystem,
@@ -53,6 +56,7 @@ export function useSettingsSync({
   setTellModeAll,
   setCtrlEnterToSend,
   setEmoteConfirm,
+  setRetainSyncSendPrefix,
   onFiltersReady,
 }: Props) {
   const serverLoadedRef = useRef(false);
@@ -75,6 +79,8 @@ export function useSettingsSync({
         if (typeof data.tellModeAll === 'boolean') setTellModeAll(data.tellModeAll);
         if (typeof data.ctrlEnterToSend === 'boolean') setCtrlEnterToSend(data.ctrlEnterToSend);
         if (typeof data.emoteConfirm === 'boolean') setEmoteConfirm(data.emoteConfirm);
+        if (typeof data.retainSyncSendPrefix === 'boolean')
+          setRetainSyncSendPrefix(data.retainSyncSendPrefix);
 
         // Restore filters / folders, or initialize with defaults if both are empty
         const loadedFilters: CustomFilter[] = Array.isArray(data.filters)
@@ -146,6 +152,7 @@ export function useSettingsSync({
           tellModeAll,
           ctrlEnterToSend,
           emoteConfirm,
+          retainSyncSendPrefix,
         }),
       }).catch(() => {});
     }, 500);
@@ -165,5 +172,6 @@ export function useSettingsSync({
     tellModeAll,
     ctrlEnterToSend,
     emoteConfirm,
+    retainSyncSendPrefix,
   ]);
 }
