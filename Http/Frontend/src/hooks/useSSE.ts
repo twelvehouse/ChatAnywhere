@@ -17,6 +17,7 @@ interface UseSSEOptions {
   isNearBottomRef: RefObject<boolean>;
   activeFilterNameRef: RefObject<string>;
   filtersRef: RefObject<CustomFilter[]>;
+  lastGameChannelRef: RefObject<string>;
 }
 
 export function useSSE({
@@ -31,6 +32,7 @@ export function useSSE({
   isNearBottomRef,
   activeFilterNameRef,
   filtersRef,
+  lastGameChannelRef,
 }: UseSSEOptions): void {
   // SSE connection with exponential-backoff reconnect
   useEffect(() => {
@@ -81,6 +83,8 @@ export function useSSE({
           }
 
           if (data.type === 'active-channel') {
+            // Always track the latest game channel, regardless of the active filter
+            if (data.prefix) lastGameChannelRef.current = data.prefix;
             // Only sync with game when the active filter has no fixed send prefix
             const activeFilter = filtersRef.current?.find(
               (f) => f.name === activeFilterNameRef.current,
@@ -143,6 +147,7 @@ export function useSSE({
     setLocalPlayerWorld,
     activeFilterNameRef,
     filtersRef,
+    lastGameChannelRef,
     isNearBottomRef,
   ]);
 }

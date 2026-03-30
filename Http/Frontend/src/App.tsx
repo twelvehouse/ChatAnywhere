@@ -48,6 +48,9 @@ function App() {
   // ── Sync tab prefix map (session only) ─────────────────────────
   const [syncTabPrefixMap, setSyncTabPrefixMap] = useState<Record<string, string>>({});
 
+  // ── Last known game channel (updated by every active-channel SSE event) ──
+  const lastGameChannelRef = useRef('');
+
   // ── Player state ───────────────────────────────────────────────
   const [localPlayerName, setLocalPlayerName] = useState('');
   const [localPlayerWorld, setLocalPlayerWorld] = useState('');
@@ -170,6 +173,7 @@ function App() {
     isNearBottomRef,
     activeFilterNameRef,
     filtersRef,
+    lastGameChannelRef,
   });
 
   // ── Font effects ───────────────────────────────────────────────
@@ -305,9 +309,13 @@ function App() {
       if (isAvailable) {
         setSelectedSendPrefix(prefix);
       } else if (retainSyncSendPrefix) {
-        // Treat unavailable channel as Sync: restore saved prefix if available
+        // Treat unavailable channel as Sync: restore saved prefix, or fall back to last game channel
         const saved = syncTabPrefixMap[name];
-        if (saved !== undefined) setSelectedSendPrefix(saved);
+        if (saved !== undefined) {
+          setSelectedSendPrefix(saved);
+        } else if (lastGameChannelRef.current) {
+          setSelectedSendPrefix(lastGameChannelRef.current);
+        }
       }
     }
     selectFilter(name);
