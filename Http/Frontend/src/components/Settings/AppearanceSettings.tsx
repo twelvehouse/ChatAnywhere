@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import type { Dispatch, SetStateAction } from 'react';
 import type { ChatMessage } from '../../types/chat';
 import styles from './AppearanceSettings.module.css';
@@ -52,19 +51,13 @@ export function AppearanceSettings({
   setItalicizeSystem,
   setUseColoredBackground,
 }: Props) {
-  const [previewTime] = useState(() => Date.now());
-
-  // Re-stamp preview messages with a stable time captured at component mount
-  const shoutMsg = { ...PREVIEW_SHOUT, Timestamp: previewTime };
-  const emoteMsg = { ...PREVIEW_EMOTE, Timestamp: previewTime + 30000 };
-
   return (
     <>
       <div className="form-section">
         <MessageItem
-          msg={shoutMsg}
+          msg={PREVIEW_SHOUT}
           prevMsg={null}
-          nextMsg={emoteMsg}
+          nextMsg={PREVIEW_EMOTE}
           tellRef={null}
           onLinkClick={NOOP}
           italicizeSystem={italicizeSystem}
@@ -73,8 +66,8 @@ export function AppearanceSettings({
           onReply={NOOP}
         />
         <MessageItem
-          msg={emoteMsg}
-          prevMsg={shoutMsg}
+          msg={PREVIEW_EMOTE}
+          prevMsg={PREVIEW_SHOUT}
           nextMsg={null}
           tellRef={null}
           onLinkClick={NOOP}

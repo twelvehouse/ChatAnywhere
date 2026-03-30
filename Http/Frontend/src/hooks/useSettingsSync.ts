@@ -4,6 +4,18 @@ import { RELAY_ADDR } from '../constants/config';
 import type { CustomFilter, FilterFolder } from '../types/filter';
 import { TRACKED_CHANNEL_TYPES } from '../constants/channels';
 
+const DEFAULT_FILTER: CustomFilter = {
+  name: 'General',
+  showChannelTypes: TRACKED_CHANNEL_TYPES,
+  defaultSendPrefix: null,
+  notifyUnread: false,
+};
+
+const DEFAULT_FOLDER: FilterFolder = {
+  name: 'Filters',
+  filters: ['General'],
+};
+
 interface Props {
   fontFamily: string;
   fontSize: number;
@@ -91,19 +103,9 @@ export function useSettingsSync({
           : [];
 
         if (loadedFilters.length === 0 && loadedFolders.length === 0) {
-          const defaultFilter: CustomFilter = {
-            name: 'General',
-            showChannelTypes: TRACKED_CHANNEL_TYPES,
-            defaultSendPrefix: null,
-            notifyUnread: false,
-          };
-          const defaultFolder: FilterFolder = {
-            name: 'Filters',
-            filters: ['General'],
-          };
-          setFilters([defaultFilter]);
-          setFolders([defaultFolder]);
-          onFiltersReady([defaultFilter], [defaultFolder]);
+          setFilters([DEFAULT_FILTER]);
+          setFolders([DEFAULT_FOLDER]);
+          onFiltersReady([DEFAULT_FILTER], [DEFAULT_FOLDER]);
         } else {
           setFilters(loadedFilters);
           setFolders(loadedFolders);
@@ -111,20 +113,9 @@ export function useSettingsSync({
         }
       })
       .catch(() => {
-        // Server unreachable — fall back to defaults
-        const defaultFilter: CustomFilter = {
-          name: 'General',
-          showChannelTypes: TRACKED_CHANNEL_TYPES,
-          defaultSendPrefix: null,
-          notifyUnread: false,
-        };
-        const defaultFolder: FilterFolder = {
-          name: 'Filters',
-          filters: ['General'],
-        };
-        setFilters([defaultFilter]);
-        setFolders([defaultFolder]);
-        onFiltersReady([defaultFilter], [defaultFolder]);
+        setFilters([DEFAULT_FILTER]);
+        setFolders([DEFAULT_FOLDER]);
+        onFiltersReady([DEFAULT_FILTER], [DEFAULT_FOLDER]);
       })
       .finally(() => {
         serverLoadedRef.current = true;

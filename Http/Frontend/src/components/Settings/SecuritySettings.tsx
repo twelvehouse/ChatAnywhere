@@ -30,7 +30,7 @@ export function SecuritySettings({ trustedDomains, setTrustedDomains }: Props) {
       </div>
 
       <div className={styles['domain-list']}>
-        {BUILT_IN_TRUSTED_DOMAINS.map((domain) => (
+        {Array.from(BUILT_IN_TRUSTED_DOMAINS).map((domain) => (
           <div key={domain} className={`${styles['domain-item']} ${styles['domain-item-builtin']}`}>
             <span className={styles['domain-name']}>{domain}</span>
             <span className={styles['builtin-badge']}>built-in</span>

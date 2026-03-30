@@ -7,6 +7,7 @@ import { useSSE } from './hooks/useSSE';
 import { useSettingsSync } from './hooks/useSettingsSync';
 import { useFilterManagement } from './hooks/useFilterManagement';
 import { DEFAULT_CHANNELS } from './constants/channels';
+import { formatPlayerName } from './lib/formatUtils';
 import { RELAY_ADDR } from './constants/config';
 import { Sidebar } from './components/Sidebar/Sidebar';
 import { ChatArea } from './components/ChatArea/ChatArea';
@@ -267,10 +268,7 @@ function App() {
     const isCommand = text.startsWith('/');
     let payloadText: string;
     if (replyTarget && !isCommand) {
-      const target = replyTarget.world
-        ? `${replyTarget.name}@${replyTarget.world}`
-        : replyTarget.name;
-      payloadText = `/tell ${target} ${text}`;
+      payloadText = `/tell ${formatPlayerName(replyTarget.name, replyTarget.world)} ${text}`;
     } else {
       payloadText = isCommand ? text : `${selectedSendPrefix}${text}`;
     }

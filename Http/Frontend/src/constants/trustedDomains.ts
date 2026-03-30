@@ -2,7 +2,7 @@
  * Built-in trusted domains that are always considered safe for link previews.
  * Users can add their own domains in Settings > Security.
  */
-export const BUILT_IN_TRUSTED_DOMAINS: ReadonlyArray<string> = [
+export const BUILT_IN_TRUSTED_DOMAINS: ReadonlySet<string> = new Set([
   // ---- Video ----
   'www.youtube.com',
   'youtube.com',
@@ -52,11 +52,20 @@ export const BUILT_IN_TRUSTED_DOMAINS: ReadonlyArray<string> = [
   // ---- Other ----
   'steamcommunity.com',
   'store.steampowered.com',
-];
+]);
 
 /** Returns true if the hostname is in the built-in or user-added trusted list. */
 export function isTrustedDomain(hostname: string, userTrusted: Set<string>): boolean {
-  return BUILT_IN_TRUSTED_DOMAINS.includes(hostname) || userTrusted.has(hostname);
+  return BUILT_IN_TRUSTED_DOMAINS.has(hostname) || userTrusted.has(hostname);
+}
+
+/** Parses a URL and returns its hostname, or null if invalid. */
+export function getHostname(url: string): string | null {
+  try {
+    return new URL(url).hostname;
+  } catch {
+    return null;
+  }
 }
 
 /** Returns true if the URL points to a direct image resource. */

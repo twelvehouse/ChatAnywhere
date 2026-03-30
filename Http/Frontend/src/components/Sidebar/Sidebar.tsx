@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef } from 'react';
 import {
   DndContext,
   DragOverlay,
@@ -18,10 +18,14 @@ import {
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import styles from './Sidebar.module.css';
+import { useOnClickOutside } from '../../hooks/useOnClickOutside';
 import type { CustomFilter, FilterFolder } from '../../types/filter';
 import { FilterEditModal } from './FilterEditModal';
 import { FilterFolderModal } from './FilterFolderModal';
 import { ConfirmDialog } from './ConfirmDialog';
+
+const FOLDER_PREFIX = 'folder:';
+const FILTER_PREFIX = 'filter:';
 
 // ── Context menu state ──────────────────────────────────────────
 type MenuTarget =
@@ -55,7 +59,7 @@ function SortableFilterRow({
   onOpenMenu,
 }: SortableFilterRowProps) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
-    id: `filter:${filterName}`,
+    id: `${FILTER_PREFIX}${filterName}`,
   });
   return (
     <div
@@ -119,7 +123,7 @@ function SortableFolderSection({
   setModal,
 }: SortableFolderSectionProps) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
-    id: `folder:${folder.name}`,
+    id: `${FOLDER_PREFIX}${folder.name}`,
   });
   return (
     <div
@@ -156,7 +160,7 @@ function SortableFolderSection({
       {folder.filters.length === 0 && <div className={styles['channel-empty']}>No filters</div>}
 
       <SortableContext
-        items={folder.filters.map((n) => `filter:${n}`)}
+        items={folder.filters.map((n) => `${FILTER_PREFIX}${n}`)}
         strategy={verticalListSortingStrategy}
       >
         {folder.filters.map((filterName) => {
@@ -228,17 +232,7 @@ export function Sidebar({
     useSensor(TouchSensor, { activationConstraint: { delay: 250, tolerance: 5 } }),
   );
 
-  // Close context menu on outside click
-  useEffect(() => {
-    if (!menu) return;
-    const handler = (e: MouseEvent) => {
-      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
-        setMenu(null);
-      }
-    };
-    document.addEventListener('mousedown', handler);
-    return () => document.removeEventListener('mousedown', handler);
-  }, [menu]);
+  useOnClickOutside(menuRef, () => setMenu(null), !!menu);
 
   const openFilterMenu = (e: React.MouseEvent, filterName: string) => {
     e.stopPropagation();
@@ -262,9 +256,9 @@ export function Sidebar({
     const oId = over.id as string;
 
     // Reorder folders
-    if (aId.startsWith('folder:') && oId.startsWith('folder:')) {
-      const oldIdx = folders.findIndex((f) => `folder:${f.name}` === aId);
-      const newIdx = folders.findIndex((f) => `folder:${f.name}` === oId);
+    if (aId.startsWith(FOLDER_PREFIX) && oId.startsWith(FOLDER_PREFIX)) {
+      const oldIdx = folders.findIndex((f) => `${FOLDER_PREFIX}${f.name}` === aId);
+      const newIdx = folders.findIndex((f) => `${FOLDER_PREFIX}${f.name}` === oId);
       if (oldIdx !== -1 && newIdx !== -1) {
         onReorderFolders(arrayMove(folders, oldIdx, newIdx));
       }
@@ -272,12 +266,12 @@ export function Sidebar({
     }
 
     // Move/reorder filter
-    if (aId.startsWith('filter:')) {
-      const draggedFilter = aId.slice('filter:'.length);
+    if (aId.startsWith(FILTER_PREFIX)) {
+      const draggedFilter = aId.slice(FILTER_PREFIX.length);
 
-      if (oId.startsWith('filter:')) {
+      if (oId.startsWith(FILTER_PREFIX)) {
         // Over another filter: same-folder reorder or cross-folder move
-        const overFilter = oId.slice('filter:'.length);
+        const overFilter = oId.slice(FILTER_PREFIX.length);
         const srcIdx = folders.findIndex((f) => f.filters.includes(draggedFilter));
         const dstIdx = folders.findIndex((f) => f.filters.includes(overFilter));
         if (srcIdx === -1 || dstIdx === -1) return;
@@ -298,9 +292,9 @@ export function Sidebar({
           newFolders[dstIdx].filters.splice(insertAt, 0, draggedFilter);
         }
         onReorderFolders(newFolders);
-      } else if (oId.startsWith('folder:')) {
+      } else if (oId.startsWith(FOLDER_PREFIX)) {
         // Over a folder header: move filter into that folder (e.g. empty folder)
-        const targetFolderName = oId.slice('folder:'.length);
+        const targetFolderName = oId.slice(FOLDER_PREFIX.length);
         const srcIdx = folders.findIndex((f) => f.filters.includes(draggedFilter));
         const dstIdx = folders.findIndex((f) => f.name === targetFolderName);
         if (srcIdx === -1 || dstIdx === -1 || srcIdx === dstIdx) return;
@@ -367,7 +361,7 @@ export function Sidebar({
             onDragEnd={handleDragEnd}
           >
             <SortableContext
-              items={folders.map((f) => `folder:${f.name}`)}
+              items={folders.map((f) => `${FOLDER_PREFIX}${f.name}`)}
               strategy={verticalListSortingStrategy}
             >
               {folders.map((folder) => (
@@ -387,16 +381,16 @@ export function Sidebar({
             </SortableContext>
 
             <DragOverlay dropAnimation={null}>
-              {dragActiveId?.startsWith('folder:') && (
+              {dragActiveId?.startsWith(FOLDER_PREFIX) && (
                 <div className={styles['drag-overlay-folder']}>
-                  {dragActiveId.slice('folder:'.length)}
+                  {dragActiveId.slice(FOLDER_PREFIX.length)}
                 </div>
               )}
-              {dragActiveId?.startsWith('filter:') && (
+              {dragActiveId?.startsWith(FILTER_PREFIX) && (
                 <div className={styles['drag-overlay-filter']}>
                   <span className={styles['channel-hash']}>#</span>
                   <span className={styles['channel-name']}>
-                    {dragActiveId.slice('filter:'.length)}
+                    {dragActiveId.slice(FILTER_PREFIX.length)}
                   </span>
                 </div>
               )}

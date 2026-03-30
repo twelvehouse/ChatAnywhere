@@ -7,8 +7,8 @@ interface Options {
 }
 
 interface Result {
-  messagesContainerRef: React.RefObject<HTMLDivElement>;
-  messagesInnerRef: React.RefObject<HTMLDivElement>;
+  messagesContainerRef: React.RefObject<HTMLDivElement | null>;
+  messagesInnerRef: React.RefObject<HTMLDivElement | null>;
   scrollToBottomRef: React.MutableRefObject<(() => void) | null>;
   isNearBottomRef: React.RefObject<boolean>;
   handleScroll: (e: UIEvent<HTMLDivElement>) => void;
@@ -20,7 +20,6 @@ export function useScrollBehavior({ activeFilterName, filteredMessagesLength }: 
   const messagesContainerRef = useRef<HTMLDivElement>(null);
   const messagesInnerRef = useRef<HTMLDivElement>(null);
   const isNearBottomRef = useRef(true);
-  // Populated by MessageList once the virtualizer is ready (MutableRefObject to allow writes)
   const scrollToBottomRef = useRef<(() => void) | null>(null);
 
   const [hasUnreadDown, setHasUnreadDown] = useState(false);

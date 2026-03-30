@@ -22,8 +22,8 @@ interface Props {
   loadOlder: () => void;
   hasMore: boolean;
   isLoadingOlder: boolean;
-  messagesContainerRef: React.RefObject<HTMLDivElement>;
-  messagesInnerRef: React.RefObject<HTMLDivElement>;
+  messagesContainerRef: React.RefObject<HTMLDivElement | null>;
+  messagesInnerRef: React.RefObject<HTMLDivElement | null>;
   scrollToBottomRef: React.MutableRefObject<(() => void) | null>;
   onScroll: (e: UIEvent<HTMLDivElement>) => void;
   onDismissBanner: () => void;

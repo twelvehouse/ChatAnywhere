@@ -1,7 +1,8 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useRef } from 'react';
 import styles from './ChannelSelect.module.css';
+import { useOnClickOutside } from '../../hooks/useOnClickOutside';
 import { FALLBACK_CHANNEL } from '../../constants/channels';
-import { getBadgeInfoByPrefix, getChannelInfo } from '../../lib/channelUtils';
+import { getBadgeInfoByPrefix, getBadgeStyle, getChannelInfo } from '../../lib/channelUtils';
 import type { ChannelOption } from '../../types/chat';
 
 const TELL_BADGE = getChannelInfo(12);
@@ -24,16 +25,7 @@ export function ChannelSelect({ channels, value, onChange, tellMode = false }: P
       ? getBadgeInfoByPrefix(current.prefix)
       : FALLBACK_CHANNEL;
 
-  useEffect(() => {
-    if (!open) return;
-    const handler = (e: MouseEvent) => {
-      if (ref.current && !ref.current.contains(e.target as Node)) {
-        setOpen(false);
-      }
-    };
-    document.addEventListener('mousedown', handler);
-    return () => document.removeEventListener('mousedown', handler);
-  }, [open]);
+  useOnClickOutside(ref, () => setOpen(false), open);
 
   return (
     <div className={styles['ch-select']} ref={ref}>
@@ -46,14 +38,7 @@ export function ChannelSelect({ channels, value, onChange, tellMode = false }: P
         data-tooltip-pos="top"
         data-picker-open={open ? 'true' : undefined}
       >
-        <span
-          className="channel-badge"
-          style={{
-            color: currentBadge.color,
-            borderColor: `${currentBadge.color}66`,
-            background: `${currentBadge.color}18`,
-          }}
-        >
+        <span className="channel-badge" style={getBadgeStyle(currentBadge)}>
           {currentBadge.label}
         </span>
         <svg

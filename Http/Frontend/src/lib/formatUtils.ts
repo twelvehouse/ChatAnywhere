@@ -2,3 +2,6 @@ export const sanitizeName = (s: string) => s.replace(/[\uE000-\uF8FF]/g, '').tri
 
 export const formatTime = (ts: number) =>
   new Date(ts).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+export const formatPlayerName = (name: string, world?: string) =>
+  world ? `${name}@${world}` : name;

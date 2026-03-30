@@ -1,13 +1,16 @@
-import { getChannelInfo } from '../../lib/channelUtils';
+import { getChannelInfo, getBadgeStyle } from '../../lib/channelUtils';
 import { sanitizeName, formatTime } from '../../lib/formatUtils';
 import { renderPayloads, urlRegex } from '../../lib/renderUtils';
 import { AvatarImage } from './AvatarImage';
 import { ImagePreview, YouTubeCard, OgpCard } from './LinkPreview';
-import { isTrustedDomain, isImageUrl, getYouTubeId } from '../../constants/trustedDomains';
+import {
+  isTrustedDomain,
+  isImageUrl,
+  getYouTubeId,
+  getHostname,
+} from '../../constants/trustedDomains';
+import { TELL_INCOMING, TELL_OUTGOING } from '../../constants/channels';
 import type { ChatMessage } from '../../types/chat';
-
-const TELL_INCOMING = 13;
-const TELL_OUTGOING = 12;
 
 function extractUrls(msg: ChatMessage): string[] {
   const urls: string[] = [];
@@ -126,14 +129,7 @@ export function MessageItem({
         <div className="message-body">
           {!hideHeader && (
             <div className="message-header">
-              <span
-                className="channel-badge"
-                style={{
-                  color: ch.color,
-                  borderColor: `${ch.color}66`,
-                  background: `${ch.color}18`,
-                }}
-              >
+              <span className="channel-badge" style={getBadgeStyle(ch)}>
                 {ch.label}
               </span>
               {hasAuthor && (
@@ -152,16 +148,12 @@ export function MessageItem({
           {(() => {
             const urls = extractUrls(msg);
             for (const url of urls) {
-              try {
-                const hostname = new URL(url).hostname;
-                if (!isTrustedDomain(hostname, trustedDomains)) continue;
-                const ytId = getYouTubeId(url);
-                if (ytId) return <YouTubeCard key={url} videoId={ytId} url={url} />;
-                if (isImageUrl(url)) return <ImagePreview key={url} url={url} />;
-                return <OgpCard key={url} url={url} />;
-              } catch {
-                /* invalid URL */
-              }
+              const hostname = getHostname(url);
+              if (!hostname || !isTrustedDomain(hostname, trustedDomains)) continue;
+              const ytId = getYouTubeId(url);
+              if (ytId) return <YouTubeCard key={url} videoId={ytId} url={url} />;
+              if (isImageUrl(url)) return <ImagePreview key={url} url={url} />;
+              return <OgpCard key={url} url={url} />;
             }
             return null;
           })()}

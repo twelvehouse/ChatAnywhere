@@ -3,10 +3,9 @@ import { useEffect, useRef, useLayoutEffect, useCallback, useMemo } from 'react'
 import styles from './MessageList.module.css';
 import { ErrorBoundary } from '../ErrorBoundary';
 import { MessageItem } from './MessageItem';
+import { TELL_INCOMING, TELL_OUTGOING } from '../../constants/channels';
 import type { ChatMessage } from '../../types/chat';
 
-const TELL_INCOMING = 13;
-const TELL_OUTGOING = 12;
 const TELL_SCAN_LIMIT = 200;
 
 /**
@@ -96,8 +95,8 @@ interface Props {
   loadOlder: () => void;
   hasMore: boolean;
   isLoadingOlder: boolean;
-  messagesContainerRef: React.RefObject<HTMLDivElement>;
-  messagesInnerRef: React.RefObject<HTMLDivElement>;
+  messagesContainerRef: React.RefObject<HTMLDivElement | null>;
+  messagesInnerRef: React.RefObject<HTMLDivElement | null>;
   scrollToBottomRef: React.MutableRefObject<(() => void) | null>;
   onScroll: (e: UIEvent<HTMLDivElement>) => void;
   onDismissBanner: () => void;

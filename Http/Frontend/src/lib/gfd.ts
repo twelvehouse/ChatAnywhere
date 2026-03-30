@@ -1,4 +1,3 @@
-// from kizer, gfd icons
 interface GdfEntry {
   id: number;
   left: number;
@@ -68,6 +67,7 @@ export async function addGfdStylesheet(gfdPath: string, texPath: string) {
   const styleNode = document.createElement('style');
   styleNode.appendChild(document.createTextNode(stylesheet));
   document.head.appendChild(styleNode);
+  URL.revokeObjectURL(texUrl);
 }
 
 async function loadTexAsBlob(path: string) {

@@ -145,6 +145,9 @@ export const CHANNEL_GROUPS: ChannelGroup[] = [
   { label: 'PvP Team', types: [36, 77, 78] },
 ];
 
+export const TELL_OUTGOING = 12;
+export const TELL_INCOMING = 13;
+
 export const PREFIX_TO_CHAT_TYPE: Record<string, number> = {
   '/s ': 10,
   '/sh ': 11,

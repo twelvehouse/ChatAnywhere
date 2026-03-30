@@ -5,7 +5,7 @@ export const urlRegex = /(https?:\/\/[^\s]+)/g;
 export function renderTextWithLinks(text: string, onLinkClick: (url: string) => void) {
   if (!text) return text;
   return text.split(urlRegex).map((part, i) => {
-    if (part.match(urlRegex)) {
+    if (i % 2 === 1) {
       return (
         <a
           key={i}

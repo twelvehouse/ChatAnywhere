@@ -1,7 +1,7 @@
 import type { Dispatch, SetStateAction } from 'react';
 import styles from './ChannelSettings.module.css';
 import { ALL_CHANNELS } from '../../constants/channels';
-import { getBadgeInfoByPrefix } from '../../lib/channelUtils';
+import { getBadgeInfoByPrefix, getBadgeStyle } from '../../lib/channelUtils';
 import type { ChannelOption } from '../../types/chat';
 
 interface Props {
@@ -59,14 +59,7 @@ export function ChannelSettings({
               className={styles['ch-toggle-row']}
               onClick={() => toggleChannel(ch.prefix)}
             >
-              <span
-                className="channel-badge"
-                style={{
-                  color: badge.color,
-                  borderColor: `${badge.color}66`,
-                  background: `${badge.color}18`,
-                }}
-              >
+              <span className="channel-badge" style={getBadgeStyle(badge)}>
                 {badge.label}
               </span>
               <span className={styles['ch-toggle-label']}>{ch.label}</span>

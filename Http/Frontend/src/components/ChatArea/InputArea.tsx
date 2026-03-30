@@ -5,6 +5,7 @@ import { ChannelSelect } from '../ChannelSelect/ChannelSelect';
 import { EmoteSymbolPicker } from '../EmoteSymbolPicker/EmoteSymbolPicker';
 import { AvatarImage } from './AvatarImage';
 import { getBadgeInfoByPrefix } from '../../lib/channelUtils';
+import { formatPlayerName } from '../../lib/formatUtils';
 import type { ChannelOption } from '../../types/chat';
 
 // Thumbtack / pin icon SVG (Bootstrap-style)
@@ -61,11 +62,7 @@ export function InputArea({
   const currentChannel =
     sendChannels.find((c) => c.prefix === selectedSendPrefix) ?? sendChannels[0];
   const inTellMode = replyTarget !== null;
-  const replyTargetLabel = replyTarget
-    ? replyTarget.world
-      ? `${replyTarget.name}@${replyTarget.world}`
-      : replyTarget.name
-    : '';
+  const replyTargetLabel = replyTarget ? formatPlayerName(replyTarget.name, replyTarget.world) : '';
   const placeholder = isConnected
     ? inTellMode
       ? `Tell ${replyTargetLabel}...`
