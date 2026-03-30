@@ -59,7 +59,9 @@
   background: transparent;
   cursor: pointer;
   color: var(--text-primary);
-  transition: background 0.1s;
+  transition:
+    background 0.1s,
+    transform 0.08s;
   -webkit-tap-highlight-color: transparent;
   touch-action: manipulation;
 }
@@ -69,7 +71,8 @@
 }
 
 .char-btn:active {
-  background: var(--accent, #5865f2);
+  background: rgba(88, 101, 242, 0.25);
+  transform: scale(0.82);
 }
 
 @media (max-width: 600px) {

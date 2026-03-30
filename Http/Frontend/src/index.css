@@ -175,7 +175,7 @@ body {
 @keyframes msg-in {
   from {
     opacity: 0;
-    transform: translateY(6px);
+    transform: translateY(3px);
   }
 
   to {
@@ -197,12 +197,12 @@ body {
 @keyframes slideUp {
   from {
     opacity: 0;
-    transform: translateY(10px);
+    transform: translateY(8px) scale(0.97);
   }
 
   to {
     opacity: 1;
-    transform: translateY(0);
+    transform: translateY(0) scale(1);
   }
 }
 
@@ -252,13 +252,13 @@ body {
   justify-content: center;
   min-width: calc(52px * var(--sys-scale, 1));
   width: calc(52px * var(--sys-scale, 1));
-  font-size: calc(9.45px * var(--sys-scale, 1));
-  font-weight: 800;
+  font-size: calc(10px * var(--sys-scale, 1));
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.07em;
+  letter-spacing: 0.06em;
   border: 1px solid;
   border-radius: 4px;
-  padding: 1px 0;
+  padding: 1px 4px;
   line-height: 1.6;
   flex-shrink: 0;
   text-align: center;
@@ -422,6 +422,10 @@ body {
   background: var(--bg-hover);
 }
 
+.btn-secondary:active {
+  transform: scale(0.97);
+}
+
 /* ========== Shared: Message Item ========== */
 /* Used in MessageItem and AppearanceSettings (preview) */
 .message {
@@ -445,9 +449,7 @@ body {
 }
 
 .message:hover {
-  background-color: var(--bg-hover) !important;
-  filter: brightness(1.15);
-  border-left-color: var(--border-focus);
+  background: rgba(255, 255, 255, 0.035) !important;
 }
 
 .message-avatar {
@@ -482,7 +484,7 @@ body {
 }
 
 .message-time {
-  font-size: 0.7em;
+  font-size: 0.72em;
   color: var(--text-muted);
 }
 
@@ -517,7 +519,7 @@ body {
 .message-time-mini {
   width: calc(36px * var(--sys-scale, 1));
   text-align: right;
-  font-size: 0.65em;
+  font-size: 0.68em;
   color: var(--text-muted);
   opacity: 0;
   flex-shrink: 0;

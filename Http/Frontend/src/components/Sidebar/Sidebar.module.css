@@ -158,11 +158,16 @@
   margin-bottom: 4px;
 }
 
+.channel-section + .channel-section {
+  border-top: 1px solid var(--border);
+  padding-top: 4px;
+}
+
 .channel-section-label {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 8px 16px 4px;
+  padding: 8px 4px 4px 16px;
   font-size: 0.7rem;
   font-weight: 700;
   text-transform: uppercase;
@@ -178,7 +183,7 @@
   cursor: pointer;
   font-size: 1.1rem;
   line-height: 1;
-  padding: 0 2px;
+  padding: 4px 6px;
   border-radius: 3px;
   transition:
     color 0.15s,
@@ -199,7 +204,7 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  width: 100%;
+  flex: 1;
   padding: 5px 16px;
   background: none;
   border: none;
@@ -209,51 +214,22 @@
   font-weight: 500;
   cursor: pointer;
   text-align: left;
-  transition:
-    color 0.15s,
-    background 0.15s;
-  position: relative;
-  margin: 1px 4px;
-  width: calc(100% - 8px);
+  transition: color 0.15s;
+  min-width: 0;
 }
 
 .channel-item:hover {
   color: var(--text-secondary);
-  background: var(--bg-hover);
 }
 
-.channel-item.active {
-  color: var(--text-primary);
-  background: var(--bg-active);
+.filter-row.active .channel-item {
+  color: var(--text-secondary);
   font-weight: 600;
 }
 
-.channel-item.active::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 15%;
-  height: 70%;
-  width: 3px;
-  background: var(--accent);
-  border-radius: 0 3px 3px 0;
-}
-
-.channel-item.has-unread {
+.filter-row.has-unread .channel-item {
   color: var(--text-primary);
   font-weight: 600;
-}
-
-.channel-item.has-unread::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 35%;
-  height: 30%;
-  width: 3px;
-  background: var(--text-primary);
-  border-radius: 0 3px 3px 0;
-  opacity: 0.7;
 }
 
 .channel-hash {
@@ -283,23 +259,52 @@
 }
 
 /* ========== Sidebar Unread Pill ========== */
-.sidebar-unread-pill {
-  background: var(--offline);
-  color: #fff;
-  font-size: 0.7rem;
-  font-weight: 700;
-  padding: 2px 7px;
-  border-radius: 12px;
-  margin-left: auto;
+@keyframes pill-pop {
+  0% {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+  70% {
+    transform: scale(1.1);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
-/* ========== Folder label left area ========== */
-.folder-label-left {
-  display: flex;
+.sidebar-unread-pill {
+  background: var(--accent);
+  color: var(--bg-primary);
+  font-size: 0.7rem;
+  font-weight: 700;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 9px;
+  flex-shrink: 0;
+  display: inline-flex;
   align-items: center;
-  gap: 4px;
+  justify-content: center;
+  box-sizing: border-box;
+  margin-right: 4px;
+  animation: pill-pop 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275) both;
+}
+
+/* ========== Folder label ========== */
+.folder-label-text {
+  flex: 1;
   min-width: 0;
   overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.folder-label-actions {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  flex-shrink: 0;
 }
 
 /* ========== Folder menu button (···) ========== */
@@ -310,7 +315,7 @@
   cursor: pointer;
   font-size: 0.85rem;
   line-height: 1;
-  padding: 0 2px;
+  padding: 4px 6px;
   border-radius: 3px;
   flex-shrink: 0;
   transition:
@@ -329,12 +334,47 @@
   display: flex;
   align-items: center;
   margin: 1px 4px;
+  border-radius: 4px;
+  position: relative;
+  transition: background 0.15s;
 }
 
-.filter-row .channel-item {
-  flex: 1;
-  margin: 0;
-  width: auto;
+.filter-row:hover {
+  background: var(--bg-hover);
+}
+
+.filter-row.active {
+  background: var(--bg-active);
+}
+
+.filter-row.active::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 15%;
+  height: 70%;
+  width: 3px;
+  background: var(--accent);
+  border-radius: 0 3px 3px 0;
+}
+
+.filter-row.has-unread::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 35%;
+  height: 30%;
+  width: 3px;
+  background: var(--accent);
+  border-radius: 0 3px 3px 0;
+  opacity: 0.8;
+}
+
+.filter-row.active.has-unread::before {
+  top: 15%;
+  height: 70%;
+  background: var(--accent);
+  opacity: 1;
 }
 
 /* ========== Filter menu button (···) ========== */
@@ -356,7 +396,8 @@
   letter-spacing: 1px;
 }
 
-.filter-row:hover .filter-menu-btn {
+.filter-row:hover .filter-menu-btn,
+.filter-row.active .filter-menu-btn {
   opacity: 1;
 }
 

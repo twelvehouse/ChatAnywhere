@@ -67,24 +67,21 @@ function SortableFilterRow({
         transition,
         opacity: isDragging ? 0.3 : 1,
       }}
-      className={styles['filter-row']}
+      className={[
+        styles['filter-row'],
+        isActive ? styles.active : '',
+        unread > 0 ? styles['has-unread'] : '',
+      ]
+        .filter(Boolean)
+        .join(' ')}
     >
-      <button
-        className={[
-          styles['channel-item'],
-          isActive ? styles.active : '',
-          unread > 0 ? styles['has-unread'] : '',
-        ]
-          .filter(Boolean)
-          .join(' ')}
-        onClick={onSelect}
-      >
+      <button className={styles['channel-item']} onClick={onSelect}>
         <span className={styles['channel-hash']}>#</span>
         <span className={styles['channel-name']}>{filterName}</span>
-        {unread > 0 && (
-          <span className={styles['sidebar-unread-pill']}>{unread > 99 ? '99+' : unread}</span>
-        )}
       </button>
+      {unread > 0 && (
+        <span className={styles['sidebar-unread-pill']}>{unread > 99 ? '99+' : unread}</span>
+      )}
       <button
         className={styles['filter-menu-btn']}
         onPointerDown={(e) => e.stopPropagation()}
@@ -135,7 +132,16 @@ function SortableFolderSection({
       className={styles['channel-section']}
     >
       <div {...attributes} {...listeners} className={styles['channel-section-label']}>
-        <div className={styles['folder-label-left']}>
+        <span className={styles['folder-label-text']}>{folder.name}</span>
+        <div className={styles['folder-label-actions']}>
+          <button
+            className={styles['add-btn']}
+            onPointerDown={(e) => e.stopPropagation()}
+            onClick={() => setModal({ type: 'createFilter', folderName: folder.name })}
+            aria-label={`Add filter to ${folder.name}`}
+          >
+            ＋
+          </button>
           <button
             className={styles['folder-menu-btn']}
             onPointerDown={(e) => e.stopPropagation()}
@@ -144,16 +150,7 @@ function SortableFolderSection({
           >
             ···
           </button>
-          <span>{folder.name}</span>
         </div>
-        <button
-          className={styles['add-btn']}
-          onPointerDown={(e) => e.stopPropagation()}
-          onClick={() => setModal({ type: 'createFilter', folderName: folder.name })}
-          aria-label={`Add filter to ${folder.name}`}
-        >
-          ＋
-        </button>
       </div>
 
       {folder.filters.length === 0 && <div className={styles['channel-empty']}>No filters</div>}

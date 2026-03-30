@@ -15,19 +15,22 @@
   overflow: hidden;
 }
 
-/* ========== Tab bar ========== */
+/* ========== Tab bar — segmented control ========== */
 .tab-bar {
   display: flex;
   flex-direction: row;
+  gap: calc(4px * var(--sys-scale, 1));
+  padding: calc(6px * var(--sys-scale, 1)) calc(8px * var(--sys-scale, 1));
   border-bottom: 1px solid var(--border);
   flex-shrink: 0;
+  background: var(--bg-tertiary);
 }
 
 .tab-btn {
   flex: 1;
-  padding: calc(9px * var(--sys-scale, 1)) calc(12px * var(--sys-scale, 1));
+  padding: calc(6px * var(--sys-scale, 1)) calc(12px * var(--sys-scale, 1));
   border: none;
-  border-bottom: 2px solid transparent;
+  border-radius: calc(6px * var(--sys-scale, 1));
   background: transparent;
   color: var(--text-muted);
   font-size: calc(11px * var(--sys-scale, 1));
@@ -37,17 +40,19 @@
   cursor: pointer;
   transition:
     color 0.15s,
-    border-color 0.15s;
-  margin-bottom: -1px;
+    background 0.15s,
+    box-shadow 0.15s;
 }
 
 .tab-btn:hover {
   color: var(--text-secondary);
+  background: rgba(255, 255, 255, 0.04);
 }
 
 .tab-btn.active {
+  background: var(--bg-secondary);
   color: var(--text-primary);
-  border-bottom-color: var(--accent, #5865f2);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
 }
 
 /* Smartphone */

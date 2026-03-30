@@ -181,7 +181,7 @@ export function SettingsModal({
             </button>
           </div>
 
-          <div className={styles['settings-content-body']}>
+          <div className={styles['settings-content-body']} key={category}>
             {category === 'appearance' && (
               <AppearanceSettings
                 fontFamily={fontFamily}

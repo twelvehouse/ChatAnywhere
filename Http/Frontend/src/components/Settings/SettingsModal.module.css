@@ -64,6 +64,7 @@
   font-weight: 500;
   cursor: pointer;
   text-align: left;
+  position: relative;
   transition:
     background 0.15s,
     color 0.15s;
@@ -78,6 +79,17 @@
   background: var(--bg-active);
   color: var(--text-primary);
   font-weight: 600;
+}
+
+.settings-nav-item.active::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 20%;
+  height: 60%;
+  width: 3px;
+  background: var(--accent);
+  border-radius: 0 3px 3px 0;
 }
 
 .settings-nav-item svg {
@@ -130,10 +142,22 @@
   background: var(--bg-hover);
 }
 
+@keyframes panelFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 .settings-content-body {
   flex: 1;
   overflow-y: auto;
   padding: 24px;
+  animation: panelFadeIn 0.18s ease-out both;
 }
 
 /* ---- Settings Hamburger Button (hidden on desktop) ---- */

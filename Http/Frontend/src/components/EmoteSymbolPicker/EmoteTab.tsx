@@ -112,16 +112,32 @@ export function EmoteTab({ emotes, loading, error, onExecute, emoteConfirm }: Pr
   return (
     <div className={styles['emote-tab']}>
       <div className={styles['search-bar']}>
-        <input
-          type="text"
-          className={styles['search-input']}
-          placeholder="Search emotes..."
-          value={search}
-          onChange={(e) => {
-            setSearch(e.target.value);
-            setPendingKey(null);
-          }}
-        />
+        <div className={styles['search-input-wrapper']}>
+          <svg
+            className={styles['search-icon']}
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 16 16"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.6"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden
+          >
+            <circle cx="6.5" cy="6.5" r="4" />
+            <line x1="10" y1="10" x2="14" y2="14" />
+          </svg>
+          <input
+            type="text"
+            className={styles['search-input']}
+            placeholder="Search emotes..."
+            value={search}
+            onChange={(e) => {
+              setSearch(e.target.value);
+              setPendingKey(null);
+            }}
+          />
+        </div>
         <button
           type="button"
           className={styles['log-toggle-wrapper']}
