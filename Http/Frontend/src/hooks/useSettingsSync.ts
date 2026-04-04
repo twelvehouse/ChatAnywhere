@@ -28,6 +28,7 @@ interface Props {
   tellModeAll: boolean;
   ctrlEnterToSend: boolean;
   emoteConfirm: boolean;
+  emoteSortByName: boolean;
   retainSyncSendPrefix: boolean;
   setFontFamily: Dispatch<SetStateAction<string>>;
   setFontSize: Dispatch<SetStateAction<number>>;
@@ -40,6 +41,7 @@ interface Props {
   setTellModeAll: Dispatch<SetStateAction<boolean>>;
   setCtrlEnterToSend: Dispatch<SetStateAction<boolean>>;
   setEmoteConfirm: Dispatch<SetStateAction<boolean>>;
+  setEmoteSortByName: Dispatch<SetStateAction<boolean>>;
   setRetainSyncSendPrefix: Dispatch<SetStateAction<boolean>>;
   onFiltersReady: (filters: CustomFilter[], folders: FilterFolder[]) => void;
 }
@@ -56,6 +58,7 @@ export function useSettingsSync({
   tellModeAll,
   ctrlEnterToSend,
   emoteConfirm,
+  emoteSortByName,
   retainSyncSendPrefix,
   setFontFamily,
   setFontSize,
@@ -68,6 +71,7 @@ export function useSettingsSync({
   setTellModeAll,
   setCtrlEnterToSend,
   setEmoteConfirm,
+  setEmoteSortByName,
   setRetainSyncSendPrefix,
   onFiltersReady,
 }: Props) {
@@ -91,6 +95,7 @@ export function useSettingsSync({
         if (typeof data.tellModeAll === 'boolean') setTellModeAll(data.tellModeAll);
         if (typeof data.ctrlEnterToSend === 'boolean') setCtrlEnterToSend(data.ctrlEnterToSend);
         if (typeof data.emoteConfirm === 'boolean') setEmoteConfirm(data.emoteConfirm);
+        if (typeof data.emoteSortByName === 'boolean') setEmoteSortByName(data.emoteSortByName);
         if (typeof data.retainSyncSendPrefix === 'boolean')
           setRetainSyncSendPrefix(data.retainSyncSendPrefix);
 
@@ -143,6 +148,7 @@ export function useSettingsSync({
           tellModeAll,
           ctrlEnterToSend,
           emoteConfirm,
+          emoteSortByName,
           retainSyncSendPrefix,
         }),
       }).catch(() => {});
@@ -163,6 +169,7 @@ export function useSettingsSync({
     tellModeAll,
     ctrlEnterToSend,
     emoteConfirm,
+    emoteSortByName,
     retainSyncSendPrefix,
   ]);
 }

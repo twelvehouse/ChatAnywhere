@@ -34,6 +34,7 @@ interface Props {
   onToggleCharPicker: () => void;
   onExecuteEmote: (command: string) => void;
   emoteConfirm: boolean;
+  emoteSortByName: boolean;
   replyTarget: { name: string; world?: string } | null;
   replyPinned: boolean;
   onClearReply: () => void;
@@ -51,6 +52,7 @@ export function InputArea({
   onToggleCharPicker,
   onExecuteEmote,
   emoteConfirm,
+  emoteSortByName,
   replyTarget,
   replyPinned,
   onClearReply,
@@ -142,6 +144,7 @@ export function InputArea({
           onInsert={(text) => setInputText((prev) => prev + text)}
           onExecute={onExecuteEmote}
           emoteConfirm={emoteConfirm}
+          emoteSortByName={emoteSortByName}
         />
       )}
     </div>

@@ -35,6 +35,8 @@ interface Props {
   setCtrlEnterToSend: Dispatch<SetStateAction<boolean>>;
   emoteConfirm: boolean;
   setEmoteConfirm: Dispatch<SetStateAction<boolean>>;
+  emoteSortByName: boolean;
+  setEmoteSortByName: Dispatch<SetStateAction<boolean>>;
   retainSyncSendPrefix: boolean;
   setRetainSyncSendPrefix: Dispatch<SetStateAction<boolean>>;
   // Control
@@ -63,6 +65,8 @@ export function SettingsModal({
   setCtrlEnterToSend,
   emoteConfirm,
   setEmoteConfirm,
+  emoteSortByName,
+  setEmoteSortByName,
   retainSyncSendPrefix,
   setRetainSyncSendPrefix,
   onClose,
@@ -217,6 +221,8 @@ export function SettingsModal({
                 setCtrlEnterToSend={setCtrlEnterToSend}
                 emoteConfirm={emoteConfirm}
                 setEmoteConfirm={setEmoteConfirm}
+                emoteSortByName={emoteSortByName}
+                setEmoteSortByName={setEmoteSortByName}
                 retainSyncSendPrefix={retainSyncSendPrefix}
                 setRetainSyncSendPrefix={setRetainSyncSendPrefix}
               />

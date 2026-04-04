@@ -11,9 +11,17 @@ interface Props {
   onExecute: (command: string) => void;
   /** When true, requires a second tap to confirm before executing. */
   emoteConfirm: boolean;
+  emoteSortByName: boolean;
 }
 
-export function EmoteTab({ emotes, loading, error, onExecute, emoteConfirm }: Props) {
+export function EmoteTab({
+  emotes,
+  loading,
+  error,
+  onExecute,
+  emoteConfirm,
+  emoteSortByName,
+}: Props) {
   const [search, setSearch] = useState('');
   // pendingKey tracks which specific row instance is pending: "<section>-<id>" (e.g. "history-1", "main-1")
   const [pendingKey, setPendingKey] = useState<string | null>(null);
@@ -44,13 +52,17 @@ export function EmoteTab({ emotes, loading, error, onExecute, emoteConfirm }: Pr
 
   const filtered = useMemo(() => {
     const q = search.toLowerCase();
-    return emotes.filter((e) => {
+    const result = emotes.filter((e) => {
       if (!e.isOwned) return false;
       if (q && !e.name.toLowerCase().includes(q) && !e.command.toLowerCase().includes(q))
         return false;
       return true;
     });
-  }, [emotes, search]);
+    if (emoteSortByName) {
+      result.sort((a, b) => a.name.localeCompare(b.name));
+    }
+    return result;
+  }, [emotes, search, emoteSortByName]);
 
   const historyEmotes = useMemo(
     () => history.map((id) => emotes.find((e) => e.id === id)).filter(Boolean) as Emote[],

@@ -43,6 +43,7 @@ function App() {
   const [tellModeAll, setTellModeAll] = useState(true);
   const [ctrlEnterToSend, setCtrlEnterToSend] = useState(false);
   const [emoteConfirm, setEmoteConfirm] = useState(true);
+  const [emoteSortByName, setEmoteSortByName] = useState(false);
   const [retainSyncSendPrefix, setRetainSyncSendPrefix] = useState(true);
 
   // ── Sync tab prefix map (session only) ─────────────────────────
@@ -115,6 +116,7 @@ function App() {
     tellModeAll,
     ctrlEnterToSend,
     emoteConfirm,
+    emoteSortByName,
     retainSyncSendPrefix,
     setFontFamily,
     setFontSize,
@@ -127,6 +129,7 @@ function App() {
     setTellModeAll,
     setCtrlEnterToSend,
     setEmoteConfirm,
+    setEmoteSortByName,
     setRetainSyncSendPrefix,
     onFiltersReady: (loadedFilters) => {
       const urlFilterName = new URL(window.location.href).searchParams.get('filter');
@@ -413,6 +416,7 @@ function App() {
         onToggleCharPicker={() => setShowCharPicker((o) => !o)}
         onExecuteEmote={handleExecuteEmote}
         emoteConfirm={emoteConfirm}
+        emoteSortByName={emoteSortByName}
         onEditFilter={handleEditFilter}
         replyTarget={replyTarget}
         replyPinned={replyPinned}
@@ -446,6 +450,8 @@ function App() {
           setCtrlEnterToSend={setCtrlEnterToSend}
           emoteConfirm={emoteConfirm}
           setEmoteConfirm={setEmoteConfirm}
+          emoteSortByName={emoteSortByName}
+          setEmoteSortByName={setEmoteSortByName}
           retainSyncSendPrefix={retainSyncSendPrefix}
           setRetainSyncSendPrefix={setRetainSyncSendPrefix}
           onClose={() => setShowSettings(false)}

@@ -7,6 +7,8 @@ interface Props {
   setCtrlEnterToSend: Dispatch<SetStateAction<boolean>>;
   emoteConfirm: boolean;
   setEmoteConfirm: Dispatch<SetStateAction<boolean>>;
+  emoteSortByName: boolean;
+  setEmoteSortByName: Dispatch<SetStateAction<boolean>>;
   retainSyncSendPrefix: boolean;
   setRetainSyncSendPrefix: Dispatch<SetStateAction<boolean>>;
 }
@@ -18,6 +20,8 @@ export function OthersSettings({
   setCtrlEnterToSend,
   emoteConfirm,
   setEmoteConfirm,
+  emoteSortByName,
+  setEmoteSortByName,
   retainSyncSendPrefix,
   setRetainSyncSendPrefix,
 }: Props) {
@@ -56,6 +60,16 @@ export function OthersSettings({
         >
           <span className="form-row-label">Confirm before executing emote</span>
           <div className={`toggle-switch${emoteConfirm ? ' on' : ''}`}>
+            <div className="toggle-knob" />
+          </div>
+        </div>
+        <div
+          className="form-row"
+          style={{ cursor: 'pointer' }}
+          onClick={() => setEmoteSortByName((v) => !v)}
+        >
+          <span className="form-row-label">Sort emotes by name</span>
+          <div className={`toggle-switch${emoteSortByName ? ' on' : ''}`}>
             <div className="toggle-knob" />
           </div>
         </div>

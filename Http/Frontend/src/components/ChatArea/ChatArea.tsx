@@ -49,6 +49,7 @@ interface Props {
   onToggleCharPicker: () => void;
   onExecuteEmote: (command: string) => void;
   emoteConfirm: boolean;
+  emoteSortByName: boolean;
 }
 
 export function ChatArea({
@@ -90,6 +91,7 @@ export function ChatArea({
   onToggleCharPicker,
   onExecuteEmote,
   emoteConfirm,
+  emoteSortByName,
 }: Props) {
   return (
     <div className={styles['chat-area']}>
@@ -135,6 +137,7 @@ export function ChatArea({
         onToggleCharPicker={onToggleCharPicker}
         onExecuteEmote={onExecuteEmote}
         emoteConfirm={emoteConfirm}
+        emoteSortByName={emoteSortByName}
         replyTarget={replyTarget}
         replyPinned={replyPinned}
         onClearReply={onClearReply}
