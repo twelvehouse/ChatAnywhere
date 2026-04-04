@@ -57,6 +57,8 @@ export function useScrollBehavior({ activeFilterName, filteredMessagesLength }: 
 
     const innerEl = messagesInnerRef.current;
     if (innerEl) observer.observe(innerEl);
+    // Also observe the outer container to handle Android keyboard resize
+    observer.observe(el);
 
     const handleImageLoad = () => {
       if (isNearBottomRef.current) {
@@ -65,9 +67,19 @@ export function useScrollBehavior({ activeFilterName, filteredMessagesLength }: 
     };
     el.addEventListener('load', handleImageLoad, true);
 
+    // iOS Safari: keyboard appearance doesn't resize layout viewport,
+    // so use visualViewport resize event to detect keyboard show/hide
+    const handleViewportResize = () => {
+      if (isNearBottomRef.current) {
+        scrollToBottom();
+      }
+    };
+    window.visualViewport?.addEventListener('resize', handleViewportResize);
+
     return () => {
       observer.disconnect();
       el.removeEventListener('load', handleImageLoad, true);
+      window.visualViewport?.removeEventListener('resize', handleViewportResize);
     };
   }, []);
 
