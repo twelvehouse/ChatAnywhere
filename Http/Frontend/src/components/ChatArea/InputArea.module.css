@@ -41,7 +41,7 @@
   border: none;
   color: var(--text-primary);
   font-family: var(--chat-font);
-  font-size: inherit;
+  font-size: max(16px, 1em); /* Prevent iOS Safari auto-zoom (triggers at < 16px) */
   outline: none;
   min-width: 0;
 }
