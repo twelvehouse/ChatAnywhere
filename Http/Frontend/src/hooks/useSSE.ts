@@ -49,7 +49,7 @@ export function useSSE({
     };
 
     const connectSSE = () => {
-      sse = new EventSource(`${RELAY_ADDR}/sse`);
+      sse = new EventSource(`${RELAY_ADDR}/sse`, { withCredentials: true });
 
       sse.onmessage = (event) => {
         try {

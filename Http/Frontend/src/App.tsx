@@ -6,17 +6,34 @@ import { useScrollBehavior } from './hooks/useScrollBehavior';
 import { useSSE } from './hooks/useSSE';
 import { useSettingsSync } from './hooks/useSettingsSync';
 import { useFilterManagement } from './hooks/useFilterManagement';
+import { useAuth } from './hooks/useAuth';
 import { DEFAULT_CHANNELS } from './constants/channels';
 import { formatPlayerName } from './lib/formatUtils';
 import { RELAY_ADDR } from './constants/config';
+import { dispatchUnauthorized } from './lib/authEvent';
 import { Sidebar } from './components/Sidebar/Sidebar';
 import { ChatArea } from './components/ChatArea/ChatArea';
 import { SettingsModal } from './components/Settings/SettingsModal';
 import { LinkConfirmModal } from './components/Settings/LinkConfirmModal';
+import { PasscodeModal } from './components/Auth/PasscodeModal';
 import type { ChatMessage, ChannelOption } from './types/chat';
 import type { CustomFilter, FilterFolder } from './types/filter';
 
 function App() {
+  const { status, authenticate } = useAuth();
+
+  if (status === 'loading') {
+    return <div style={{ display: 'none' }} />;
+  }
+
+  if (status !== 'authenticated') {
+    return <PasscodeModal status={status} onAuthenticate={authenticate} />;
+  }
+
+  return <AppContent />;
+}
+
+function AppContent() {
   // ── Core chat state ────────────────────────────────────────────
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isConnected, setIsConnected] = useState(false);
@@ -281,11 +298,13 @@ function App() {
     }
     if (replyTarget && !replyPinned) setReplyTarget(null);
     try {
-      await fetch(`${RELAY_ADDR}/send`, {
+      const res = await fetch(`${RELAY_ADDR}/send`, {
         method: 'POST',
+        credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ Message: payloadText }),
       });
+      if (res.status === 401) dispatchUnauthorized();
     } catch (e) {
       console.error('Send failed:', e);
     }

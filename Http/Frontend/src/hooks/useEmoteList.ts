@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { RELAY_ADDR } from '../constants/config';
+import { dispatchUnauthorized } from '../lib/authEvent';
 
 export interface Emote {
   id: number;
@@ -20,8 +21,14 @@ export function useEmoteList(): State {
 
   useEffect(() => {
     let cancelled = false;
-    fetch(`${RELAY_ADDR}/emotes`)
-      .then((r) => r.json())
+    fetch(`${RELAY_ADDR}/emotes`, { credentials: 'include' })
+      .then((r) => {
+        if (r.status === 401) {
+          dispatchUnauthorized();
+          return Promise.reject();
+        }
+        return r.json();
+      })
       .then((data: { emotes: Emote[] }) => {
         if (!cancelled) setState({ emotes: data.emotes ?? [], loading: false, error: null });
       })

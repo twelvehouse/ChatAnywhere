@@ -68,7 +68,6 @@ public sealed class Plugin : IDalamudPlugin
         CommandManager = commandManager;
 
         Config = Interface.GetPluginConfig() as Configuration ?? new Configuration();
-        Config.AuthStore ??= new List<string>();
 
         Sender      = new ChatSender(Log);
         Receiver    = new ChatReceiver(Chat, ClientState, ObjectTable, Log);

@@ -1,6 +1,7 @@
 import { useEffect, useRef, useCallback, useState } from 'react';
 import type { Dispatch, SetStateAction } from 'react';
 import { RELAY_ADDR } from '../constants/config';
+import { dispatchUnauthorized } from '../lib/authEvent';
 import type { ChatMessage } from '../types/chat';
 
 const LIMIT = 200;
@@ -29,8 +30,14 @@ export function usePaginatedHistory(setMessages: Dispatch<SetStateAction<ChatMes
 
   // Initial load: fetch the newest LIMIT messages.
   useEffect(() => {
-    fetch(`${RELAY_ADDR}/history?limit=${LIMIT}`)
-      .then((r) => r.json())
+    fetch(`${RELAY_ADDR}/history?limit=${LIMIT}`, { credentials: 'include' })
+      .then((r) => {
+        if (r.status === 401) {
+          dispatchUnauthorized();
+          return Promise.reject();
+        }
+        return r.json();
+      })
       .then((data: ChatMessage[]) => {
         if (Array.isArray(data) && data.length > 0) {
           setMessages(data);
@@ -52,8 +59,14 @@ export function usePaginatedHistory(setMessages: Dispatch<SetStateAction<ChatMes
     isLoadingRef.current = true;
     setIsLoadingOlder(true);
 
-    fetch(`${RELAY_ADDR}/history?limit=${LIMIT}&before=${before}`)
-      .then((r) => r.json())
+    fetch(`${RELAY_ADDR}/history?limit=${LIMIT}&before=${before}`, { credentials: 'include' })
+      .then((r) => {
+        if (r.status === 401) {
+          dispatchUnauthorized();
+          return Promise.reject();
+        }
+        return r.json();
+      })
       .then((data: ChatMessage[]) => {
         if (Array.isArray(data) && data.length > 0) {
           oldestTimestampRef.current = data[0].Timestamp;

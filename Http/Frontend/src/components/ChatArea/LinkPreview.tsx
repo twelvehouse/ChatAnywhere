@@ -47,7 +47,7 @@ export function OgpCard({ url }: OgpCardProps) {
     if (cached && cached !== 'loading') return;
 
     ogpCache.set(url, 'loading');
-    fetch(`${RELAY_ADDR}/ogp?url=${encodeURIComponent(url)}`)
+    fetch(`${RELAY_ADDR}/ogp?url=${encodeURIComponent(url)}`, { credentials: 'include' })
       .then((r) => r.json())
       .then((d: OgpData) => {
         const result = d.title || d.image ? d : 'error';

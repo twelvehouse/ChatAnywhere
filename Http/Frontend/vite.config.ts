@@ -17,5 +17,12 @@ export default defineConfig({
   server: {
     host: true,
     port: 5173,
+    proxy: {
+      // Forward all API routes to the plugin server — avoids CORS in dev
+      '^/(auth|send|sse|history|channels|avatar|ogp|settings|emotes|icon|files)': {
+        target: 'http://localhost:3000',
+        changeOrigin: false,
+      },
+    },
   },
 });

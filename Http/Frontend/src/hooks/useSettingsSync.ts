@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react';
 import type { Dispatch, SetStateAction } from 'react';
 import { RELAY_ADDR } from '../constants/config';
+import { dispatchUnauthorized } from '../lib/authEvent';
 import type { CustomFilter, FilterFolder } from '../types/filter';
 import { TRACKED_CHANNEL_TYPES } from '../constants/channels';
 
@@ -80,8 +81,14 @@ export function useSettingsSync({
 
   // Load from server on mount
   useEffect(() => {
-    fetch(`${RELAY_ADDR}/settings`)
-      .then((r) => (r.ok ? r.json() : Promise.reject()))
+    fetch(`${RELAY_ADDR}/settings`, { credentials: 'include' })
+      .then((r) => {
+        if (r.status === 401) {
+          dispatchUnauthorized();
+          return Promise.reject();
+        }
+        return r.ok ? r.json() : Promise.reject();
+      })
       .then((data: Record<string, unknown>) => {
         if (typeof data.fontFamily === 'string') setFontFamily(data.fontFamily);
         if (typeof data.fontSize === 'number') setFontSize(data.fontSize);
@@ -135,6 +142,7 @@ export function useSettingsSync({
     timerRef.current = setTimeout(() => {
       fetch(`${RELAY_ADDR}/settings`, {
         method: 'PUT',
+        credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           fontFamily,

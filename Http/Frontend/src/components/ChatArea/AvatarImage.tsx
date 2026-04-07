@@ -27,6 +27,7 @@ export function AvatarImage({ name, world }: Props) {
 
     fetch(
       `${RELAY_ADDR}/avatar?name=${encodeURIComponent(cleanName)}&world=${encodeURIComponent(world)}`,
+      { credentials: 'include' },
     )
       .then((r) => r.json())
       .then((data) => {

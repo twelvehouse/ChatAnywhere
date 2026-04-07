@@ -1,3 +1,4 @@
+using System.Linq;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
 using System.Numerics;
@@ -13,6 +14,13 @@ public sealed class SettingsWindow : Window
 
     private int _editPort;
     private bool _editAutoStart;
+    private string _editPassword = "";
+    private string _editPasswordConfirm = "";
+
+    // Snapshot of saved values — used to detect unsaved changes
+    private int _savedPort;
+    private bool _savedAutoStart;
+    private string _savedPasswordHash = "";
 
     // Cached once on open — network enumeration is too expensive to run every frame
     private List<(string Label, string Url)> _cachedUrls = [];
@@ -22,16 +30,9 @@ public sealed class SettingsWindow : Window
     private static readonly Vector4 ColorYellow = new(1f, 0.85f, 0.2f, 1f);
     private static readonly Vector4 ColorMuted  = new(0.6f, 0.6f, 0.6f, 1f);
 
-    public SettingsWindow(Plugin plugin) : base("ChatAnywhere - Settings###chatanywhere-settings")
+    public SettingsWindow(Plugin plugin) : base("ChatAnywhere - Settings###chatanywhere-settings", ImGuiWindowFlags.AlwaysAutoResize)
     {
         _plugin = plugin;
-
-        SizeCondition = ImGuiCond.FirstUseEver;
-        SizeConstraints = new WindowSizeConstraints
-        {
-            MinimumSize = new Vector2(400, 380),
-            MaximumSize = new Vector2(float.MaxValue, float.MaxValue),
-        };
     }
 
     public override void OnOpen()
@@ -69,15 +70,50 @@ public sealed class SettingsWindow : Window
 
     private void SyncFromConfig()
     {
-        _editPort      = _plugin.Config.WebinterfacePort;
-        _editAutoStart = _plugin.Config.WebinterfaceEnabled;
+        _editPort             = _plugin.Config.WebinterfacePort;
+        _editAutoStart        = _plugin.Config.WebinterfaceEnabled;
+        _editPassword         = "";
+        _editPasswordConfirm  = "";
+        _savedPort            = _editPort;
+        _savedAutoStart       = _editAutoStart;
+        _savedPasswordHash    = _plugin.Config.WebinterfacePasswordHash;
     }
+
+    /// <summary>
+    /// Returns true if any edit field has been changed since the last save/open.
+    /// </summary>
+    private bool HasUnsavedChanges()
+    {
+        if (_editPort != _savedPort) return true;
+        if (_editAutoStart != _savedAutoStart) return true;
+        if (_editPassword.Length > 0) return true;
+        return false;
+    }
+
+    /// <summary>
+    /// Returns true if the password fields contain a new valid passcode ready to save.
+    /// </summary>
+    private bool IsNewPasscodeValid() =>
+        _editPassword.Length >= 4
+        && _editPassword.Length <= 8
+        && _editPassword == _editPasswordConfirm;
 
     private void Save()
     {
         _plugin.Config.WebinterfacePort    = _editPort;
         _plugin.Config.WebinterfaceEnabled = _editAutoStart;
+
+        if (IsNewPasscodeValid())
+            _plugin.Config.WebinterfacePasswordHash = Configuration.HashPasscode(_editPassword);
+
         _plugin.SaveConfig();
+
+        // Update snapshot so unsaved-changes warning clears
+        _editPassword        = "";
+        _editPasswordConfirm = "";
+        _savedPort           = _editPort;
+        _savedAutoStart      = _editAutoStart;
+        _savedPasswordHash   = _plugin.Config.WebinterfacePasswordHash;
     }
 
     public override void Draw()
@@ -137,29 +173,73 @@ public sealed class SettingsWindow : Window
 
         ImGui.Spacing();
 
-        // ─── Commands ─────────────────────────────────────────────────
-        SectionHeader("Commands");
-        ImGui.TextColored(ColorMuted, "/chatanywhere");
-        ImGui.SameLine(150); ImGui.TextUnformatted("Toggle this settings window");
-        ImGui.TextColored(ColorMuted, "/chatanywhere start");
-        ImGui.SameLine(150); ImGui.TextUnformatted("Start the server");
-        ImGui.TextColored(ColorMuted, "/chatanywhere stop");
-        ImGui.SameLine(150); ImGui.TextUnformatted("Stop the server");
+        // ─── Security ─────────────────────────────────────────────────
+        SectionHeader("Security");
+
+        // Show warning if no passcode has been saved yet
+        if (string.IsNullOrEmpty(_savedPasswordHash))
+        {
+            ImGui.TextColored(ColorRed, "Passcode not configured — the web interface cannot be accessed.");
+            ImGui.Spacing();
+        }
+
+        ImGui.SetNextItemWidth(120);
+        ImGui.InputText("New Passcode##passcode", ref _editPassword, 8, ImGuiInputTextFlags.Password);
+        ImGui.SameLine();
+        ImGui.TextColored(ColorMuted, "(4–8 digits)");
+
+        var digitsOnly = new string(_editPassword.Where(char.IsDigit).ToArray());
+        if (digitsOnly != _editPassword) _editPassword = digitsOnly;
+
+        ImGui.SetNextItemWidth(120);
+        ImGui.InputText("Confirm##passcode-confirm", ref _editPasswordConfirm, 8, ImGuiInputTextFlags.Password);
+
+        var confirmDigitsOnly = new string(_editPasswordConfirm.Where(char.IsDigit).ToArray());
+        if (confirmDigitsOnly != _editPasswordConfirm) _editPasswordConfirm = confirmDigitsOnly;
+
+        if (_editPassword.Length > 0 && _editPasswordConfirm.Length > 0
+            && _editPassword != _editPasswordConfirm)
+        {
+            ImGui.TextColored(ColorRed, "  Passcodes do not match.");
+        }
+
+        if (!string.IsNullOrEmpty(_savedPasswordHash) && _editPassword.Length == 0)
+            ImGui.TextColored(ColorMuted, "  Leave blank to keep the current passcode.");
+
+        if (isRunning)
+        {
+            ImGui.Spacing();
+            if (ImGui.Button("Invalidate All Sessions"))
+                _plugin.Server.InvalidateAllSessions();
+            if (ImGui.IsItemHovered())
+                ImGui.SetTooltip("Forces all connected browsers to re-authenticate.");
+        }
 
         ImGui.Spacing();
         ImGui.Separator();
         ImGui.Spacing();
 
+        // Unsaved-changes warning
+        if (HasUnsavedChanges())
+            ImGui.TextColored(ColorYellow, "  * You have unsaved changes.");
+
         // ─── Buttons ──────────────────────────────────────────────────
-        if (ImGui.Button("Save"))
-            Save();
+        // Disable Save when a new passcode is partially entered but invalid
+        var newPasscodeStarted = _editPassword.Length > 0 || _editPasswordConfirm.Length > 0;
+        var canSave = !newPasscodeStarted || IsNewPasscodeValid();
 
-        ImGui.SameLine();
-
-        if (ImGui.Button("Save & Close"))
+        using (ImRaii.Disabled(!canSave))
         {
-            Save();
-            IsOpen = false;
+            if (ImGui.Button("Save"))
+                Save();
+
+            ImGui.SameLine();
+
+            if (ImGui.Button("Save & Close"))
+            {
+                Save();
+                IsOpen = false;
+            }
         }
 
         ImGui.SameLine();

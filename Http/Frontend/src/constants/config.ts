@@ -1,8 +1,6 @@
-// In dev (Vite, port 5173): point to the plugin server on port 3000.
-// In production (static files served by the plugin): use the same origin — port is whatever the server is running on.
-export const RELAY_ADDR = import.meta.env.DEV
-  ? `${window.location.protocol}//${window.location.hostname}:3000`
-  : window.location.origin;
+// In dev (Vite, port 5173): Vite proxies API routes to localhost:3000, so same-origin — use empty string.
+// In production (static files served by the plugin): use the same origin.
+export const RELAY_ADDR = import.meta.env.DEV ? '' : window.location.origin;
 
 export const FONTS = [
   'Inter',
