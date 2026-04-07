@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import styles from './EmoteTab.module.css';
 import type { Emote } from '../../hooks/useEmoteList';
 import { RELAY_ADDR } from '../../constants/config';
@@ -50,24 +50,16 @@ export function EmoteTab({
 
   const buildCommand = (emote: Emote) => (logOutput ? emote.command : `${emote.command} motion`);
 
-  const filtered = useMemo(() => {
-    const q = search.toLowerCase();
-    const result = emotes.filter((e) => {
-      if (!e.isOwned) return false;
-      if (q && !e.name.toLowerCase().includes(q) && !e.command.toLowerCase().includes(q))
-        return false;
-      return true;
-    });
-    if (emoteSortByName) {
-      result.sort((a, b) => a.name.localeCompare(b.name));
-    }
-    return result;
-  }, [emotes, search, emoteSortByName]);
-
-  const historyEmotes = useMemo(
-    () => history.map((id) => emotes.find((e) => e.id === id)).filter(Boolean) as Emote[],
-    [emotes, history],
+  const q = search.toLowerCase();
+  const filtered = emotes.filter(
+    (e) =>
+      e.isOwned && (!q || e.name.toLowerCase().includes(q) || e.command.toLowerCase().includes(q)),
   );
+  if (emoteSortByName) filtered.sort((a, b) => a.name.localeCompare(b.name));
+
+  const historyEmotes = history
+    .map((id) => emotes.find((e) => e.id === id))
+    .filter((e): e is Emote => !!e && e.isOwned);
 
   const executeEmote = (emote: Emote) => {
     onExecute(buildCommand(emote));

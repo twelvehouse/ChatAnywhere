@@ -1,5 +1,5 @@
 import type { UIEvent } from 'react';
-import { useEffect, useRef, useLayoutEffect, useCallback, useMemo } from 'react';
+import { useEffect, useRef, useLayoutEffect, useCallback } from 'react';
 import styles from './MessageList.module.css';
 import { ErrorBoundary } from '../ErrorBoundary';
 import { MessageItem } from './MessageItem';
@@ -130,7 +130,7 @@ export function MessageList({
   onReply,
   trustedDomains,
 }: Props) {
-  const tellRefs = useMemo(() => messages.map((_, idx) => findTellRef(messages, idx)), [messages]);
+  const tellRefs = messages.map((_, idx) => findTellRef(messages, idx));
 
   const topSentinelRef = useRef<HTMLDivElement>(null);
   // Captures scrollHeight immediately before triggering a load, used to restore position after prepend.

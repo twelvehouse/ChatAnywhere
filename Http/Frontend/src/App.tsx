@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useMemo } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import styles from './App.module.css';
 import { addGfdStylesheet } from './lib/gfd';
 import { usePaginatedHistory } from './hooks/useHistory';
@@ -96,21 +96,11 @@ function AppContent() {
   });
 
   // ── Derived state ──────────────────────────────────────────────
-  const sendChannels = useMemo(
-    () => serverChannels.filter((c) => !disabledChannels.has(c.prefix)),
-    [serverChannels, disabledChannels],
-  );
-  const activeFilter = useMemo(
-    () => filters.find((f) => f.name === activeFilterName) ?? null,
-    [filters, activeFilterName],
-  );
-  const filteredMessages = useMemo(
-    () =>
-      activeFilter
-        ? messages.filter((m) => activeFilter.showChannelTypes.includes(m.Type))
-        : messages,
-    [activeFilter, messages],
-  );
+  const sendChannels = serverChannels.filter((c) => !disabledChannels.has(c.prefix));
+  const activeFilter = filters.find((f) => f.name === activeFilterName) ?? null;
+  const filteredMessages = activeFilter
+    ? messages.filter((m) => activeFilter.showChannelTypes.includes(m.Type))
+    : messages;
 
   // ── URL-driven filter selection ────────────────────────────────
   const selectFilter = (name: string) => {
