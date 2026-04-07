@@ -95,7 +95,12 @@ https://raw.githubusercontent.com/twelvehouse/DalamudPlugins/main/pluginmaster.j
 
 Click **+**, save, then search for **ChatAnywhere** in the plugin browser and install it.
 
-### 2. Open the chat UI
+### 2. Set a passcode
+
+Before opening the browser UI, set a **4–8 digit numeric passcode** in the plugin settings window (**ChatAnywhere → Security**).
+This passcode protects the web interface from unauthorised access.
+
+### 3. Open the chat UI
 
 Once the plugin is loaded and you are logged in to a character, open your browser and go to:
 
@@ -103,7 +108,7 @@ Once the plugin is loaded and you are logged in to a character, open your browse
 http://localhost:3000
 ```
 
-The page connects automatically and starts streaming your chat.
+You will be prompted to enter your passcode. After authenticating, the page streams your chat in real time.
 
 To access from another device on the same network (phone, tablet, etc.), use your PC's local IP address instead:
 
@@ -161,23 +166,33 @@ FFXIV game process
  └─ Dalamud plugin (C#)
       ├─ Subscribes to Dalamud chat events
       ├─ Watson.Lite HTTP server (default: port 3000)
-      │    ├─ GET        /           → serves the React SPA (dist folder bundled into the plugin at build time)
+      │    │
+      │    │  Authentication
+      │    ├─ POST       /auth       → verify passcode (PBKDF2-SHA256 hash stored in config);
+      │    │                           issues an HttpOnly SameSite=Strict session cookie on success
+      │    │
+      │    │  Protected endpoints (require valid session cookie)
       │    ├─ GET        /sse        → SSE stream; pushes chat messages as JSON in real time
       │    ├─ GET        /history    → paginated message history (loaded on scroll-up)
       │    ├─ GET        /channels   → list of available chat channels for the logged-in character
       │    ├─ POST       /send       → injects a message into the game's chat input
       │    ├─ GET        /emotes     → list of emotes available to the logged-in character
-      │    ├─ GET        /icon/{id}  → emote icon served as PNG from game data
       │    ├─ GET        /avatar     → Lodestone character avatar lookup (proxied via NetStone)
       │    ├─ GET        /ogp        → Open Graph metadata for URL link preview cards
-      │    ├─ GET/PUT    /settings   → persists filters, folders, and appearance config
-      │    └─ GET        /files/*    → static game data files (SSF font, GFD icon data, PS5 fonticon texture)
-      └─ Avatar results cached in browser sessionStorage
+      │    └─ GET/PUT    /settings   → persists filters, folders, and appearance config
+      │                                (returns 503 if no passcode has been configured yet)
+      │
+      │    Public endpoints (no auth required)
+      ├─ GET        /           → serves the React SPA (dist folder bundled into the plugin at build time)
+      └─ GET        /files/*    → static game data files (SSF font, GFD icon data, PS5 fonticon texture)
+         GET        /icon/{id}  → emote icon served as PNG from game data
 
 Browser (React + TypeScript SPA, built with Vite)
- ├─ Connects to /sse SSE stream on load
+ ├─ Shows a passcode modal on load; re-prompts if a session cookie expires mid-use
+ ├─ Connects to /sse SSE stream after authentication (withCredentials)
  ├─ Filter sidebar with drag-and-drop reordering (@dnd-kit/sortable)
  ├─ FFXIV Lodestone font (SSF TTF), GFD icon data, and PS5 fonticon texture loaded from the plugin server
+ ├─ Avatar results cached in memory (per session)
  └─ Settings and filters persisted server-side via PUT /settings
 ```
 
