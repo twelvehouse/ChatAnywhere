@@ -689,7 +689,7 @@ Host.Routes.PreAuthentication.Static.Add(HttpMethod.GET, "/channels", HandleGetC
     public async ValueTask DisposeAsync()
     {
         Receiver.OnMessageReceived -= HandleNewChatMessage;
-        await _tokenSource.CancelAsync();
+                await _tokenSource.CancelAsync().ConfigureAwait(false);
         Host?.Stop();
         Host?.Dispose();
         _tokenSource.Dispose();
