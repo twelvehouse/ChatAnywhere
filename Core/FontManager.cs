@@ -1,6 +1,3 @@
-using System;
-using System.IO;
-using System.Net.Http;
 using Dalamud.Plugin;
 using Dalamud.Plugin.Services;
 

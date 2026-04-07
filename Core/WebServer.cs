@@ -1,6 +1,3 @@
-using System;
-using System.Threading;
-using System.Threading.Tasks;
 using Dalamud.Plugin.Services;
 using WatsonWebserver.Core;
 using WatsonWebserver.Lite;

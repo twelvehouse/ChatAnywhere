@@ -1,4 +1,3 @@
-using System;
 using System.Text;
 using Dalamud.Plugin.Services;
 using FFXIVClientStructs.FFXIV.Client.System.String;
