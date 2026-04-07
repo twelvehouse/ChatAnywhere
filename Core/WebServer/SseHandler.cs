@@ -1,4 +1,5 @@
 using System;
+using System.Text;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
@@ -96,48 +97,43 @@ internal class SseHandler
         ctx.Response.Headers.Add("Connection", "keep-alive");
         ctx.Response.ChunkedTransfer = true;
 
-        var clientId = _sseManager.Register(ctx);
+        using var clientCts = new CancellationTokenSource();
+        using var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(clientCts.Token, _getToken());
+        var token = linkedCts.Token;
+        var clientId = _sseManager.Register(ctx, clientCts);
+
+        Task<bool> Send(string json) =>
+            ctx.Response.SendChunk(Encoding.UTF8.GetBytes($"data: {json}\n\n"), false, token);
 
         try
         {
-            // Initial payload to confirm connection
-            await ctx.Response.SendChunk(System.Text.Encoding.UTF8.GetBytes("data: {\"type\":\"connected\"}\n\n"), false, default);
+            var initEvents = new List<string> { "{\"type\":\"connected\"}", _chat.GetChannelsJson() };
 
-            // Send available channels
-            var channelsJson = _chat.GetChannelsJson();
-            await ctx.Response.SendChunk(System.Text.Encoding.UTF8.GetBytes($"data: {channelsJson}\n\n"), false, default);
-
-            // Send current active channel
             var activePrefix = _chat.GetCurrentGameChannelPrefix();
             if (!string.IsNullOrEmpty(activePrefix))
-            {
-                var activeData = JsonSerializer.Serialize(new { type = "active-channel", prefix = activePrefix });
-                await ctx.Response.SendChunk(System.Text.Encoding.UTF8.GetBytes($"data: {activeData}\n\n"), false, default);
-            }
+                initEvents.Add(JsonSerializer.Serialize(new { type = "active-channel", prefix = activePrefix }));
 
-            // Send player info if the local player is already known (e.g. on page reload or mid-session connect)
             if (!string.IsNullOrEmpty(_plugin.LocalPlayerName))
-            {
-                var playerData = JsonSerializer.Serialize(new { type = "player-info", name = _plugin.LocalPlayerName, world = _plugin.LocalPlayerWorld });
-                await ctx.Response.SendChunk(System.Text.Encoding.UTF8.GetBytes($"data: {playerData}\n\n"), false, default);
-            }
+                initEvents.Add(JsonSerializer.Serialize(new { type = "player-info", name = _plugin.LocalPlayerName, world = _plugin.LocalPlayerWorld }));
 
-            // Keep connection open
-            var token = _getToken();
+            foreach (var ev in initEvents)
+                if (!await Send(ev)) return;
+
+            var pingBytes = Encoding.UTF8.GetBytes("data: {\"type\":\"ping\"}\n\n");
             while (!token.IsCancellationRequested)
             {
                 await Task.Delay(15000, token);
-                await ctx.Response.SendChunk(System.Text.Encoding.UTF8.GetBytes("data: {\"type\":\"ping\"}\n\n"), false, token);
+                if (!await ctx.Response.SendChunk(pingBytes, false, token)) break;
             }
         }
-        catch (TaskCanceledException) { }
-        catch (Exception ex)
-        {
-            _log.Debug($"SSE connection ended: {ex.Message}");
-        }
+        catch (OperationCanceledException) { }
+        catch (Exception ex) { _log.Debug($"SSE connection ended: {ex.Message}"); }
         finally
         {
             _sseManager.Unregister(clientId);
+            // Watson requires every route handler to complete a response. For SSE the connection
+            // outlives the request lifecycle, so we send an empty final chunk on exit.
+            try { await ctx.Response.SendChunk([], true, CancellationToken.None); } catch { }
         }
     }
 }

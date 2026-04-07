@@ -88,7 +88,14 @@ public class WebServer : IAsyncDisposable
             _settings.Load();
 
             _host.Events.Logger = msg => _log.Debug($"[Watson] {msg}");
-            _host.Events.ExceptionEncountered += (sender, args) => _log.Error(args.Exception, "Webserver threw an exception.");
+            _host.Events.ExceptionEncountered += (sender, args) =>
+            {
+                // Watson throws "did not send a response" when a long-lived SSE connection ends —
+                // expected behavior for SSE, not a real error.
+                if (args.Exception is InvalidOperationException && args.Exception.Message.Contains("did not send a response"))
+                    return;
+                _log.Error(args.Exception, "Webserver threw an exception.");
+            };
 
             _host.Start(_tokenSource.Token);
             IsRunning = true;
