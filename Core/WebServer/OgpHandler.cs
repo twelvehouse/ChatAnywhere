@@ -13,7 +13,7 @@ internal class OgpHandler : IDisposable
     private readonly IPluginLog _log;
     private readonly AuthHandler _auth;
 
-    private static readonly ConcurrentDictionary<string, string> OgpCache = new();
+    private readonly ConcurrentDictionary<string, string> OgpCache = new();
     private readonly HttpClient _httpClient;
 
     private static readonly HashSet<string> TwitterHosts = new(StringComparer.OrdinalIgnoreCase)
