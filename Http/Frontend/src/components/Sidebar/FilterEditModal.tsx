@@ -6,6 +6,8 @@ import { TRACKED_CHANNEL_TYPES, ALL_CHANNELS, CHANNEL_GROUPS } from '../../const
 
 // Channel type labels for the modal checkboxes (used for individual/ungrouped types)
 const CHANNEL_LABELS: Record<number, string> = {
+  1: 'Debug',
+  2: 'Error',
   10: 'Say',
   11: 'Shout',
   12: 'Tell (Out)',

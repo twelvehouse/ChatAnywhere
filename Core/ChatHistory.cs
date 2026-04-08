@@ -20,6 +20,9 @@ public sealed class ChatHistory
     /// </summary>
     public static readonly IReadOnlySet<XivChatType> TrackedTypes = new HashSet<XivChatType>
     {
+        // ---- Plugin/system output ----
+        XivChatType.Debug,                    // 1  - IChatGui.Print() default (most plugin notifications)
+        XivChatType.Urgent,                   // 2  - IChatGui.PrintError() (plugin errors, shown in red)
         // ---- Player chat ----
         XivChatType.Say,
         XivChatType.Party,

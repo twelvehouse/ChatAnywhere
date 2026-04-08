@@ -11,6 +11,9 @@ function rgbaBgSys(r: number, g: number, b: number): string {
 }
 
 export const CHANNEL_MAP: Record<number, ChannelInfo> = {
+  // ---- Plugin output ----
+  1: { label: 'Debug', color: rgba(204, 204, 204), bg: rgbaBgSys(204, 204, 204), isSystem: true },
+  2: { label: 'Error', color: rgba(255, 99, 99), bg: rgbaBgSys(255, 99, 99), isSystem: true },
   // ---- Chat ----
   10: { label: 'Say', color: rgba(247, 247, 247), bg: rgbaBg(247, 247, 247), isSystem: false },
   11: { label: 'Shout', color: rgba(255, 166, 102), bg: rgbaBg(255, 166, 102), isSystem: false },
@@ -127,7 +130,7 @@ export const DEFAULT_CHANNELS: ChannelOption[] = ALL_CHANNELS.filter((c) =>
 // Channel types that match the server-side TrackedTypes exactly
 export const TRACKED_CHANNEL_TYPES: number[] = [
   10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 27, 28, 29, 30, 32, 36, 37, 101, 102,
-  103, 104, 105, 106, 107, 56, 69, 70, 75, 77, 78,
+  103, 104, 105, 106, 107, 69, 70, 75, 77, 78, 56, 1, 2,
 ];
 
 export interface ChannelGroup {
