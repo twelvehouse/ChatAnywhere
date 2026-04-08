@@ -1,5 +1,6 @@
 using System.Collections.Concurrent;
 using System.Text;
+using System.Threading.Channels;
 using Dalamud.Plugin.Services;
 using WatsonWebserver.Core;
 
@@ -7,15 +8,20 @@ namespace ChatAnywhere.Core;
 
 /// <summary>
 /// Manages SSE client connections and broadcasts events to all connected clients.
-/// Uses ConcurrentDictionary so disconnected clients can be removed during iteration.
-/// Each connection has a CancellationTokenSource; cancelling it signals the ping loop to exit.
+/// A single consumer task drains the broadcast queue in order; callers are never blocked.
 /// </summary>
-public sealed class SseManager
+public sealed class SseManager : IAsyncDisposable
 {
     private readonly ConcurrentDictionary<Guid, (HttpContextBase ctx, CancellationTokenSource cts)> _connections = new();
     private readonly IPluginLog _log;
+    private readonly Channel<byte[]> _queue = Channel.CreateUnbounded<byte[]>(new UnboundedChannelOptions { SingleReader = true });
+    private readonly Task _consumer;
 
-    public SseManager(IPluginLog log) { _log = log; }
+    public SseManager(IPluginLog log)
+    {
+        _log = log;
+        _consumer = Task.Run(ConsumeAsync);
+    }
 
     public int Count => _connections.Count;
 
@@ -34,26 +40,39 @@ public sealed class SseManager
     }
 
     /// <summary>
-    /// Sends an SSE event to all connected clients.
-    /// SendChunk returns false instead of throwing on write failure, so we check the return value.
+    /// Enqueues an SSE event for delivery to all connected clients.
+    /// Returns immediately; the consumer task sends events in order on the thread pool.
     /// </summary>
     public void Broadcast(string eventData)
     {
-        var bytes = Encoding.UTF8.GetBytes(eventData);
-        foreach (var (id, (ctx, cts)) in _connections)
+        if (_connections.IsEmpty) return;
+        _queue.Writer.TryWrite(Encoding.UTF8.GetBytes(eventData));
+    }
+
+    private async Task ConsumeAsync()
+    {
+        await foreach (var bytes in _queue.Reader.ReadAllAsync().ConfigureAwait(false))
         {
-            if (cts.IsCancellationRequested) { RemoveClient(id, cts); continue; }
-
-            bool sent;
-            try
+            foreach (var (id, (ctx, cts)) in _connections)
             {
-                var task = ctx.Response.SendChunk(bytes, false, cts.Token);
-                sent = task.Wait(500) && task.Result;
-            }
-            catch { sent = false; }
+                if (cts.IsCancellationRequested) { RemoveClient(id, cts); continue; }
 
-            if (!sent) RemoveClient(id, cts);
+                bool sent;
+                try
+                {
+                    sent = await ctx.Response.SendChunk(bytes, false, cts.Token).ConfigureAwait(false);
+                }
+                catch { sent = false; }
+
+                if (!sent) RemoveClient(id, cts);
+            }
         }
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        _queue.Writer.Complete();
+        await _consumer.ConfigureAwait(false);
     }
 
     private void RemoveClient(Guid id, CancellationTokenSource cts)

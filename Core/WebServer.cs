@@ -125,6 +125,8 @@ public class WebServer : IAsyncDisposable
     {
         _receiver.OnMessageReceived -= _sse.OnChatMessageReceived;
         _receiver.Dispose();
+        _ogp.Dispose();
+        await _sseManager.DisposeAsync().ConfigureAwait(false);
         await _tokenSource.CancelAsync().ConfigureAwait(false);
         _host?.Stop();
         _host?.Dispose();

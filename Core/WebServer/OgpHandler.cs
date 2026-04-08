@@ -8,13 +8,13 @@ using WatsonWebserver.Core;
 
 namespace ChatAnywhere.Core;
 
-internal class OgpHandler
+internal class OgpHandler : IDisposable
 {
     private readonly IPluginLog _log;
     private readonly AuthHandler _auth;
 
     private static readonly ConcurrentDictionary<string, string> OgpCache = new();
-    private static readonly HttpClient OgpHttpClient = CreateOgpHttpClient();
+    private readonly HttpClient _httpClient;
 
     private static readonly HashSet<string> TwitterHosts = new(StringComparer.OrdinalIgnoreCase)
         { "x.com", "twitter.com", "www.x.com", "www.twitter.com" };
@@ -23,13 +23,11 @@ internal class OgpHandler
     {
         _log = log;
         _auth = auth;
+        var handler = new HttpClientHandler { AllowAutoRedirect = true, MaxAutomaticRedirections = 5 };
+        _httpClient = new HttpClient(handler) { Timeout = TimeSpan.FromSeconds(10) };
     }
 
-    private static HttpClient CreateOgpHttpClient()
-    {
-        var handler = new HttpClientHandler { AllowAutoRedirect = true, MaxAutomaticRedirections = 5 };
-        return new HttpClient(handler) { Timeout = TimeSpan.FromSeconds(10) };
-    }
+    public void Dispose() => _httpClient.Dispose();
 
     internal async Task HandleGetOgp(HttpContextBase ctx)
     {
@@ -141,7 +139,7 @@ internal class OgpHandler
     private async Task<string> FetchTwitterOEmbed(string url)
     {
         var oembedUrl = $"https://publish.twitter.com/oembed?url={Uri.EscapeDataString(url)}&format=json&omit_script=true";
-        var json = await OgpHttpClient.GetStringAsync(oembedUrl);
+        var json = await _httpClient.GetStringAsync(oembedUrl);
 
         using var doc = JsonDocument.Parse(json);
         var root = doc.RootElement;
