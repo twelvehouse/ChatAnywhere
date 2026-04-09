@@ -106,6 +106,7 @@ export function ChatArea({
 
       <MessageList
         messages={filteredMessages}
+        filterName={activeFilter?.name}
         isConnected={isConnected}
         bannerCount={bannerCount}
         hasUnreadDown={hasUnreadDown}

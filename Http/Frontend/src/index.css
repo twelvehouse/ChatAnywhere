@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
 
 /* ========== Design Tokens (Dark Theme Default) ========== */
 :root,
@@ -453,8 +453,8 @@ body {
 }
 
 .message-avatar {
-  width: calc(36px * var(--sys-scale, 1));
-  height: calc(36px * var(--sys-scale, 1));
+  width: calc(40px * var(--sys-scale, 1));
+  height: calc(40px * var(--sys-scale, 1));
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -462,7 +462,9 @@ body {
   font-weight: 700;
   font-size: 0.9rem;
   flex-shrink: 0;
-  margin-top: 2px;
+  margin-top: calc(2px * var(--sys-scale, 1));
+  overflow: hidden;
+  transition: box-shadow 0.2s ease;
 }
 
 .message-body {
@@ -474,7 +476,7 @@ body {
   display: flex;
   align-items: center;
   gap: 8px;
-  margin-bottom: 2px;
+  margin-bottom: 4px;
   flex-wrap: wrap;
 }
 
@@ -517,13 +519,13 @@ body {
 }
 
 .message-time-mini {
-  width: calc(36px * var(--sys-scale, 1));
-  text-align: right;
+  width: calc(40px * var(--sys-scale, 1));
+  text-align: center;
   font-size: 0.68em;
   color: var(--text-muted);
   opacity: 0;
   flex-shrink: 0;
-  margin-top: 4px;
+  margin-top: calc(4px * var(--sys-scale, 1));
   user-select: none;
   transition: opacity 0.1s ease-in-out;
 }
@@ -536,20 +538,20 @@ body {
 
 /*
  * Reference row — sits above .message-inner, aligned after the avatar column.
- * margin-left = avatar(36px) + gap(12px) = 48px.
+ * margin-left = avatar(40px) + gap(12px) = 52px.
  *
  * The L-shaped connector is drawn via ::before:
- *   left: -30px  → reaches avatar horizontal center (48 - 18 = 30px left)
+ *   left: -32px  → reaches avatar horizontal center (52 - 20 = 32px left)
  *   top: 50%     → starts at the vertical center of the reference icon
  *   bottom: 0    → extends down to connect with the avatar below
- *   width: 26px  → stops just before the reference icon (30 - 4px gap)
+ *   width: 28px  → stops just before the reference icon (32 - 4px gap)
  */
 .tell-ref-row {
   position: relative;
   display: flex;
   align-items: center;
   gap: calc(4px * var(--sys-scale, 1));
-  margin-left: calc(48px * var(--sys-scale, 1));
+  margin-left: calc(52px * var(--sys-scale, 1));
   margin-bottom: 2px;
   font-size: 0.75em;
   color: var(--text-dim);
@@ -559,10 +561,10 @@ body {
 .tell-ref-row::before {
   content: '';
   position: absolute;
-  left: calc(-30px * var(--sys-scale, 1));
+  left: calc(-32px * var(--sys-scale, 1));
   top: 50%;
   bottom: 0;
-  width: calc(26px * var(--sys-scale, 1));
+  width: calc(28px * var(--sys-scale, 1));
   border-left: 2px solid rgba(255, 255, 255, 0.15);
   border-top: 2px solid rgba(255, 255, 255, 0.15);
   border-top-left-radius: 6px;

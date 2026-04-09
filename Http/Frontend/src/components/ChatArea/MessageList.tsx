@@ -89,6 +89,7 @@ function findTellRef(messages: ChatMessage[], idx: number): ChatMessage | null {
 
 interface Props {
   messages: ChatMessage[];
+  filterName?: string;
   isConnected: boolean;
   bannerCount: number;
   hasUnreadDown: boolean;
@@ -111,6 +112,7 @@ interface Props {
 
 export function MessageList({
   messages,
+  filterName,
   isConnected,
   bannerCount,
   hasUnreadDown,
@@ -225,10 +227,51 @@ export function MessageList({
 
             {messages.length === 0 && (
               <div className={styles['messages-empty']}>
-                <div className={styles['messages-empty-icon']}>💬</div>
-                <div>
-                  {isConnected ? 'No messages in this filter.' : 'Waiting for chat stream...'}
-                </div>
+                {isConnected ? (
+                  <>
+                    <svg
+                      className={styles['messages-empty-icon']}
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="1.2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      aria-hidden="true"
+                    >
+                      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                    </svg>
+                    <div className={styles['messages-empty-title']}>
+                      {filterName ? `#${filterName} is quiet` : 'Nothing here yet'}
+                    </div>
+                    <div className={styles['messages-empty-subtitle']}>
+                      Messages from the game will appear here as they arrive.
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <svg
+                      className={styles['messages-empty-icon']}
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="1.2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      aria-hidden="true"
+                    >
+                      <circle cx="12" cy="12" r="10" />
+                      <line x1="12" y1="8" x2="12" y2="12" />
+                      <line x1="12" y1="16" x2="12.01" y2="16" />
+                    </svg>
+                    <div className={styles['messages-empty-title']}>Waiting for chat stream...</div>
+                    <div className={styles['messages-empty-subtitle']}>
+                      Make sure the plugin is running in-game.
+                    </div>
+                  </>
+                )}
               </div>
             )}
 

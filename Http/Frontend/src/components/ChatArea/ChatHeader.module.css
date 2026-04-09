@@ -63,7 +63,7 @@
   color: var(--text-secondary);
   font-size: 0.78rem;
   font-weight: 600;
-  padding: 4px 12px;
+  padding: 4px 10px;
   border-radius: 4px;
   cursor: pointer;
   flex-shrink: 0;
@@ -71,9 +71,18 @@
     background 0.15s,
     color 0.15s;
   font-family: inherit;
+  display: flex;
+  align-items: center;
+  gap: 5px;
 }
 
 .header-edit-btn:hover {
   background: var(--bg-hover);
   color: var(--text-primary);
+}
+
+.header-edit-icon {
+  width: 13px;
+  height: 13px;
+  flex-shrink: 0;
 }
