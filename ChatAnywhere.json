@@ -3,14 +3,13 @@
   "Name": "ChatAnywhere",
   "InternalName": "ChatAnywhere",
   "AssemblyVersion": "1.0.0.0",
-  "Description": "Host your chat on a web server so you can talk from anywhere.\n\nNote: Plugin icon was generated using AI (Google Gemini).",
+  "Description": "Host your chat on a web server so you can talk from anywhere.",
   "ApplicableVersion": "any",
   "DalamudApiLevel": 14,
   "LoadRequiredState": 0,
   "LoadSync": false,
   "LoadPriority": 0,
   "CanUnloadAsync": false,
-  "IconUrl": "https://raw.githubusercontent.com/twelvehouse/ChatAnywhere/main/images/icon.png",
   "ImageUrls": [
     "https://raw.githubusercontent.com/twelvehouse/ChatAnywhere/main/images/image1.png",
     "https://raw.githubusercontent.com/twelvehouse/ChatAnywhere/main/images/image2.png"
