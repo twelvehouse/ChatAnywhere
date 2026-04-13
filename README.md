@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="images/icon1024.png" alt="ChatAnywhere icon" width="96">
+  <img src="images/icon.png" alt="ChatAnywhere icon" width="96">
   <h1>ChatAnywhere</h1>
   <p>Read and send your FFXIV in-game chat from any browser — at home or on the go.</p>
 </div>

@@ -10,6 +10,7 @@
   "LoadSync": false,
   "LoadPriority": 0,
   "CanUnloadAsync": false,
+  "IconUrl": "https://raw.githubusercontent.com/twelvehouse/ChatAnywhere/main/images/icon.png",
   "ImageUrls": [
     "https://raw.githubusercontent.com/twelvehouse/ChatAnywhere/main/images/image1.png",
     "https://raw.githubusercontent.com/twelvehouse/ChatAnywhere/main/images/image2.png"
