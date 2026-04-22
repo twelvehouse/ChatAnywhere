@@ -108,6 +108,7 @@ interface Props {
   tellModeAll: boolean;
   onReply: (name: string, world?: string) => void;
   trustedDomains: Set<string>;
+  disableTellRef?: boolean;
 }
 
 export function MessageList({
@@ -131,8 +132,11 @@ export function MessageList({
   tellModeAll,
   onReply,
   trustedDomains,
+  disableTellRef = false,
 }: Props) {
-  const tellRefs = messages.map((_, idx) => findTellRef(messages, idx));
+  const tellRefs = disableTellRef
+    ? messages.map(() => null)
+    : messages.map((_, idx) => findTellRef(messages, idx));
 
   const topSentinelRef = useRef<HTMLDivElement>(null);
   // Captures scrollHeight immediately before triggering a load, used to restore position after prepend.

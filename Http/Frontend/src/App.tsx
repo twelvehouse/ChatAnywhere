@@ -7,8 +7,8 @@ import { useSSE } from './hooks/useSSE';
 import { useSettingsSync } from './hooks/useSettingsSync';
 import { useFilterManagement } from './hooks/useFilterManagement';
 import { useAuth } from './hooks/useAuth';
-import { DEFAULT_CHANNELS } from './constants/channels';
-import { formatPlayerName } from './lib/formatUtils';
+import { DEFAULT_CHANNELS, TELL_INCOMING, TELL_OUTGOING } from './constants/channels';
+import { formatPlayerName, isSamePlayer } from './lib/formatUtils';
 import { RELAY_ADDR } from './constants/config';
 import { dispatchUnauthorized } from './lib/authEvent';
 import { Sidebar } from './components/Sidebar/Sidebar';
@@ -16,8 +16,40 @@ import { ChatArea } from './components/ChatArea/ChatArea';
 import { SettingsModal } from './components/Settings/SettingsModal';
 import { LinkConfirmModal } from './components/Settings/LinkConfirmModal';
 import { PasscodeModal } from './components/Auth/PasscodeModal';
-import type { ChatMessage, ChannelOption } from './types/chat';
+import type { ChatMessage, ChannelOption, TellPartner } from './types/chat';
 import type { CustomFilter, FilterFolder } from './types/filter';
+
+function collectTellPartners(messages: ChatMessage[]): TellPartner[] {
+  const seen = new Map<
+    string,
+    { name: string; world?: string; lastTs: number; lastMessage: ChatMessage }
+  >();
+  for (const msg of messages) {
+    if (msg.Type !== TELL_INCOMING && msg.Type !== TELL_OUTGOING) continue;
+    let partnerName: string, partnerWorld: string | undefined;
+    if (msg.Type === TELL_INCOMING) {
+      partnerName = msg.SenderName;
+      partnerWorld = msg.SenderWorld;
+    } else {
+      if (!msg.RecipientName) continue;
+      partnerName = msg.RecipientName;
+      partnerWorld = msg.RecipientWorld;
+    }
+    const key = partnerWorld ? `${partnerName}@${partnerWorld}` : partnerName;
+    const existing = seen.get(key);
+    if (!existing || msg.Timestamp > existing.lastTs) {
+      seen.set(key, {
+        name: partnerName,
+        world: partnerWorld,
+        lastTs: msg.Timestamp,
+        lastMessage: msg,
+      });
+    }
+  }
+  return [...seen.values()]
+    .sort((a, b) => b.lastTs - a.lastTs)
+    .map(({ name, world, lastMessage }) => ({ name, world, lastMessage }));
+}
 
 function App() {
   const { status, authenticate } = useAuth();
@@ -73,6 +105,9 @@ function AppContent() {
   const [localPlayerName, setLocalPlayerName] = useState('');
   const [localPlayerWorld, setLocalPlayerWorld] = useState('');
 
+  // ── DM view state ──────────────────────────────────────────────
+  const [activeDmTarget, setActiveDmTarget] = useState<TellPartner | null>(null);
+
   // ── Tell mode state ────────────────────────────────────────────
   const [replyTarget, setReplyTarget] = useState<{ name: string; world?: string } | null>(null);
   const [replyPinned, setReplyPinned] = useState(false);
@@ -97,10 +132,32 @@ function AppContent() {
 
   // ── Derived state ──────────────────────────────────────────────
   const sendChannels = serverChannels.filter((c) => !disabledChannels.has(c.prefix));
-  const activeFilter = filters.find((f) => f.name === activeFilterName) ?? null;
-  const filteredMessages = activeFilter
-    ? messages.filter((m) => activeFilter.showChannelTypes.includes(m.Type))
-    : messages;
+  const activeFilter = activeDmTarget
+    ? null
+    : (filters.find((f) => f.name === activeFilterName) ?? null);
+
+  const filteredMessages = activeDmTarget
+    ? messages.filter((m) => {
+        if (m.Type !== TELL_INCOMING && m.Type !== TELL_OUTGOING) return false;
+        if (m.Type === TELL_INCOMING)
+          return isSamePlayer(
+            m.SenderName,
+            m.SenderWorld,
+            activeDmTarget.name,
+            activeDmTarget.world,
+          );
+        return isSamePlayer(
+          m.RecipientName ?? '',
+          m.RecipientWorld,
+          activeDmTarget.name,
+          activeDmTarget.world,
+        );
+      })
+    : activeFilter
+      ? messages.filter((m) => activeFilter.showChannelTypes.includes(m.Type))
+      : messages;
+
+  const tellPartners = collectTellPartners(messages);
 
   // ── URL-driven filter selection ────────────────────────────────
   const selectFilter = (name: string) => {
@@ -330,6 +387,7 @@ function AppContent() {
         }
       }
     }
+    setActiveDmTarget(null);
     selectFilter(name);
     setReplyTarget(null);
     setReplyPinned(false);
@@ -345,6 +403,16 @@ function AppContent() {
     } else {
       setBannerCount(0);
     }
+  };
+
+  const handleSelectDm = (partner: TellPartner) => {
+    setActiveDmTarget(partner);
+    setActiveFilterName('');
+    setReplyTarget({ name: partner.name, world: partner.world });
+    setReplyPinned(true);
+    setHasUnreadDown(false);
+    setBannerCount(0);
+    setIsSidebarOpen(false);
   };
 
   // ── Filter / Folder CRUD ───────────────────────────────────────
@@ -379,7 +447,10 @@ function AppContent() {
         folders={folders}
         activeFilterName={activeFilterName}
         unreadMap={unreadMap}
+        tellPartners={tellPartners}
+        activeDmTarget={activeDmTarget}
         onSelectFilter={handleSelectFilter}
+        onSelectDm={handleSelectDm}
         onClose={() => setIsSidebarOpen(false)}
         onOpenSettings={() => setShowSettings(true)}
         onAddFilter={handleAddFilter}
@@ -392,6 +463,7 @@ function AppContent() {
       />
 
       <ChatArea
+        activeDmTarget={activeDmTarget}
         activeFilter={activeFilter}
         filters={filters}
         folders={folders}

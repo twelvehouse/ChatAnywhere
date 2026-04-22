@@ -5,3 +5,14 @@ export const formatTime = (ts: number) =>
 
 export const formatPlayerName = (name: string, world?: string) =>
   world ? `${name}@${world}` : name;
+
+export function isSamePlayer(
+  playerName: string,
+  playerWorld: string | undefined,
+  otherName: string,
+  otherWorld: string | undefined,
+): boolean {
+  if (playerName !== otherName) return false;
+  if (playerWorld && otherWorld) return playerWorld === otherWorld;
+  return true;
+}

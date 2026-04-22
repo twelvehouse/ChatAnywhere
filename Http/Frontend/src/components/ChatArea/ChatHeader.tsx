@@ -1,9 +1,11 @@
 import { useState } from 'react';
 import styles from './ChatHeader.module.css';
 import type { CustomFilter, FilterFolder } from '../../types/filter';
+import type { TellPartner } from '../../types/chat';
 import { FilterEditModal } from '../Sidebar/FilterEditModal';
 
 interface Props {
+  activeDmTarget: TellPartner | null;
   activeFilter: CustomFilter | null;
   filters: CustomFilter[];
   folders: FilterFolder[];
@@ -13,6 +15,7 @@ interface Props {
 }
 
 export function ChatHeader({
+  activeDmTarget,
   activeFilter,
   filters,
   folders,
@@ -38,10 +41,16 @@ export function ChatHeader({
           </span>
         </button>
         <div className={styles['header-title']}>
-          <span className={styles['chat-header-hash']}>#</span>
-          <span className={styles['chat-header-name']}>{activeFilter?.name ?? 'chat'}</span>
+          <span className={styles['chat-header-hash']}>{activeDmTarget ? '@' : '#'}</span>
+          <span className={styles['chat-header-name']}>
+            {activeDmTarget
+              ? activeDmTarget.world
+                ? `${activeDmTarget.name}@${activeDmTarget.world}`
+                : activeDmTarget.name
+              : (activeFilter?.name ?? 'chat')}
+          </span>
         </div>
-        {activeFilter && (
+        {activeFilter && !activeDmTarget && (
           <button className={styles['header-edit-btn']} onClick={() => setShowEditModal(true)}>
             <svg
               className={styles['header-edit-icon']}

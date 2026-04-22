@@ -20,6 +20,10 @@ import { CSS } from '@dnd-kit/utilities';
 import styles from './Sidebar.module.css';
 import { useOnClickOutside } from '../../hooks/useOnClickOutside';
 import type { CustomFilter, FilterFolder } from '../../types/filter';
+import type { TellPartner } from '../../types/chat';
+import { TELL_OUTGOING } from '../../constants/channels';
+import { isSamePlayer } from '../../lib/formatUtils';
+import { AvatarImage } from '../ChatArea/AvatarImage';
 import { FilterEditModal } from './FilterEditModal';
 import { FilterFolderModal } from './FilterFolderModal';
 import { ConfirmDialog } from './ConfirmDialog';
@@ -184,6 +188,54 @@ function SortableFolderSection({
   );
 }
 
+// ── DM row ─────────────────────────────────────────────────────
+interface DmRowProps {
+  partner: TellPartner;
+  isActive: boolean;
+  onSelect: () => void;
+}
+
+function DmRow({ partner, isActive, onSelect }: DmRowProps) {
+  const isOutgoing = partner.lastMessage.Type === TELL_OUTGOING;
+  const previewText = partner.lastMessage.MessagePayloads.filter(
+    (p) => p.Type === 'text' && p.Text,
+  )
+    .map((p) => p.Text!)
+    .join('');
+
+  return (
+    <button
+      className={[styles['dm-row'], isActive ? styles['dm-active'] : ''].filter(Boolean).join(' ')}
+      onClick={onSelect}
+    >
+      <div className={styles['dm-avatar']}>
+        <AvatarImage name={partner.name} world={partner.world} />
+      </div>
+      <div className={styles['dm-info']}>
+        <span className={styles['dm-name']}>{partner.name}</span>
+        <span className={styles['dm-preview']}>
+          {isOutgoing && (
+            <svg
+              className={styles['dm-reply-icon']}
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+            >
+              <polyline points="9 17 4 12 9 7" />
+              <path d="M20 18v-2a4 4 0 0 0-4-4H4" />
+            </svg>
+          )}
+          <span className={styles['dm-preview-text']}>{previewText}</span>
+        </span>
+      </div>
+    </button>
+  );
+}
+
 // ── Main Sidebar ────────────────────────────────────────────────
 interface Props {
   isOpen: boolean;
@@ -192,7 +244,10 @@ interface Props {
   folders: FilterFolder[];
   activeFilterName: string;
   unreadMap: Record<string, number>;
+  tellPartners: TellPartner[];
+  activeDmTarget: TellPartner | null;
   onSelectFilter: (name: string) => void;
+  onSelectDm: (partner: TellPartner) => void;
   onClose: () => void;
   onOpenSettings: () => void;
   onAddFilter: (folderName: string, filter: CustomFilter) => void;
@@ -211,7 +266,10 @@ export function Sidebar({
   folders,
   activeFilterName,
   unreadMap,
+  tellPartners,
+  activeDmTarget,
   onSelectFilter,
+  onSelectDm,
   onClose,
   onOpenSettings,
   onAddFilter,
@@ -406,14 +464,28 @@ export function Sidebar({
           </button>
         </nav>
 
-        {/* ── DM Section (placeholder) ── */}
-        <div className={styles['dm-section']}>
-          <div className={styles['channel-section-label']}>
-            <span>Direct Messages</span>
-            <span className={styles['coming-soon-badge']}>In Development</span>
+        {/* ── DM Section ── */}
+        {tellPartners.length > 0 && (
+          <div className={styles['dm-section']}>
+            <div className={styles['channel-section-label']}>
+              <span>Direct Messages</span>
+            </div>
+            {tellPartners.map((partner) => {
+              const key = partner.world ? `${partner.name}@${partner.world}` : partner.name;
+              const isActive =
+                activeDmTarget !== null &&
+                isSamePlayer(activeDmTarget.name, activeDmTarget.world, partner.name, partner.world);
+              return (
+                <DmRow
+                  key={key}
+                  partner={partner}
+                  isActive={isActive}
+                  onSelect={() => onSelectDm(partner)}
+                />
+              );
+            })}
           </div>
-          <div className={styles['channel-empty']}>Not yet implemented</div>
-        </div>
+        )}
       </aside>
 
       {/* ── Context Menu ── */}

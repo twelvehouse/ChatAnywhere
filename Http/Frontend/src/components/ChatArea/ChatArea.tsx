@@ -3,10 +3,11 @@ import styles from './ChatArea.module.css';
 import { ChatHeader } from './ChatHeader';
 import { MessageList } from './MessageList';
 import { InputArea } from './InputArea';
-import type { ChatMessage, ChannelOption } from '../../types/chat';
+import type { ChatMessage, ChannelOption, TellPartner } from '../../types/chat';
 import type { CustomFilter, FilterFolder } from '../../types/filter';
 
 interface Props {
+  activeDmTarget: TellPartner | null;
   // Header
   activeFilter: CustomFilter | null;
   filters: CustomFilter[];
@@ -53,6 +54,7 @@ interface Props {
 }
 
 export function ChatArea({
+  activeDmTarget,
   activeFilter,
   filters,
   folders,
@@ -97,6 +99,7 @@ export function ChatArea({
     <div className={styles['chat-area']}>
       <ChatHeader
         activeFilter={activeFilter}
+        activeDmTarget={activeDmTarget}
         filters={filters}
         folders={folders}
         isSidebarOpen={isSidebarOpen}
@@ -107,6 +110,7 @@ export function ChatArea({
       <MessageList
         messages={filteredMessages}
         filterName={activeFilter?.name}
+        disableTellRef={activeDmTarget !== null}
         isConnected={isConnected}
         bannerCount={bannerCount}
         hasUnreadDown={hasUnreadDown}
@@ -141,7 +145,8 @@ export function ChatArea({
         emoteSortByName={emoteSortByName}
         replyTarget={replyTarget}
         replyPinned={replyPinned}
-        onClearReply={onClearReply}
+        isDmView={activeDmTarget !== null}
+        onClearReply={activeDmTarget ? () => {} : onClearReply}
         onToggleReplyPin={onToggleReplyPin}
       />
     </div>

@@ -21,6 +21,12 @@ export interface ChannelOption {
   prefix: string;
 }
 
+export interface TellPartner {
+  name: string;
+  world?: string;
+  lastMessage: ChatMessage;
+}
+
 export interface ChannelInfo {
   label: string;
   color: string;

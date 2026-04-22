@@ -23,6 +23,103 @@ function PinIcon() {
   );
 }
 
+interface ChatInputRowProps {
+  innerClass: string;
+  sendChannels: ChannelOption[];
+  selectedSendPrefix: string;
+  onChannelChange: (prefix: string) => void;
+  inTellMode: boolean;
+  inputText: string;
+  onInputChange: (text: string) => void;
+  onKeyDown: (e: KeyboardEvent<HTMLInputElement>) => void;
+  placeholder: string;
+  isConnected: boolean;
+  showCharPicker: boolean;
+  onToggleCharPicker: () => void;
+  onSend: () => void;
+  onExecuteEmote: (command: string) => void;
+  emoteConfirm: boolean;
+  emoteSortByName: boolean;
+}
+
+function ChatInputRow({
+  innerClass,
+  sendChannels,
+  selectedSendPrefix,
+  onChannelChange,
+  inTellMode,
+  inputText,
+  onInputChange,
+  onKeyDown,
+  placeholder,
+  isConnected,
+  showCharPicker,
+  onToggleCharPicker,
+  onSend,
+  onExecuteEmote,
+  emoteConfirm,
+  emoteSortByName,
+}: ChatInputRowProps) {
+  return (
+    <div className={innerClass}>
+      <ChannelSelect
+        channels={sendChannels}
+        value={selectedSendPrefix}
+        onChange={onChannelChange}
+        tellMode={inTellMode}
+      />
+      <div className={styles['input-divider']} />
+      <input
+        type="text"
+        className={styles['chat-input']}
+        placeholder={placeholder}
+        value={inputText}
+        onChange={(e) => onInputChange(e.target.value)}
+        onKeyDown={onKeyDown}
+        disabled={!isConnected}
+        autoFocus
+      />
+      <button
+        type="button"
+        className={styles['char-picker-btn']}
+        onMouseDown={(e) => e.stopPropagation()}
+        onClick={onToggleCharPicker}
+        aria-label="Emotes & Symbols"
+        data-tooltip="Emotes & Symbols"
+        data-picker-open={showCharPicker ? 'true' : undefined}
+      >
+        <span className={styles['char-picker-icon']}>&#xE03E;</span>
+      </button>
+      <button
+        type="button"
+        className={styles['send-btn']}
+        onClick={onSend}
+        disabled={!inputText.trim() || !isConnected}
+        aria-label="Send"
+        data-tooltip="Send Message"
+      >
+        <svg
+          width="16"
+          height="16"
+          viewBox="0 0 16 16"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path d="M14 8L2 2L5.5 8L2 14L14 8Z" fill="currentColor" />
+        </svg>
+      </button>
+      {showCharPicker && (
+        <EmoteSymbolPicker
+          onInsert={(text) => onInputChange(inputText + text)}
+          onExecute={onExecuteEmote}
+          emoteConfirm={emoteConfirm}
+          emoteSortByName={emoteSortByName}
+        />
+      )}
+    </div>
+  );
+}
+
 interface Props {
   isConnected: boolean;
   sendChannels: ChannelOption[];
@@ -37,6 +134,7 @@ interface Props {
   emoteSortByName: boolean;
   replyTarget: { name: string; world?: string } | null;
   replyPinned: boolean;
+  isDmView?: boolean;
   onClearReply: () => void;
   onToggleReplyPin: () => void;
 }
@@ -55,6 +153,7 @@ export function InputArea({
   emoteSortByName,
   replyTarget,
   replyPinned,
+  isDmView = false,
   onClearReply,
   onToggleReplyPin,
 }: Props) {
@@ -90,65 +189,23 @@ export function InputArea({
     }
   };
 
-  // Shared input row content
-  const inputRowContent = (innerClass: string) => (
-    <div className={innerClass}>
-      <ChannelSelect
-        channels={sendChannels}
-        value={selectedSendPrefix}
-        onChange={handleChannelChange}
-        tellMode={inTellMode}
-      />
-      <div className={styles['input-divider']} />
-      <input
-        type="text"
-        className={styles['chat-input']}
-        placeholder={placeholder}
-        value={inputText}
-        onChange={(e) => setInputText(e.target.value)}
-        onKeyDown={handleKeyDown}
-        disabled={!isConnected}
-        autoFocus
-      />
-      <button
-        type="button"
-        className={styles['char-picker-btn']}
-        onMouseDown={(e) => e.stopPropagation()}
-        onClick={onToggleCharPicker}
-        aria-label="Emotes & Symbols"
-        data-tooltip="Emotes & Symbols"
-        data-picker-open={showCharPicker ? 'true' : undefined}
-      >
-        <span className={styles['char-picker-icon']}>&#xE03E;</span>
-      </button>
-      <button
-        type="button"
-        className={styles['send-btn']}
-        onClick={handleSend}
-        disabled={!inputText.trim() || !isConnected}
-        aria-label="Send"
-        data-tooltip="Send Message"
-      >
-        <svg
-          width="16"
-          height="16"
-          viewBox="0 0 16 16"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path d="M14 8L2 2L5.5 8L2 14L14 8Z" fill="currentColor" />
-        </svg>
-      </button>
-      {showCharPicker && (
-        <EmoteSymbolPicker
-          onInsert={(text) => setInputText((prev) => prev + text)}
-          onExecute={onExecuteEmote}
-          emoteConfirm={emoteConfirm}
-          emoteSortByName={emoteSortByName}
-        />
-      )}
-    </div>
-  );
+  const rowProps = {
+    sendChannels,
+    selectedSendPrefix,
+    onChannelChange: handleChannelChange,
+    inTellMode,
+    inputText,
+    onInputChange: setInputText,
+    onKeyDown: handleKeyDown,
+    placeholder,
+    isConnected,
+    showCharPicker,
+    onToggleCharPicker,
+    onSend: handleSend,
+    onExecuteEmote,
+    emoteConfirm,
+    emoteSortByName,
+  };
 
   return (
     <div className={styles['input-area']} ref={inputAreaRef}>
@@ -160,30 +217,36 @@ export function InputArea({
               <AvatarImage name={replyTarget!.name} world={replyTarget!.world} />
             </div>
             <span className={styles['tell-banner-name']}>{replyTargetLabel}</span>
-            <button
-              type="button"
-              className={`${styles['tell-pin-btn']}${replyPinned ? ` ${styles.pinned}` : ''}`}
-              onClick={onToggleReplyPin}
-              aria-label={replyPinned ? 'Unpin (auto-dismiss after send)' : 'Pin (keep after send)'}
-              data-tooltip={replyPinned ? 'Keep after send' : 'Send once'}
-            >
-              <PinIcon />
-              <span>{replyPinned ? 'Pinned' : 'Pin'}</span>
-            </button>
-            <button
-              type="button"
-              className={styles['tell-dismiss-btn']}
-              onClick={onClearReply}
-              aria-label="Exit Tell mode"
-              data-tooltip="Cancel"
-            >
-              ×
-            </button>
+            {!isDmView && (
+              <button
+                type="button"
+                className={`${styles['tell-pin-btn']}${replyPinned ? ` ${styles.pinned}` : ''}`}
+                onClick={onToggleReplyPin}
+                aria-label={
+                  replyPinned ? 'Unpin (auto-dismiss after send)' : 'Pin (keep after send)'
+                }
+                data-tooltip={replyPinned ? 'Keep after send' : 'Send once'}
+              >
+                <PinIcon />
+                <span>{replyPinned ? 'Pinned' : 'Pin'}</span>
+              </button>
+            )}
+            {!isDmView && (
+              <button
+                type="button"
+                className={styles['tell-dismiss-btn']}
+                onClick={onClearReply}
+                aria-label="Exit Tell mode"
+                data-tooltip="Cancel"
+              >
+                ×
+              </button>
+            )}
           </div>
-          {inputRowContent(styles['tell-input-inner'])}
+          <ChatInputRow {...rowProps} innerClass={styles['tell-input-inner']} />
         </div>
       ) : (
-        inputRowContent(styles['chat-input-wrapper'])
+        <ChatInputRow {...rowProps} innerClass={styles['chat-input-wrapper']} />
       )}
     </div>
   );
