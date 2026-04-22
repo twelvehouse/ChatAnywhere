@@ -42,26 +42,6 @@
   margin-bottom: 0;
 }
 
-/* ── Sub-row (indented, dimmed) ── */
-.row-sub {
-  padding-left: 16px;
-  opacity: 0.5;
-}
-
-/* ── Coming soon badge ── */
-.coming-soon-badge {
-  font-size: 10px;
-  font-weight: 600;
-  color: var(--text-muted);
-  background: var(--bg-input);
-  border: 1px solid var(--border);
-  border-radius: 4px;
-  padding: 1px 5px;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  flex-shrink: 0;
-}
-
 /* ── Select All buttons ── */
 .select-all-btns {
   display: flex;

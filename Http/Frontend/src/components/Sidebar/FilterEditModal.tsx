@@ -169,21 +169,6 @@ export function FilterEditModal({
         <div className={`form-section ${styles['modal-section']}`}>
           <div className="form-section-title">Notification</div>
           <div className="form-row">
-            <span className="form-row-label">
-              Sound
-              <span className={styles['coming-soon-badge']}>In Development</span>
-            </span>
-            <div className="toggle-switch" style={{ opacity: 0.35, cursor: 'not-allowed' }}>
-              <div className="toggle-knob" />
-            </div>
-          </div>
-          <div className={`form-row ${styles['row-sub']}`}>
-            <span className="form-row-label">SE</span>
-            <select className="form-select" disabled>
-              <option>SE1</option>
-            </select>
-          </div>
-          <div className="form-row">
             <span className="form-row-label">Badge (Unread)</span>
             <button
               className={`toggle-switch${notifyUnread ? ' on' : ''}`}

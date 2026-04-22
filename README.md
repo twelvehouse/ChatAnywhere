@@ -38,7 +38,6 @@ Organise filters into folders and reorder everything with drag-and-drop.
 Each filter can have its own:
 - **Default send channel** — the channel used when you press Send
 - **Unread badge** — highlights the filter tab when new messages arrive while it's not active
-- **Sound notification** — plays an in-browser SE sound on new messages
 
 ![Filter editor](images/readme-filter.png)
 
