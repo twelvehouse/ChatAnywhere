@@ -94,7 +94,7 @@ internal class GameFileHandler
                 if (row.Icon == 0 || string.IsNullOrEmpty(name) || string.IsNullOrEmpty(command))
                     continue;
 
-                var isOwned = row.UnlockLink == 0 || (uiState != null && uiState->IsUnlockLinkUnlocked(row.UnlockLink));
+                var isOwned = uiState == null || uiState->IsEmoteUnlocked((ushort)row.RowId);
                 entries.Add(new { id = (int)row.RowId, name, command, iconId = (int)row.Icon, isOwned });
             }
 
