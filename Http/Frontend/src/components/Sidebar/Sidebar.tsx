@@ -463,12 +463,14 @@ export function Sidebar({
         </nav>
 
         {/* ── DM Section ── */}
-        {tellPartners.length > 0 && (
-          <div className={styles['dm-section']}>
-            <div className={styles['channel-section-label']}>
-              <span>Direct Messages</span>
-            </div>
-            {tellPartners.map((partner) => {
+        <div className={styles['dm-section']}>
+          <div className={styles['channel-section-label']}>
+            <span>Direct Messages</span>
+          </div>
+          {tellPartners.length === 0 ? (
+            <div className={styles['channel-empty']}>No recent tells</div>
+          ) : (
+            tellPartners.map((partner) => {
               const key = partner.world ? `${partner.name}@${partner.world}` : partner.name;
               const isActive =
                 activeDmTarget !== null &&
@@ -486,9 +488,9 @@ export function Sidebar({
                   onSelect={() => onSelectDm(partner)}
                 />
               );
-            })}
-          </div>
-        )}
+            })
+          )}
+        </div>
       </aside>
 
       {/* ── Context Menu ── */}
