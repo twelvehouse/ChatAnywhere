@@ -12,10 +12,14 @@
 }
 
 .chat-header-hash {
-  font-size: 1.25rem;
+  font-family: 'Roboto Mono', monospace;
+  font-size: 1.3rem;
   font-weight: 700;
   color: var(--text-muted);
   line-height: 1;
+  width: 1.2rem;
+  text-align: center;
+  flex-shrink: 0;
 }
 
 .chat-header-name {

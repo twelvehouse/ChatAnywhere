@@ -43,11 +43,7 @@ export function ChatHeader({
         <div className={styles['header-title']}>
           <span className={styles['chat-header-hash']}>{activeDmTarget ? '@' : '#'}</span>
           <span className={styles['chat-header-name']}>
-            {activeDmTarget
-              ? activeDmTarget.world
-                ? `${activeDmTarget.name}@${activeDmTarget.world}`
-                : activeDmTarget.name
-              : (activeFilter?.name ?? 'chat')}
+            {activeDmTarget ? activeDmTarget.name : (activeFilter?.name ?? 'chat')}
           </span>
         </div>
         {activeFilter && !activeDmTarget && (
