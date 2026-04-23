@@ -46,14 +46,14 @@ Each filter can have its own:
 Click any sender's name to enter **Tell mode** and reply to them directly.
 - **Pin** the conversation to keep Tell mode active across multiple sends
 - Use the **channel switcher** to switch between Tell and any other channel mid-session
-- Recent Tell partners appear in the **Direct Messages** section of the sidebar
+- Recent Tell partners appear in the **Direct Messages** section of the sidebar — clicking one automatically pins them as the active send target
 
 ### Emote & symbol picker
 
 A built-in picker lets you perform emotes or insert FFXIV special characters without ever leaving the chat window.
 
 **Emotes tab** — lists every emote you own, pulled live from your game data.
-Search by name or `/command`, see your recently used emotes at the top, and toggle whether the emote appears in the chat log (with or without the `motion` suffix).
+Search by name or `/command` (tap × to clear), see your recently used emotes at the top, and toggle whether the emote appears in the chat log (with or without the `motion` suffix).
 Enable *Confirm mode* in Settings to require a second tap before the emote fires — handy on touchscreens.
 
 **Symbols tab** — gives quick access to every FFXIV private-use symbol:
