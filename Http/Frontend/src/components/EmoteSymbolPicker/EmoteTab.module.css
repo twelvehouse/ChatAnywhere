@@ -43,10 +43,38 @@
   color: var(--text-primary);
   font-family: inherit;
   font-size: calc(15px * var(--sys-scale, 1));
-  padding: calc(4px * var(--sys-scale, 1)) calc(8px * var(--sys-scale, 1))
+  padding: calc(4px * var(--sys-scale, 1)) calc(28px * var(--sys-scale, 1))
     calc(4px * var(--sys-scale, 1)) calc(28px * var(--sys-scale, 1));
   outline: none;
   transition: border-color 0.15s;
+}
+
+.clear-btn {
+  position: absolute;
+  right: calc(7px * var(--sys-scale, 1));
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: calc(16px * var(--sys-scale, 1));
+  height: calc(16px * var(--sys-scale, 1));
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  color: var(--text-muted);
+  border-radius: 3px;
+  transition: color 0.1s;
+}
+
+.clear-btn:hover {
+  color: var(--text-primary);
+}
+
+.clear-btn svg {
+  width: calc(10px * var(--sys-scale, 1));
+  height: calc(10px * var(--sys-scale, 1));
 }
 
 .search-input::placeholder {

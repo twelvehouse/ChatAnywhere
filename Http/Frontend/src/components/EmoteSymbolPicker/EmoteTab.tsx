@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useTransition } from 'react';
 import styles from './EmoteTab.module.css';
 import type { Emote } from '../../hooks/useEmoteList';
 import { RELAY_ADDR } from '../../constants/config';
@@ -23,6 +23,9 @@ export function EmoteTab({
   emoteSortByName,
 }: Props) {
   const [search, setSearch] = useState('');
+  const [filterQuery, setFilterQuery] = useState('');
+  const [, startTransition] = useTransition();
+
   // pendingKey tracks which specific row instance is pending: "<section>-<id>" (e.g. "history-1", "main-1")
   const [pendingKey, setPendingKey] = useState<string | null>(null);
 
@@ -50,7 +53,7 @@ export function EmoteTab({
 
   const buildCommand = (emote: Emote) => (logOutput ? emote.command : `${emote.command} motion`);
 
-  const q = search.toLowerCase();
+  const q = filterQuery.toLowerCase();
   const filtered = emotes.filter(
     (e) =>
       e.isOwned && (!q || e.name.toLowerCase().includes(q) || e.command.toLowerCase().includes(q)),
@@ -81,12 +84,12 @@ export function EmoteTab({
   };
 
   const renderRow = (emote: Emote, keyPrefix: string) => {
-    const isPending = pendingKey === `${keyPrefix}-${emote.id}`;
+    const isPendingRow = pendingKey === `${keyPrefix}-${emote.id}`;
     return (
       <button
         key={`${keyPrefix}-${emote.id}`}
         type="button"
-        className={`${styles['emote-row']}${isPending ? ` ${styles.pending}` : ''}`}
+        className={`${styles['emote-row']}${isPendingRow ? ` ${styles.pending}` : ''}`}
         onClick={() => handleEmoteClick(emote, keyPrefix)}
       >
         <img
@@ -106,12 +109,12 @@ export function EmoteTab({
         <span className={styles['emote-icon-fallback']} style={{ display: 'none' }} aria-hidden />
         <span className={styles['emote-name']}>{emote.name}</span>
         <span className={styles['emote-command']}>{emote.command}</span>
-        {isPending && <span className={styles['emote-play']}>Perform</span>}
+        {isPendingRow && <span className={styles['emote-play']}>Perform</span>}
       </button>
     );
   };
 
-  const showHistory = historyEmotes.length > 0 && !search;
+  const showHistory = historyEmotes.length > 0 && !search && !filterQuery;
 
   return (
     <div className={styles['emote-tab']}>
@@ -137,10 +140,41 @@ export function EmoteTab({
             placeholder="Search emotes..."
             value={search}
             onChange={(e) => {
-              setSearch(e.target.value);
+              const val = e.target.value;
+              setSearch(val);
               setPendingKey(null);
+              startTransition(() => {
+                setFilterQuery(val);
+              });
             }}
           />
+          {search && (
+            <button
+              type="button"
+              className={styles['clear-btn']}
+              aria-label="Clear search"
+              onClick={() => {
+                setSearch('');
+                setPendingKey(null);
+                startTransition(() => {
+                  setFilterQuery('');
+                });
+              }}
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 16 16"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                aria-hidden
+              >
+                <line x1="4" y1="4" x2="12" y2="12" />
+                <line x1="12" y1="4" x2="4" y2="12" />
+              </svg>
+            </button>
+          )}
         </div>
         <button
           type="button"
