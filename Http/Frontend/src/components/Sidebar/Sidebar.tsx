@@ -197,9 +197,7 @@ interface DmRowProps {
 
 function DmRow({ partner, isActive, onSelect }: DmRowProps) {
   const isOutgoing = partner.lastMessage.Type === TELL_OUTGOING;
-  const previewText = partner.lastMessage.MessagePayloads.filter(
-    (p) => p.Type === 'text' && p.Text,
-  )
+  const previewText = partner.lastMessage.MessagePayloads.filter((p) => p.Type === 'text' && p.Text)
     .map((p) => p.Text!)
     .join('');
 
@@ -474,7 +472,12 @@ export function Sidebar({
               const key = partner.world ? `${partner.name}@${partner.world}` : partner.name;
               const isActive =
                 activeDmTarget !== null &&
-                isSamePlayer(activeDmTarget.name, activeDmTarget.world, partner.name, partner.world);
+                isSamePlayer(
+                  activeDmTarget.name,
+                  activeDmTarget.world,
+                  partner.name,
+                  partner.world,
+                );
               return (
                 <DmRow
                   key={key}

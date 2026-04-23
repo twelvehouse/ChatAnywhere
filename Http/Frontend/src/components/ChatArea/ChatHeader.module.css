@@ -15,12 +15,14 @@
   font-size: 1.25rem;
   font-weight: 700;
   color: var(--text-muted);
+  line-height: 1;
 }
 
 .chat-header-name {
   font-size: 0.95rem;
   font-weight: 600;
   color: var(--text-primary);
+  line-height: 1;
 }
 
 /* ========== Hamburger Button ========== */
