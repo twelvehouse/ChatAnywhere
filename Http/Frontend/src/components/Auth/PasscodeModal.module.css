@@ -46,6 +46,7 @@
   text-align: center;
   letter-spacing: 0.4em;
   outline: none;
+  caret-color: transparent;
   transition:
     border-color 0.15s,
     box-shadow 0.15s;

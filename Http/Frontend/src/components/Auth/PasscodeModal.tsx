@@ -83,6 +83,7 @@ export function PasscodeModal({ status, onAuthenticate }: Props) {
             value={passcode}
             onChange={(e) => handleChange(e.target.value)}
             onKeyDown={handleKeyDown}
+            onBlur={() => inputRef.current?.focus()}
             placeholder="••••"
             disabled={isSubmitting}
             autoComplete="off"
