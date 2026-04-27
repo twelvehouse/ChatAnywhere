@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import type { KeyboardEvent } from 'react';
 import styles from './InputArea.module.css';
 import { ChannelSelect } from '../ChannelSelect/ChannelSelect';
@@ -8,7 +8,25 @@ import { getBadgeInfoByPrefix } from '../../lib/channelUtils';
 import { formatPlayerName } from '../../lib/formatUtils';
 import type { ChannelOption } from '../../types/chat';
 
-// Thumbtack / pin icon SVG (Bootstrap-style)
+const MAX_BYTES = 500;
+
+function getUtf8ByteLength(str: string): number {
+  return new TextEncoder().encode(str).length;
+}
+
+function findOverflowIndex(text: string, maxBytes: number): number {
+  let byteCount = 0;
+  for (let i = 0; i < text.length; ) {
+    const cp = text.codePointAt(i)!;
+    const charLen = cp > 0xffff ? 2 : 1;
+    const charBytes = cp <= 0x7f ? 1 : cp <= 0x7ff ? 2 : cp <= 0xffff ? 3 : 4;
+    if (byteCount + charBytes > maxBytes) return i;
+    byteCount += charBytes;
+    i += charLen;
+  }
+  return text.length;
+}
+
 function PinIcon() {
   return (
     <svg
@@ -40,6 +58,8 @@ interface ChatInputRowProps {
   onExecuteEmote: (command: string) => void;
   emoteConfirm: boolean;
   emoteSortByName: boolean;
+  effectiveLimit: number;
+  isOverLimit: boolean;
 }
 
 function ChatInputRow({
@@ -59,7 +79,26 @@ function ChatInputRow({
   onExecuteEmote,
   emoteConfirm,
   emoteSortByName,
+  effectiveLimit,
+  isOverLimit,
 }: ChatInputRowProps) {
+  const inputRef = useRef<HTMLInputElement>(null);
+  const mirrorTextRef = useRef<HTMLSpanElement>(null);
+
+  const syncScroll = useCallback(() => {
+    if (inputRef.current && mirrorTextRef.current) {
+      mirrorTextRef.current.style.transform = `translateX(-${inputRef.current.scrollLeft}px)`;
+    }
+  }, []);
+
+  const scheduleSync = useCallback(() => {
+    requestAnimationFrame(syncScroll);
+  }, [syncScroll]);
+
+  const overflowIndex = isOverLimit
+    ? findOverflowIndex(inputText, effectiveLimit)
+    : inputText.length;
+
   return (
     <div className={innerClass}>
       <ChannelSelect
@@ -69,16 +108,36 @@ function ChatInputRow({
         tellMode={inTellMode}
       />
       <div className={styles['input-divider']} />
-      <input
-        type="text"
-        className={styles['chat-input']}
-        placeholder={placeholder}
-        value={inputText}
-        onChange={(e) => onInputChange(e.target.value)}
-        onKeyDown={onKeyDown}
-        disabled={!isConnected}
-        autoFocus
-      />
+      <div className={styles['input-container']}>
+        {isOverLimit && (
+          <div className={styles['input-mirror']} aria-hidden="true">
+            <span ref={mirrorTextRef} className={styles['mirror-text']}>
+              {inputText.slice(0, overflowIndex)}
+              <span className={styles['overflow-highlight']}>{inputText.slice(overflowIndex)}</span>
+            </span>
+          </div>
+        )}
+        <input
+          ref={inputRef}
+          type="text"
+          className={styles['chat-input']}
+          placeholder={placeholder}
+          value={inputText}
+          onChange={(e) => {
+            onInputChange(e.target.value);
+            scheduleSync();
+          }}
+          onKeyDown={(e) => {
+            onKeyDown(e);
+            scheduleSync();
+          }}
+          onScroll={syncScroll}
+          onClick={scheduleSync}
+          onSelect={scheduleSync}
+          disabled={!isConnected}
+          autoFocus
+        />
+      </div>
       <button
         type="button"
         className={styles['char-picker-btn']}
@@ -94,7 +153,8 @@ function ChatInputRow({
         type="button"
         className={styles['send-btn']}
         onClick={onSend}
-        disabled={!inputText.trim() || !isConnected}
+        disabled={!inputText.trim() || !isConnected || isOverLimit}
+        data-over-limit={isOverLimit ? 'true' : undefined}
         aria-label="Send"
         data-tooltip="Send Message"
       >
@@ -163,6 +223,13 @@ export function InputArea({
   const currentChannel =
     sendChannels.find((c) => c.prefix === selectedSendPrefix) ?? sendChannels[0];
   const inTellMode = replyTarget !== null;
+
+  const prefixBytes =
+    inTellMode && replyTarget
+      ? getUtf8ByteLength(`/tell ${formatPlayerName(replyTarget.name, replyTarget.world)} `)
+      : getUtf8ByteLength(selectedSendPrefix);
+  const effectiveLimit = Math.max(1, MAX_BYTES - prefixBytes);
+  const isOverLimit = getUtf8ByteLength(inputText) > effectiveLimit;
   const replyTargetLabel = replyTarget ? formatPlayerName(replyTarget.name, replyTarget.world) : '';
   const placeholder = isConnected
     ? inTellMode
@@ -176,7 +243,7 @@ export function InputArea({
   };
 
   const handleSend = () => {
-    if (!inputText.trim() || !isConnected) return;
+    if (!inputText.trim() || !isConnected || isOverLimit) return;
     onSend(inputText);
     setInputText('');
   };
@@ -205,6 +272,8 @@ export function InputArea({
     onExecuteEmote,
     emoteConfirm,
     emoteSortByName,
+    effectiveLimit,
+    isOverLimit,
   };
 
   return (

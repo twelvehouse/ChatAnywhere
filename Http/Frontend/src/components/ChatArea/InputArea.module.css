@@ -35,15 +35,48 @@
   flex-shrink: 0;
 }
 
-.chat-input {
+/* ========== Input container + overflow highlight mirror ========== */
+.input-container {
   flex: 1;
+  min-width: 0;
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.input-mirror {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+}
+
+.mirror-text {
+  white-space: pre;
+  flex-shrink: 0;
+  font-family: var(--chat-font);
+  font-size: max(16px, 1em);
+  color: transparent;
+  will-change: transform;
+}
+
+.overflow-highlight {
+  background: rgba(240, 71, 71, 0.35);
+  border-radius: 2px;
+}
+
+.chat-input {
+  width: 100%;
+  padding: 0;
   background: transparent;
   border: none;
   color: var(--text-primary);
   font-family: var(--chat-font);
   font-size: max(16px, 1em); /* Prevent iOS Safari auto-zoom (triggers at < 16px) */
   outline: none;
-  min-width: 0;
+  position: relative;
 }
 
 .chat-input::placeholder {
@@ -263,6 +296,12 @@
     color 0.15s;
   background: var(--accent, #5865f2);
   color: #fff;
+}
+
+.send-btn[data-over-limit='true']:disabled {
+  background: rgba(240, 71, 71, 0.25);
+  color: var(--text-muted);
+  cursor: not-allowed;
 }
 
 .send-btn:disabled {
