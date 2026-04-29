@@ -5,7 +5,7 @@
   "AssemblyVersion": "1.0.0.0",
   "Description": "Host your chat on a web server so you can talk from anywhere.",
   "ApplicableVersion": "any",
-  "DalamudApiLevel": 14,
+  "DalamudApiLevel": 15,
   "LoadRequiredState": 0,
   "LoadSync": false,
   "LoadPriority": 0,

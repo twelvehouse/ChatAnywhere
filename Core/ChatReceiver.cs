@@ -1,6 +1,6 @@
 using System.Text.RegularExpressions;
+using Dalamud.Game.Chat;
 using Dalamud.Game.Text;
-using Dalamud.Game.Text.SeStringHandling;
 using Dalamud.Game.Text.SeStringHandling.Payloads;
 using Dalamud.Plugin.Services;
 
@@ -76,14 +76,18 @@ public class ChatReceiver : IDisposable
         ChatGui.ChatMessageUnhandled += ChatMessageUnhandled;
     }
 
-    private void ChatMessageUnhandled(XivChatType type, int timestamp, SeString sender, SeString message)
+    private void ChatMessageUnhandled(IChatMessage chatMessage)
     {
         try
         {
+            var type = chatMessage.LogKind;
+            var sender = chatMessage.Sender;
+            var message = chatMessage.Message;
+
             var msg = new ReceivedChatMessage
             {
                 Type = (ushort)type,
-                SenderName = Regex.Replace(sender.TextValue, @"[\uE000-\uF8FF]", "").Trim(),
+                SenderName = Regex.Replace(sender.TextValue, @"[-]", "").Trim(),
                 SenderWorld = string.Empty,
                 MessagePayloads = new System.Collections.Generic.List<ChatPayloadDto>(),
                 Timestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()
@@ -97,12 +101,12 @@ public class ChatReceiver : IDisposable
                 msg.SenderWorld = ObjectTable.LocalPlayer.HomeWorld.ValueNullable?.Name.ToString() ?? string.Empty;
 
                 // Extract recipient name and world from the 'sender' parameter
-                msg.RecipientName = Regex.Replace(sender.TextValue, @"[\uE000-\uF8FF]", "").Trim();
+                msg.RecipientName = Regex.Replace(sender.TextValue, @"[-]", "").Trim();
                 foreach (var payload in sender.Payloads)
                 {
                     if (payload is Dalamud.Game.Text.SeStringHandling.Payloads.PlayerPayload pp)
                     {
-                        msg.RecipientName = Regex.Replace(pp.PlayerName, @"[\uE000-\uF8FF]", "").Trim();
+                        msg.RecipientName = Regex.Replace(pp.PlayerName, @"[-]", "").Trim();
                         msg.RecipientWorld = pp.World.ValueNullable?.Name.ToString() ?? string.Empty;
                         break;
                     }
@@ -119,7 +123,7 @@ public class ChatReceiver : IDisposable
                     if (payload is Dalamud.Game.Text.SeStringHandling.Payloads.PlayerPayload pp)
                     {
                         msg.SenderWorld = pp.World.ValueNullable?.Name.ToString() ?? string.Empty;
-                        msg.SenderName = Regex.Replace(pp.PlayerName, @"[\uE000-\uF8FF]", "").Trim();
+                        msg.SenderName = Regex.Replace(pp.PlayerName, @"[-]", "").Trim();
                         break;
                     }
                 }
@@ -167,7 +171,7 @@ public class ChatReceiver : IDisposable
 
             // For CustomEmote (28), the game message text does NOT include the sender's name,
             // so we prepend it into the payload stream so the frontend can display it.
-            if (msg.Type == 28 && !string.IsNullOrEmpty(msg.SenderName))
+            if (msg.Type == (ushort)XivChatType.CustomEmote && !string.IsNullOrEmpty(msg.SenderName))
             {
                 msg.MessagePayloads.Insert(0, new ChatPayloadDto { Type = "text", Text = msg.SenderName });
             }

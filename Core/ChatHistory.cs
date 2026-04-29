@@ -36,12 +36,12 @@ public sealed class ChatHistory
         XivChatType.CustomEmote,
         XivChatType.StandardEmote,
         XivChatType.PvPTeam,
-        XivChatType.CrossParty,               // 32
-        (XivChatType)69,                      // FreeCompanyAnnouncement
-        (XivChatType)70,                      // FreeCompanyLoginLogout
-        (XivChatType)75,                      // NoviceNetworkSystem
-        (XivChatType)77,                      // PvpTeamAnnouncement
-        (XivChatType)78,                      // PvpTeamLoginLogout
+        XivChatType.CrossParty,
+        XivChatType.FreeCompanyAnnouncement,
+        XivChatType.FreeCompanyLoginLogout,
+        XivChatType.NoviceNetworkSystem,
+        XivChatType.PvpTeamAnnouncement,
+        XivChatType.PvpTeamLoginLogout,
         // Linkshell 1-8
         XivChatType.Ls1,
         XivChatType.Ls2,
