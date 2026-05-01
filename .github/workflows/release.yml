@@ -46,8 +46,11 @@ jobs:
           cd Http/Frontend && zip -r ../../websiteBuild.zip dist/ && cd ../..
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
+          git fetch origin main
+          git checkout main
+          git pull origin main
           git add websiteBuild.zip
-          git diff --cached --quiet || git commit -m "chore: update websiteBuild.zip" && git push origin HEAD:refs/heads/main
+          git diff --cached --quiet || git commit -m "chore: update websiteBuild.zip" && git push origin main
 
       - name: Build
         run: dotnet build -c Release -p:DalamudLibPath=$HOME/dalamud -p:IsPlogonBuild=True
