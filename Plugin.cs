@@ -7,7 +7,7 @@ using ChatAnywhere.Ui;
 
 namespace ChatAnywhere;
 
-public sealed class Plugin : IDalamudPlugin
+public sealed class Plugin : IAsyncDalamudPlugin
 {
     public string Name => "ChatAnywhere";
 
@@ -76,7 +76,10 @@ public sealed class Plugin : IDalamudPlugin
 
         SettingsWindow = new SettingsWindow(this);
         WindowSystem.AddWindow(SettingsWindow);
+    }
 
+    public Task LoadAsync(CancellationToken cancellationToken)
+    {
         if (Config.WebinterfaceEnabled)
             Server.Start();
 
@@ -93,6 +96,8 @@ public sealed class Plugin : IDalamudPlugin
         Interface.UiBuilder.Draw         += WindowSystem.Draw;
         Interface.UiBuilder.OpenConfigUi += OnOpenConfigUi;
         Interface.UiBuilder.OpenMainUi   += OnOpenConfigUi;
+
+        return Task.CompletedTask;
     }
 
     private void OnCommand(string command, string args)
@@ -189,7 +194,7 @@ public sealed class Plugin : IDalamudPlugin
         Interface.SavePluginConfig(Config);
     }
 
-    public void Dispose()
+    public async ValueTask DisposeAsync()
     {
         CommandManager.RemoveHandler(CommandName);
 
@@ -201,7 +206,7 @@ public sealed class Plugin : IDalamudPlugin
 
         WindowSystem.RemoveAllWindows();
 
-        Server.DisposeAsync().AsTask().Wait();
+        await Server.DisposeAsync().ConfigureAwait(false);
         Receiver.Dispose();
 
         SaveConfig();
