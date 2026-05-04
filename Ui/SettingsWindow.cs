@@ -161,7 +161,7 @@ public sealed class SettingsWindow : Window
 
         ImGui.Spacing();
 
-        ImGui.SetNextItemWidth(100);
+        ImGui.SetNextItemWidth(100 * ImGuiHelpers.GlobalScale);
         if (ImGui.InputInt("Port", ref _editPort))
             _editPort = Math.Clamp(_editPort, 1024, 49151);
 
@@ -183,7 +183,7 @@ public sealed class SettingsWindow : Window
             ImGui.Spacing();
         }
 
-        ImGui.SetNextItemWidth(120);
+        ImGui.SetNextItemWidth(120 * ImGuiHelpers.GlobalScale);
         ImGui.InputText("New Passcode##passcode", ref _editPassword, 8, ImGuiInputTextFlags.Password);
         ImGui.SameLine();
         ImGui.TextColored(ColorMuted, "(4–8 digits)");
@@ -191,7 +191,7 @@ public sealed class SettingsWindow : Window
         var digitsOnly = new string(_editPassword.Where(char.IsDigit).ToArray());
         if (digitsOnly != _editPassword) _editPassword = digitsOnly;
 
-        ImGui.SetNextItemWidth(120);
+        ImGui.SetNextItemWidth(120 * ImGuiHelpers.GlobalScale);
         ImGui.InputText("Confirm##passcode-confirm", ref _editPasswordConfirm, 8, ImGuiInputTextFlags.Password);
 
         var confirmDigitsOnly = new string(_editPasswordConfirm.Where(char.IsDigit).ToArray());
