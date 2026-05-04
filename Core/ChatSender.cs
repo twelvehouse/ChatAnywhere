@@ -5,6 +5,7 @@ using FFXIVClientStructs.FFXIV.Client.UI;
 
 namespace ChatAnywhere.Core;
 
+// Based on ChatTwo: https://github.com/Infiziert90/ChatTwo
 public unsafe class ChatSender
 {
     private readonly IPluginLog Log;
@@ -38,7 +39,7 @@ public unsafe class ChatSender
 
     private void SendMessageUnsafe(byte[] message)
     {
-        var mes = Utf8String.FromSequence(message);
+        var mes = Utf8String.FromSequence([.. message, 0]);
         UIModule.Instance()->ProcessChatBoxEntry(mes);
         mes->Dtor(true);
     }

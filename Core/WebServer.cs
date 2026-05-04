@@ -56,7 +56,7 @@ public class WebServer : IAsyncDisposable
                 _tokenSource = new CancellationTokenSource();
             }
 
-            var serverSettings = new WebserverSettings("*", _plugin.Config.WebinterfacePort);
+            var serverSettings = new WebserverSettings("0.0.0.0", _plugin.Config.WebinterfacePort);
             // Remove Watson's built-in wildcard CORS default headers — we reflect the origin per-route
             serverSettings.Headers.DefaultHeaders.Remove("Access-Control-Allow-Origin");
             serverSettings.Headers.DefaultHeaders.Remove("Access-Control-Allow-Methods");

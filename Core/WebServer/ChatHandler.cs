@@ -176,7 +176,7 @@ internal class ChatHandler
             22  => "/l7 ",   // Ls7
             23  => "/l8 ",   // Ls8
             24  => "/fc ",   // FreeCompany
-            27  => "/n ",    // NoviceNetwork
+            27  => "/b ",    // NoviceNetwork
             30  => "/y ",    // Yell
             37  => "/cwl1 ", // CrossLinkShell1
             101 => "/cwl2 ", // CrossLinkShell2

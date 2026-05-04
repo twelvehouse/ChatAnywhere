@@ -1,6 +1,7 @@
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
 using System.Numerics;
+using Dalamud.Interface.Utility;
 using Dalamud.Interface.Utility.Raii;
 using Dalamud.Interface.Windowing;
 using Dalamud.Bindings.ImGui;
@@ -125,7 +126,7 @@ public sealed class SettingsWindow : Window
 
         ImGui.TextColored(isRunning ? ColorGreen : ColorRed, isRunning ? "● Running" : "○ Stopped");
 
-        ImGui.SameLine(80);
+        ImGui.SameLine(80 * ImGuiHelpers.GlobalScale);
 
         using (ImRaii.Disabled(isRunning))
         {
@@ -262,7 +263,7 @@ public sealed class SettingsWindow : Window
     private static void DrawUrlRow(string label, string url)
     {
         ImGui.TextColored(ColorMuted, $"  {label}:");
-        ImGui.SameLine(110);
+        ImGui.SameLine(110 * ImGuiHelpers.GlobalScale);
 
         if (ImGui.Selectable(url + $"##url-{label}"))
             Dalamud.Utility.Util.OpenLink(url);
