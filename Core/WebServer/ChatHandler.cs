@@ -161,31 +161,18 @@ internal class ChatHandler
 
         var type = shell->ChatType;
 
+        // Game-internal ChatType values
         return type switch
         {
-            10  => "/s ",    // Say
-            11  => "/sh ",   // Shout
-            14  => "/p ",    // Party
-            15  => "/a ",    // Alliance
-            16  => "/l1 ",   // Ls1
-            17  => "/l2 ",   // Ls2
-            18  => "/l3 ",   // Ls3
-            19  => "/l4 ",   // Ls4
-            20  => "/l5 ",   // Ls5
-            21  => "/l6 ",   // Ls6
-            22  => "/l7 ",   // Ls7
-            23  => "/l8 ",   // Ls8
-            24  => "/fc ",   // FreeCompany
-            27  => "/b ",    // NoviceNetwork
-            30  => "/y ",    // Yell
-            37  => "/cwl1 ", // CrossLinkShell1
-            101 => "/cwl2 ", // CrossLinkShell2
-            102 => "/cwl3 ", // CrossLinkShell3
-            103 => "/cwl4 ", // CrossLinkShell4
-            104 => "/cwl5 ", // CrossLinkShell5
-            105 => "/cwl6 ", // CrossLinkShell6
-            106 => "/cwl7 ", // CrossLinkShell7
-            107 => "/cwl8 ", // CrossLinkShell8
+            1  => "/s ",    // Say
+            2  => "/p ",    // Party
+            3  => "/a ",    // Alliance
+            4  => "/y ",    // Yell
+            5  => "/sh ",   // Shout
+            6  => "/fc ",   // FreeCompany
+            8  => "/b ",    // NoviceNetwork
+            >= 9  and <= 16 => $"/cwl{type - 8} ",  // CrossLinkShell1-8
+            >= 19 and <= 26 => $"/l{type - 18} ",   // LinkShell1-8
             _   => string.Empty
         };
     }
