@@ -6,6 +6,7 @@
   "Description": "Host your chat on a web server so you can talk from anywhere.",
   "ApplicableVersion": "any",
   "Punchline": "Chat in FFXIV from your browser anywhere.",
+  "RepoUrl": "https://github.com/twelvehouse/ChatAnywhere",
   "Tags": [
     "chat",
     "web",
