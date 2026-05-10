@@ -1,7 +1,7 @@
 <div align="center">
   <img src="images/icon.png" alt="ChatAnywhere icon" width="96">
   <h1>ChatAnywhere</h1>
-  <p>Read and send your FFXIV in-game chat from any browser — at home or on the go.</p>
+  <p>Host your chat on a web server so you can talk from anywhere.</p>
 </div>
 
 <div align="center">
