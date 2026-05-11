@@ -2,12 +2,16 @@
   <img src="images/icon.png" alt="ChatAnywhere icon" width="96">
   <h1>ChatAnywhere</h1>
   <p>Host your chat on a web server so you can talk from anywhere.</p>
+  <a href="https://github.com/twelvehouse/ChatAnywhere">
+    <img src="https://img.shields.io/endpoint?url=https://qzysathwfhebdai6xgauhz4q7m0mzmrf.lambda-url.us-east-1.on.aws/ChatAnywhere" alt="Download count">
+  </a>
 </div>
 
 <div align="center">
-  <img src="images/readme-chat.png" alt="Chat view on desktop" width="640">
-  &nbsp;&nbsp;
-  <img src="images/readme-mobile.png" alt="Chat view on mobile" width="200">
+  <table><tr>
+    <td><img src="images/readme-chat.png" alt="Chat view on desktop" width="560"></td>
+    <td><img src="images/readme-mobile.png" alt="Chat view on mobile" width="180"></td>
+  </tr></table>
 </div>
 
 ChatAnywhere is a [Dalamud](https://github.com/goatcorp/Dalamud) plugin that runs a lightweight web server inside FFXIV.
