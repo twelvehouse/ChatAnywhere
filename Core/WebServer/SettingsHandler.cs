@@ -251,7 +251,7 @@ internal class SettingsHandler
             var characterKey = $"{name}@{world}";
             var charPath = CharacterSettingsPath(name, world);
 
-            var copyFromGlobal = true;
+            var copyFromGlobal = false;
             var body = await HttpHelper.ReadBodyAsync(ctx, 256);
             if (!string.IsNullOrEmpty(body))
             {
