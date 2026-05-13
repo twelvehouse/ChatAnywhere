@@ -565,6 +565,12 @@ function AppContent() {
           setEmoteSortByName={setEmoteSortByName}
           retainSyncSendPrefix={retainSyncSendPrefix}
           setRetainSyncSendPrefix={setRetainSyncSendPrefix}
+          currentFilters={filters}
+          currentFolders={folders}
+          onImportFilters={(nf, nfold) => {
+            setFilters(nf);
+            setFolders(nfold);
+          }}
           onClose={() => setShowSettings(false)}
         />
       )}

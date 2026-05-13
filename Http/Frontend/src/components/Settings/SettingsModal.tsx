@@ -3,11 +3,13 @@ import type { Dispatch, SetStateAction } from 'react';
 import styles from './SettingsModal.module.css';
 import { AppearanceSettings } from './AppearanceSettings';
 import { ChannelSettings } from './ChannelSettings';
-import { SecuritySettings } from './SecuritySettings';
+import { FiltersSettings } from './FiltersSettings';
 import { OthersSettings } from './OthersSettings';
+import { SecuritySettings } from './SecuritySettings';
 import type { ChannelOption } from '../../types/chat';
+import type { CustomFilter, FilterFolder } from '../../types/filter';
 
-type SettingsCategory = 'appearance' | 'channels' | 'security' | 'others';
+type SettingsCategory = 'appearance' | 'send-channels' | 'filters' | 'chat-input' | 'security';
 
 interface Props {
   // Appearance
@@ -19,7 +21,7 @@ interface Props {
   setFontSize: Dispatch<SetStateAction<number>>;
   setItalicizeSystem: Dispatch<SetStateAction<boolean>>;
   setUseColoredBackground: Dispatch<SetStateAction<boolean>>;
-  // Channels
+  // Send Channels
   serverChannels: ChannelOption[];
   disabledChannels: Set<string>;
   selectedSendPrefix: string;
@@ -28,7 +30,7 @@ interface Props {
   // Security
   trustedDomains: Set<string>;
   setTrustedDomains: Dispatch<SetStateAction<Set<string>>>;
-  // Others
+  // Chat & Input
   tellModeAll: boolean;
   setTellModeAll: Dispatch<SetStateAction<boolean>>;
   ctrlEnterToSend: boolean;
@@ -39,6 +41,10 @@ interface Props {
   setEmoteSortByName: Dispatch<SetStateAction<boolean>>;
   retainSyncSendPrefix: boolean;
   setRetainSyncSendPrefix: Dispatch<SetStateAction<boolean>>;
+  // Filters
+  currentFilters: CustomFilter[];
+  currentFolders: FilterFolder[];
+  onImportFilters: (newFilters: CustomFilter[], newFolders: FilterFolder[]) => void;
   // Control
   onClose: () => void;
 }
@@ -69,6 +75,9 @@ export function SettingsModal({
   setEmoteSortByName,
   retainSyncSendPrefix,
   setRetainSyncSendPrefix,
+  currentFilters,
+  currentFolders,
+  onImportFilters,
   onClose,
 }: Props) {
   const [category, setCategory] = useState<SettingsCategory>('appearance');
@@ -112,8 +121,8 @@ export function SettingsModal({
               Appearance
             </button>
             <button
-              className={`${styles['settings-nav-item']}${category === 'channels' ? ` ${styles.active}` : ''}`}
-              onClick={() => selectCategory('channels')}
+              className={`${styles['settings-nav-item']}${category === 'send-channels' ? ` ${styles.active}` : ''}`}
+              onClick={() => selectCategory('send-channels')}
             >
               <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
                 <path
@@ -123,7 +132,42 @@ export function SettingsModal({
                   strokeLinecap="round"
                 />
               </svg>
-              Chat Channels
+              Send Channels
+            </button>
+            <button
+              className={`${styles['settings-nav-item']}${category === 'filters' ? ` ${styles.active}` : ''}`}
+              onClick={() => selectCategory('filters')}
+            >
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 16 16"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.5"
+              >
+                <path d="M2 3h12l-4.5 5.5V13l-3-1.5V8.5L2 3z" strokeLinejoin="round" />
+              </svg>
+              Filters
+            </button>
+            <button
+              className={`${styles['settings-nav-item']}${category === 'chat-input' ? ` ${styles.active}` : ''}`}
+              onClick={() => selectCategory('chat-input')}
+            >
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 16 16"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.5"
+              >
+                <path
+                  d="M2 3h12a1 1 0 0 1 1 1v7a1 1 0 0 1-1 1H5l-3 2V4a1 1 0 0 1 1-1z"
+                  strokeLinejoin="round"
+                />
+              </svg>
+              Chat &amp; Input
             </button>
             <button
               className={`${styles['settings-nav-item']}${category === 'security' ? ` ${styles.active}` : ''}`}
@@ -140,23 +184,6 @@ export function SettingsModal({
                 <path d="M8 2L3 4.5v4c0 2.5 2 4.5 5 5.5 3-1 5-3 5-5.5v-4L8 2z" />
               </svg>
               Security
-            </button>
-            <button
-              className={`${styles['settings-nav-item']}${category === 'others' ? ` ${styles.active}` : ''}`}
-              onClick={() => selectCategory('others')}
-            >
-              <svg
-                width="16"
-                height="16"
-                viewBox="0 0 16 16"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.5"
-              >
-                <rect x="2" y="2" width="12" height="12" rx="2" />
-                <path d="M5 8h6M8 5v6" />
-              </svg>
-              Others
             </button>
           </nav>
         </div>
@@ -176,9 +203,10 @@ export function SettingsModal({
             </button>
             <h2>
               {category === 'appearance' && 'Appearance'}
-              {category === 'channels' && 'Chat Channels'}
+              {category === 'send-channels' && 'Send Channels'}
+              {category === 'filters' && 'Filters'}
+              {category === 'chat-input' && 'Chat & Input'}
               {category === 'security' && 'Security'}
-              {category === 'others' && 'Others'}
             </h2>
             <button className={styles['modal-close']} onClick={handleClose}>
               ×
@@ -198,7 +226,7 @@ export function SettingsModal({
                 setUseColoredBackground={setUseColoredBackground}
               />
             )}
-            {category === 'channels' && (
+            {category === 'send-channels' && (
               <ChannelSettings
                 serverChannels={serverChannels}
                 disabledChannels={disabledChannels}
@@ -207,13 +235,14 @@ export function SettingsModal({
                 setSelectedSendPrefix={setSelectedSendPrefix}
               />
             )}
-            {category === 'security' && (
-              <SecuritySettings
-                trustedDomains={trustedDomains}
-                setTrustedDomains={setTrustedDomains}
+            {category === 'filters' && (
+              <FiltersSettings
+                currentFilters={currentFilters}
+                currentFolders={currentFolders}
+                onImport={onImportFilters}
               />
             )}
-            {category === 'others' && (
+            {category === 'chat-input' && (
               <OthersSettings
                 tellModeAll={tellModeAll}
                 setTellModeAll={setTellModeAll}
@@ -225,6 +254,12 @@ export function SettingsModal({
                 setEmoteSortByName={setEmoteSortByName}
                 retainSyncSendPrefix={retainSyncSendPrefix}
                 setRetainSyncSendPrefix={setRetainSyncSendPrefix}
+              />
+            )}
+            {category === 'security' && (
+              <SecuritySettings
+                trustedDomains={trustedDomains}
+                setTrustedDomains={setTrustedDomains}
               />
             )}
           </div>

@@ -1,3 +1,4 @@
+using System.Text;
 using System.Text.Json;
 using Dalamud.Plugin.Services;
 using WatsonWebserver.Core;
@@ -63,6 +64,58 @@ internal class SettingsHandler
         catch (Exception ex)
         {
             _log.Error(ex, "Failed to read frontend settings.");
+            ctx.Response.StatusCode = 500;
+            _auth.AddCorsHeaders(ctx);
+            await ctx.Response.Send("Internal Server Error");
+        }
+    }
+
+    internal async Task HandleGetCharacters(HttpContextBase ctx)
+    {
+        if (!await _auth.RequireAuth(ctx)) return;
+
+        try
+        {
+            var configDir = _plugin.Interface.ConfigDirectory.FullName;
+            var sb = new StringBuilder("[");
+            var first = true;
+
+            foreach (var file in Directory.EnumerateFiles(configDir, "*.json"))
+            {
+                var fileName = Path.GetFileName(file);
+                if (fileName.Equals("frontend-settings.json", StringComparison.OrdinalIgnoreCase))
+                    continue;
+
+                var key = Path.GetFileNameWithoutExtension(fileName);
+                try
+                {
+                    var json = await File.ReadAllTextAsync(file);
+                    using var doc = JsonDocument.Parse(json);
+                    var root = doc.RootElement;
+
+                    var filtersJson = root.TryGetProperty("filters", out var f) ? f.GetRawText() : "[]";
+                    var foldersJson = root.TryGetProperty("folders", out var fo) ? fo.GetRawText() : "[]";
+
+                    if (!first) sb.Append(',');
+                    sb.Append($"{{\"key\":{JsonSerializer.Serialize(key)},\"filters\":{filtersJson},\"folders\":{foldersJson}}}");
+                    first = false;
+                }
+                catch
+                {
+                    // Skip malformed files
+                }
+            }
+
+            sb.Append(']');
+
+            ctx.Response.StatusCode = 200;
+            _auth.AddCorsHeaders(ctx);
+            ctx.Response.Headers.Add("Content-Type", "application/json");
+            await ctx.Response.Send(sb.ToString());
+        }
+        catch (Exception ex)
+        {
+            _log.Error(ex, "Failed to list character settings.");
             ctx.Response.StatusCode = 500;
             _auth.AddCorsHeaders(ctx);
             await ctx.Response.Send("Internal Server Error");

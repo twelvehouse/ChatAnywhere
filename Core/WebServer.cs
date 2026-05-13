@@ -74,9 +74,11 @@ public class WebServer : IAsyncDisposable
             _host.Routes.PreAuthentication.Static.Add(HttpMethod.GET,     "/channels", _chat.HandleGetChannels,          ExceptionRoute);
             _host.Routes.PreAuthentication.Static.Add(HttpMethod.GET,     "/avatar",   _avatar.HandleGetAvatar,          ExceptionRoute);
             _host.Routes.PreAuthentication.Static.Add(HttpMethod.GET,     "/ogp",      _ogp.HandleGetOgp,                ExceptionRoute);
-            _host.Routes.PreAuthentication.Static.Add(HttpMethod.OPTIONS, "/settings", _auth.HandleCorsPreflight,        ExceptionRoute);
-            _host.Routes.PreAuthentication.Static.Add(HttpMethod.GET,     "/settings", _settings.HandleGetSettings,      ExceptionRoute);
-            _host.Routes.PreAuthentication.Static.Add(HttpMethod.PUT,     "/settings", _settings.HandlePutSettings,      ExceptionRoute);
+            _host.Routes.PreAuthentication.Static.Add(HttpMethod.OPTIONS, "/settings",            _auth.HandleCorsPreflight,           ExceptionRoute);
+            _host.Routes.PreAuthentication.Static.Add(HttpMethod.GET,     "/settings",            _settings.HandleGetSettings,         ExceptionRoute);
+            _host.Routes.PreAuthentication.Static.Add(HttpMethod.PUT,     "/settings",            _settings.HandlePutSettings,         ExceptionRoute);
+            _host.Routes.PreAuthentication.Static.Add(HttpMethod.OPTIONS, "/settings/characters", _auth.HandleCorsPreflight,           ExceptionRoute);
+            _host.Routes.PreAuthentication.Static.Add(HttpMethod.GET,     "/settings/characters", _settings.HandleGetCharacters,       ExceptionRoute);
             _host.Routes.PreAuthentication.Static.Add(HttpMethod.GET,     "/files/gfdata.gfd",              _gameFiles.GetGfdData,       ExceptionRoute);
             _host.Routes.PreAuthentication.Static.Add(HttpMethod.GET,     "/files/fonticon_ps5.tex",        _gameFiles.GetTexData,       ExceptionRoute);
             _host.Routes.PreAuthentication.Static.Add(HttpMethod.GET,     "/files/FFXIV_Lodestone_SSF.ttf", _gameFiles.GetLodestoneFont, ExceptionRoute);
