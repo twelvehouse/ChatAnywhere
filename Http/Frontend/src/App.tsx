@@ -54,10 +54,6 @@ function collectTellPartners(messages: ChatMessage[]): TellPartner[] {
 function App() {
   const { status, authenticate } = useAuth();
 
-  if (status === 'loading') {
-    return <div style={{ display: 'none' }} />;
-  }
-
   if (status !== 'authenticated') {
     return <PasscodeModal status={status} onAuthenticate={authenticate} />;
   }
@@ -123,6 +119,9 @@ function AppContent() {
   // ── Settings reload epoch (increments on character change) ────
   const [settingsEpoch, setSettingsEpoch] = useState(0);
 
+  // ── Login overlay (delayed to avoid flash on initial SSE connect) ──
+  const [showLoginOverlay, setShowLoginOverlay] = useState(false);
+
   // ── Refs for hooks ─────────────────────────────────────────────
   const activeFilterNameRef = useRef(activeFilterName);
   const filtersRef = useRef(filters);
@@ -172,6 +171,16 @@ function AppContent() {
 
   const handleReset = useCallback(() => setSettingsEpoch((n) => n + 1), []);
 
+  useEffect(() => {
+    if (isConnected && !localPlayerName) {
+      const t = setTimeout(() => setShowLoginOverlay(true), 300);
+      return () => {
+        clearTimeout(t);
+        setShowLoginOverlay(false);
+      };
+    }
+  }, [isConnected, localPlayerName]);
+
   // ── Settings sync (filters/folders + initial selection) ───────
   useSettingsSync({
     fontFamily,
@@ -188,6 +197,7 @@ function AppContent() {
     emoteSortByName,
     retainSyncSendPrefix,
     refetchEpoch: settingsEpoch,
+    isLoggedIn: !!localPlayerName,
     setFontFamily,
     setFontSize,
     setItalicizeSystem,
@@ -443,6 +453,17 @@ function AppContent() {
 
   return (
     <div className={styles['app-container']}>
+      {showLoginOverlay && (
+        <div className={styles['login-overlay']}>
+          <span className={styles['login-overlay-text']}>Waiting for character login…</span>
+          <div className={styles['login-overlay-dots']}>
+            <span />
+            <span />
+            <span />
+          </div>
+        </div>
+      )}
+
       {isSidebarOpen && (
         <div className={styles['sidebar-overlay']} onClick={() => setIsSidebarOpen(false)} />
       )}

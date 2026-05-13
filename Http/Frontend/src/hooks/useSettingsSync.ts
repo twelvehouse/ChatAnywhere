@@ -32,6 +32,7 @@ interface Props {
   emoteSortByName: boolean;
   retainSyncSendPrefix: boolean;
   refetchEpoch: number;
+  isLoggedIn: boolean;
   setFontFamily: Dispatch<SetStateAction<string>>;
   setFontSize: Dispatch<SetStateAction<number>>;
   setItalicizeSystem: Dispatch<SetStateAction<boolean>>;
@@ -63,6 +64,7 @@ export function useSettingsSync({
   emoteSortByName,
   retainSyncSendPrefix,
   refetchEpoch,
+  isLoggedIn,
   setFontFamily,
   setFontSize,
   setItalicizeSystem,
@@ -79,7 +81,12 @@ export function useSettingsSync({
   onFiltersReady,
 }: Props) {
   const serverLoadedRef = useRef(false);
+  const isLoggedInRef = useRef(isLoggedIn);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    isLoggedInRef.current = isLoggedIn;
+  });
 
   // Load from server on mount and whenever refetchEpoch increments (character change)
   useEffect(() => {
@@ -139,7 +146,7 @@ export function useSettingsSync({
 
   // Debounced PUT to server whenever settings change (after initial load)
   useEffect(() => {
-    if (!serverLoadedRef.current) return;
+    if (!serverLoadedRef.current || !isLoggedInRef.current) return;
 
     if (timerRef.current) clearTimeout(timerRef.current);
     timerRef.current = setTimeout(() => {
