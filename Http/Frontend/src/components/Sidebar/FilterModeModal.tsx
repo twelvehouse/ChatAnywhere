@@ -48,7 +48,7 @@ export function FilterModeModal({ filterMode, onEnable, onDisable, onClose }: Pr
               Cancel
             </button>
             <button className="btn btn-primary" onClick={handleDisable} disabled={busy}>
-              Use Shared Filters
+              {busy ? 'Switching…' : 'Use Shared Filters'}
             </button>
           </div>
         </div>
@@ -82,7 +82,7 @@ export function FilterModeModal({ filterMode, onEnable, onDisable, onClose }: Pr
             Cancel
           </button>
           <button className="btn btn-primary" onClick={handleEnable} disabled={busy}>
-            Use Personal Filters
+            {busy ? 'Switching…' : 'Use Personal Filters'}
           </button>
         </div>
       </div>
