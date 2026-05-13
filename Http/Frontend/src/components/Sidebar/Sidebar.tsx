@@ -420,7 +420,22 @@ export function Sidebar({
                 <AvatarImage name={localPlayerName} world={localPlayerWorld || undefined} />
               </div>
               <div className={styles['player-info']}>
-                <span className={styles['player-name']}>{localPlayerName}</span>
+                <span className={styles['player-name']}>
+                  {(() => {
+                    const idx = localPlayerName.indexOf(' ');
+                    if (idx === -1) return localPlayerName;
+                    return (
+                      <>
+                        <span className={styles['player-firstname']}>
+                          {localPlayerName.slice(0, idx)}
+                        </span>
+                        <span className={styles['player-lastname']}>
+                          {localPlayerName.slice(idx + 1)}
+                        </span>
+                      </>
+                    );
+                  })()}
+                </span>
                 {localPlayerWorld && (
                   <span className={styles['player-world']}>{localPlayerWorld}</span>
                 )}

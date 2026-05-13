@@ -170,14 +170,20 @@
 }
 
 .player-name {
-  display: block;
+  display: flex;
+  flex-direction: column;
   font-size: 14px;
   font-weight: 600;
   color: var(--text-primary);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  line-height: 1.2;
+  line-height: 1.3;
+}
+
+.player-firstname {
+  text-align: left;
+}
+
+.player-lastname {
+  text-align: right;
 }
 
 .player-world {
@@ -286,8 +292,7 @@
 
 .channel-hash {
   color: var(--text-muted);
-  font-weight: 700;
-  font-size: 0.95em;
+  font-size: 9px;
   flex-shrink: 0;
   transition: color 0.15s;
 }
