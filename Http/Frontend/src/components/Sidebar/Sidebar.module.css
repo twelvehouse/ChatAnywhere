@@ -146,6 +146,58 @@
   animation: pulse-offline 2s infinite ease-in-out;
 }
 
+/* ========== Player Row ========== */
+.player-row {
+  padding: 10px 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.player-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  overflow: hidden;
+  flex-shrink: 0;
+  background: linear-gradient(135deg, oklch(70% 0.1 210), oklch(55% 0.13 250));
+}
+
+.player-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.player-name {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  line-height: 1.2;
+}
+
+.player-world {
+  display: block;
+  font-size: 11.5px;
+  font-style: italic;
+  color: var(--text-muted);
+  margin-top: 3px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.player-divider {
+  height: 1px;
+  margin: 0 16px;
+  background: rgba(255, 255, 255, 0.05);
+  flex-shrink: 0;
+}
+
 /* ========== Sidebar Navigation ========== */
 .sidebar-nav {
   flex: 1;
@@ -240,8 +292,8 @@
   transition: color 0.15s;
 }
 
-.channel-item.active .channel-hash,
-.channel-item:hover .channel-hash {
+.channel-item:hover .channel-hash,
+.filter-row.active .channel-item .channel-hash {
   color: inherit;
 }
 

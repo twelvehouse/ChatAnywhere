@@ -10,8 +10,8 @@ internal class SettingsHandler
     private readonly IPluginLog _log;
     private readonly AuthHandler _auth;
 
-    private string _settingsJson = "{}";
-    private string SettingsFilePath => Path.Combine(_plugin.Interface.ConfigDirectory.FullName, "frontend-settings.json");
+    private string GlobalSettingsPath =>
+        Path.Combine(_plugin.Interface.ConfigDirectory.FullName, "frontend-settings.json");
 
     internal SettingsHandler(Plugin plugin, IPluginLog log, AuthHandler auth)
     {
@@ -20,45 +20,53 @@ internal class SettingsHandler
         _auth = auth;
     }
 
-    internal void Load()
+    private string CharacterSettingsPath(string name, string world) =>
+        Path.Combine(_plugin.Interface.ConfigDirectory.FullName, $"{name}@{world}.json");
+
+    // Prefers character-specific file when logged in; falls back to the global file.
+    private string GetReadPath()
     {
-        try
+        var name = _plugin.LocalPlayerName;
+        var world = _plugin.LocalPlayerWorld;
+        if (!string.IsNullOrEmpty(name) && !string.IsNullOrEmpty(world))
         {
-            if (File.Exists(SettingsFilePath))
-            {
-                var json = File.ReadAllText(SettingsFilePath);
-                JsonDocument.Parse(json).Dispose(); // validate
-                _settingsJson = json;
-                _log.Debug("Frontend settings loaded.");
-            }
+            var charPath = CharacterSettingsPath(name, world);
+            if (File.Exists(charPath)) return charPath;
         }
-        catch (Exception ex)
-        {
-            _log.Error(ex, "Failed to load frontend settings.");
-            _settingsJson = "{}";
-        }
+        return GlobalSettingsPath;
     }
 
-    private void Save()
+    // Uses a character-specific file when logged in; otherwise uses the global file.
+    private string GetSavePath()
     {
-        try
-        {
-            File.WriteAllText(SettingsFilePath, _settingsJson);
-        }
-        catch (Exception ex)
-        {
-            _log.Error(ex, "Failed to save frontend settings.");
-        }
+        var name = _plugin.LocalPlayerName;
+        var world = _plugin.LocalPlayerWorld;
+        return !string.IsNullOrEmpty(name) && !string.IsNullOrEmpty(world)
+            ? CharacterSettingsPath(name, world)
+            : GlobalSettingsPath;
     }
 
     internal async Task HandleGetSettings(HttpContextBase ctx)
     {
         if (!await _auth.RequireAuth(ctx)) return;
 
-        ctx.Response.StatusCode = 200;
-        _auth.AddCorsHeaders(ctx);
-        ctx.Response.Headers.Add("Content-Type", "application/json");
-        await ctx.Response.Send(_settingsJson);
+        try
+        {
+            var path = GetReadPath();
+            var json = File.Exists(path) ? await File.ReadAllTextAsync(path) : "{}";
+
+            ctx.Response.StatusCode = 200;
+            _auth.AddCorsHeaders(ctx);
+            ctx.Response.Headers.Add("Content-Type", "application/json");
+            await ctx.Response.Send(json);
+        }
+        catch (Exception ex)
+        {
+            _log.Error(ex, "Failed to read frontend settings.");
+            ctx.Response.StatusCode = 500;
+            _auth.AddCorsHeaders(ctx);
+            await ctx.Response.Send("Internal Server Error");
+        }
     }
 
     internal async Task HandlePutSettings(HttpContextBase ctx)
@@ -79,8 +87,7 @@ internal class SettingsHandler
             if (!string.IsNullOrEmpty(body))
             {
                 JsonDocument.Parse(body).Dispose(); // validate JSON before storing
-                _settingsJson = body;
-                Save();
+                await File.WriteAllTextAsync(GetSavePath(), body);
             }
 
             ctx.Response.StatusCode = 200;

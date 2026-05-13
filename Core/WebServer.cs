@@ -82,8 +82,6 @@ public class WebServer : IAsyncDisposable
             _host.Routes.PreAuthentication.Static.Add(HttpMethod.GET,     "/files/FFXIV_Lodestone_SSF.ttf", _gameFiles.GetLodestoneFont, ExceptionRoute);
             _host.Routes.PreAuthentication.Static.Add(HttpMethod.GET,     "/emotes",   _gameFiles.HandleGetEmotes,       ExceptionRoute);
 
-            _settings.Load();
-
             _host.Events.Logger = msg => _log.Debug($"[Watson] {msg}");
             _host.Events.ExceptionEncountered += (sender, args) =>
             {

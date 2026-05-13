@@ -14,6 +14,7 @@ interface UseSSEOptions {
   setHasUnreadDown: Dispatch<SetStateAction<boolean>>;
   setLocalPlayerName: Dispatch<SetStateAction<string>>;
   setLocalPlayerWorld: Dispatch<SetStateAction<string>>;
+  onReset: () => void;
   isNearBottomRef: RefObject<boolean>;
   activeFilterNameRef: RefObject<string>;
   filtersRef: RefObject<CustomFilter[]>;
@@ -29,6 +30,7 @@ export function useSSE({
   setHasUnreadDown,
   setLocalPlayerName,
   setLocalPlayerWorld,
+  onReset,
   isNearBottomRef,
   activeFilterNameRef,
   filtersRef,
@@ -68,6 +70,7 @@ export function useSSE({
             setHasUnreadDown(false);
             setLocalPlayerName('');
             setLocalPlayerWorld('');
+            onReset();
             return;
           }
 
@@ -145,6 +148,7 @@ export function useSSE({
     setHasUnreadDown,
     setLocalPlayerName,
     setLocalPlayerWorld,
+    onReset,
     activeFilterNameRef,
     filtersRef,
     lastGameChannelRef,

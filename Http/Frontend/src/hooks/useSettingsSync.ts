@@ -31,6 +31,7 @@ interface Props {
   emoteConfirm: boolean;
   emoteSortByName: boolean;
   retainSyncSendPrefix: boolean;
+  refetchEpoch: number;
   setFontFamily: Dispatch<SetStateAction<string>>;
   setFontSize: Dispatch<SetStateAction<number>>;
   setItalicizeSystem: Dispatch<SetStateAction<boolean>>;
@@ -61,6 +62,7 @@ export function useSettingsSync({
   emoteConfirm,
   emoteSortByName,
   retainSyncSendPrefix,
+  refetchEpoch,
   setFontFamily,
   setFontSize,
   setItalicizeSystem,
@@ -79,8 +81,9 @@ export function useSettingsSync({
   const serverLoadedRef = useRef(false);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Load from server on mount
+  // Load from server on mount and whenever refetchEpoch increments (character change)
   useEffect(() => {
+    serverLoadedRef.current = false;
     fetch(`${RELAY_ADDR}/settings`, { credentials: 'include' })
       .then((r) => {
         if (r.status === 401) {
@@ -132,7 +135,7 @@ export function useSettingsSync({
       .finally(() => {
         serverLoadedRef.current = true;
       });
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [refetchEpoch]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Debounced PUT to server whenever settings change (after initial load)
   useEffect(() => {

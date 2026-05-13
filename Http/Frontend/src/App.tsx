@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import styles from './App.module.css';
 import { addGfdStylesheet } from './lib/gfd';
 import { usePaginatedHistory } from './hooks/useHistory';
@@ -120,6 +120,9 @@ function AppContent() {
   // ── Sidebar state ──────────────────────────────────────────────
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
+  // ── Settings reload epoch (increments on character change) ────
+  const [settingsEpoch, setSettingsEpoch] = useState(0);
+
   // ── Refs for hooks ─────────────────────────────────────────────
   const activeFilterNameRef = useRef(activeFilterName);
   const filtersRef = useRef(filters);
@@ -167,6 +170,8 @@ function AppContent() {
     setActiveFilterName(name);
   };
 
+  const handleReset = useCallback(() => setSettingsEpoch((n) => n + 1), []);
+
   // ── Settings sync (filters/folders + initial selection) ───────
   useSettingsSync({
     fontFamily,
@@ -182,6 +187,7 @@ function AppContent() {
     emoteConfirm,
     emoteSortByName,
     retainSyncSendPrefix,
+    refetchEpoch: settingsEpoch,
     setFontFamily,
     setFontSize,
     setItalicizeSystem,
@@ -237,6 +243,7 @@ function AppContent() {
     setHasUnreadDown,
     setLocalPlayerName,
     setLocalPlayerWorld,
+    onReset: handleReset,
     isNearBottomRef,
     activeFilterNameRef,
     filtersRef,
@@ -443,6 +450,8 @@ function AppContent() {
       <Sidebar
         isOpen={isSidebarOpen}
         isConnected={isConnected}
+        localPlayerName={localPlayerName}
+        localPlayerWorld={localPlayerWorld}
         filters={filters}
         folders={folders}
         activeFilterName={activeFilterName}

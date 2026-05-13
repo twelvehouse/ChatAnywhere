@@ -238,6 +238,8 @@ function DmRow({ partner, isActive, onSelect }: DmRowProps) {
 interface Props {
   isOpen: boolean;
   isConnected: boolean;
+  localPlayerName: string;
+  localPlayerWorld: string;
   filters: CustomFilter[];
   folders: FilterFolder[];
   activeFilterName: string;
@@ -260,6 +262,8 @@ interface Props {
 export function Sidebar({
   isOpen,
   isConnected,
+  localPlayerName,
+  localPlayerWorld,
   filters,
   folders,
   activeFilterName,
@@ -407,6 +411,24 @@ export function Sidebar({
             </div>
           </div>
         </div>
+
+        {/* ── Player row ── */}
+        {localPlayerName && (
+          <>
+            <div className={styles['player-row']}>
+              <div className={styles['player-avatar']}>
+                <AvatarImage name={localPlayerName} world={localPlayerWorld || undefined} />
+              </div>
+              <div className={styles['player-info']}>
+                <span className={styles['player-name']}>{localPlayerName}</span>
+                {localPlayerWorld && (
+                  <span className={styles['player-world']}>{localPlayerWorld}</span>
+                )}
+              </div>
+            </div>
+            <div className={styles['player-divider']} />
+          </>
+        )}
 
         {/* ── Navigation ── */}
         <nav className={styles['sidebar-nav']}>
