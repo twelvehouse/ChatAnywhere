@@ -424,16 +424,10 @@ export function Sidebar({
                   {(() => {
                     const idx = localPlayerName.indexOf(' ');
                     if (idx === -1) return localPlayerName;
-                    return (
-                      <>
-                        <span className={styles['player-firstname']}>
-                          {localPlayerName.slice(0, idx)}
-                        </span>
-                        <span className={styles['player-lastname']}>
-                          {localPlayerName.slice(idx + 1)}
-                        </span>
-                      </>
-                    );
+                    const first = localPlayerName.slice(0, idx);
+                    const last = localPlayerName.slice(idx + 1);
+                    if (localPlayerName.length > 20) return `${first} ${last[0]}.`;
+                    return localPlayerName;
                   })()}
                 </span>
                 {localPlayerWorld && (
