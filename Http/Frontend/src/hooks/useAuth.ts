@@ -1,20 +1,46 @@
 import { useState, useEffect, useCallback } from 'react';
 import { RELAY_ADDR } from '../constants/config';
 
-export type AuthStatus = 'loading' | 'authenticated' | 'unauthenticated' | 'not-configured';
+export type AuthStatus =
+  | 'loading'
+  | 'authenticated'
+  | 'unauthenticated'
+  | 'not-configured'
+  | 'unreachable';
 export type AuthResult = 'ok' | 'wrong' | 'not-configured' | 'error';
 
 export function useAuth() {
   const [status, setStatus] = useState<AuthStatus>('loading');
 
   useEffect(() => {
-    fetch(`${RELAY_ADDR}/settings`, { credentials: 'include' })
-      .then((res) => {
-        if (res.ok) setStatus('authenticated');
-        else if (res.status === 503) setStatus('not-configured');
-        else setStatus('unauthenticated');
-      })
-      .catch(() => setStatus('unauthenticated'));
+    let cancelled = false;
+    let retryTimeoutId: ReturnType<typeof setTimeout>;
+    let retryCount = 0;
+
+    const tryConnect = () => {
+      fetch(`${RELAY_ADDR}/settings`, { credentials: 'include' })
+        .then((res) => {
+          if (cancelled) return;
+          if (res.ok) setStatus('authenticated');
+          else if (res.status === 503) setStatus('not-configured');
+          else if (res.status === 401) setStatus('unauthenticated');
+          else throw new Error('unexpected');
+        })
+        .catch(() => {
+          if (cancelled) return;
+          retryCount++;
+          setStatus('unreachable');
+          const delay = Math.min(1000 * 2 ** retryCount, 16000);
+          retryTimeoutId = setTimeout(tryConnect, delay);
+        });
+    };
+
+    tryConnect();
+
+    return () => {
+      cancelled = true;
+      clearTimeout(retryTimeoutId);
+    };
   }, []);
 
   // Listen for 401s dispatched by other hooks so the login screen reappears

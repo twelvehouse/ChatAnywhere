@@ -12,11 +12,26 @@ export function PasscodeModal({ status, onAuthenticate }: Props) {
   const [passcode, setPasscode] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [formRevealed, setFormRevealed] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
+  // Reveal the form with a CSS transition once a response is received
   useEffect(() => {
-    inputRef.current?.focus();
-  }, []);
+    if (status === 'unauthenticated' || status === 'not-configured') {
+      const raf = requestAnimationFrame(() => setFormRevealed(true));
+      return () => {
+        cancelAnimationFrame(raf);
+        setFormRevealed(false);
+      };
+    }
+  }, [status]);
+
+  // Focus input after the reveal transition settles
+  useEffect(() => {
+    if (!formRevealed || status !== 'unauthenticated') return;
+    const t = setTimeout(() => inputRef.current?.focus(), 360);
+    return () => clearTimeout(t);
+  }, [formRevealed, status]);
 
   const handleSubmit = async () => {
     if (passcode.length < 4 || isSubmitting) return;
@@ -45,6 +60,7 @@ export function PasscodeModal({ status, onAuthenticate }: Props) {
     if (error) setError(null);
   };
 
+  const isConnecting = status === 'loading' || status === 'unreachable';
   const isNotConfigured = status === 'not-configured';
 
   return (
@@ -68,46 +84,67 @@ export function PasscodeModal({ status, onAuthenticate }: Props) {
 
         <h1 className={styles.title}>ChatAnywhere</h1>
 
-        <p className={styles.subtitle}>
-          {isNotConfigured ? 'Plugin configuration required' : 'Enter your passcode to continue'}
-        </p>
-
-        {!isNotConfigured && (
-          <input
-            ref={inputRef}
-            type="password"
-            inputMode="numeric"
-            pattern="[0-9]*"
-            maxLength={8}
-            className={styles.input}
-            value={passcode}
-            onChange={(e) => handleChange(e.target.value)}
-            onKeyDown={handleKeyDown}
-            onBlur={() => inputRef.current?.focus()}
-            placeholder="••••"
-            disabled={isSubmitting}
-            autoComplete="off"
-          />
+        {isConnecting && (
+          <div className={styles.connecting}>
+            <p className={styles.connectingText}>
+              {status === 'unreachable' ? 'Could not reach plugin — retrying…' : 'Connecting…'}
+            </p>
+            <div className={styles.connectingDots}>
+              <span />
+              <span />
+              <span />
+            </div>
+          </div>
         )}
 
-        {error && <p className={styles.error}>{error}</p>}
+        <div className={`${styles.formBody} ${formRevealed ? styles.formRevealed : ''}`}>
+          <div className={styles.formBodyInner}>
+            <p className={styles.subtitle}>
+              {isNotConfigured
+                ? 'Plugin configuration required'
+                : 'Enter your passcode to continue'}
+            </p>
 
-        {!isNotConfigured && (
-          <button
-            className={styles.button}
-            onClick={handleSubmit}
-            disabled={passcode.length < 4 || isSubmitting}
-          >
-            {isSubmitting ? 'Verifying…' : 'Unlock'}
-          </button>
-        )}
+            {!isNotConfigured && (
+              <input
+                ref={inputRef}
+                type="password"
+                inputMode="numeric"
+                pattern="[0-9]*"
+                maxLength={8}
+                className={styles.input}
+                value={passcode}
+                onChange={(e) => handleChange(e.target.value)}
+                onKeyDown={handleKeyDown}
+                onBlur={() => {
+                  if (formRevealed) inputRef.current?.focus();
+                }}
+                placeholder="••••"
+                disabled={isSubmitting}
+                autoComplete="off"
+              />
+            )}
 
-        {isNotConfigured && (
-          <p className={styles.hint}>
-            Open the plugin settings in FFXIV and set a 4–8 digit passcode under Security, then
-            reload this page.
-          </p>
-        )}
+            {error && <p className={styles.error}>{error}</p>}
+
+            {!isNotConfigured && (
+              <button
+                className={styles.button}
+                onClick={handleSubmit}
+                disabled={passcode.length < 4 || isSubmitting}
+              >
+                {isSubmitting ? 'Verifying…' : 'Unlock'}
+              </button>
+            )}
+
+            {isNotConfigured && (
+              <p className={styles.hint}>
+                Open the plugin settings in FFXIV and set a 4–8 digit passcode under Security, then
+                reload this page.
+              </p>
+            )}
+          </div>
+        </div>
       </div>
     </div>
   );

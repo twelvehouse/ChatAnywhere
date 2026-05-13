@@ -116,3 +116,82 @@
   margin: 0;
   line-height: 1.6;
 }
+
+/* ── Connecting state ── */
+.connecting {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.connectingText {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin: 0;
+  text-align: center;
+  letter-spacing: 0.03em;
+}
+
+.connectingDots {
+  display: flex;
+  gap: 6px;
+}
+
+.connectingDots span {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--text-muted);
+  animation: dotPulse 1.4s ease-in-out infinite both;
+}
+
+.connectingDots span:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.connectingDots span:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes dotPulse {
+  0%,
+  80%,
+  100% {
+    opacity: 0.25;
+    transform: scale(0.8);
+  }
+  40% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* ── Form body (revealed with transition) ── */
+.formBody {
+  width: 100%;
+  display: grid;
+  grid-template-rows: 0fr;
+  opacity: 0;
+  pointer-events: none;
+  margin-top: -16px; /* cancel parent flex gap when collapsed */
+  transition:
+    grid-template-rows 0.45s cubic-bezier(0.4, 0, 0.2, 1),
+    opacity 0.35s ease;
+}
+
+.formBodyInner {
+  overflow: hidden;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding-top: 16px; /* gap from connecting state, only visible when expanded */
+}
+
+.formRevealed {
+  grid-template-rows: 1fr;
+  opacity: 1;
+  pointer-events: auto;
+}
