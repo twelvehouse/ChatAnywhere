@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import styles from './FiltersSettings.module.css';
 import { ImportFiltersModal } from './ImportFiltersModal';
 import { ConfirmDialog } from '../Sidebar/ConfirmDialog';
 import type { CustomFilter, FilterFolder } from '../../types/filter';
@@ -28,10 +29,9 @@ export function FiltersSettings({
     <>
       <div className="form-section">
         <div className="form-section-title">IMPORT</div>
-        <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', margin: '0 0 12px' }}>
+        <p className={styles.description}>
           Copy filters and folders from another character&apos;s saved settings into{' '}
-          <strong style={{ color: 'var(--text-secondary)' }}>this character&apos;s settings</strong>
-          .
+          <strong>this character&apos;s settings</strong>.
         </p>
         <button className="btn btn-primary" onClick={() => setShowImportModal(true)}>
           Import Filters
@@ -41,51 +41,18 @@ export function FiltersSettings({
       <div className="form-section">
         <div className="form-section-title">PERSONAL FILTERS</div>
         {personalFilterCharacters.length === 0 ? (
-          <p
-            style={{ fontSize: '0.8rem', color: 'var(--text-dim)', fontStyle: 'italic', margin: 0 }}
-          >
-            No characters are using personal filter settings.
-          </p>
+          <p className={styles.empty}>No characters are using personal filter settings.</p>
         ) : (
           <>
-            <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', margin: '0 0 12px' }}>
+            <p className={styles.description}>
               Characters using their own personal filter settings instead of the shared settings.
             </p>
-            <table
-              style={{
-                width: '100%',
-                borderCollapse: 'collapse',
-                fontSize: '0.85rem',
-              }}
-            >
+            <table className={styles.table}>
               <thead>
                 <tr>
-                  <th
-                    style={{
-                      textAlign: 'left',
-                      padding: '4px 8px 8px 0',
-                      color: 'var(--text-muted)',
-                      fontWeight: 600,
-                      fontSize: '0.75rem',
-                      borderBottom: '1px solid var(--border)',
-                    }}
-                  >
-                    Character
-                  </th>
-                  <th
-                    style={{
-                      textAlign: 'left',
-                      padding: '4px 8px 8px',
-                      color: 'var(--text-muted)',
-                      fontWeight: 600,
-                      fontSize: '0.75rem',
-                      borderBottom: '1px solid var(--border)',
-                      whiteSpace: 'nowrap',
-                    }}
-                  >
-                    Status
-                  </th>
-                  <th style={{ borderBottom: '1px solid var(--border)' }} />
+                  <th className={styles.th}>Character</th>
+                  <th className={styles['th-status']}>Status</th>
+                  <th className={styles['th-action']} />
                 </tr>
               </thead>
               <tbody>
@@ -93,61 +60,17 @@ export function FiltersSettings({
                   const isCurrent = filterMode?.characterKey === key;
                   return (
                     <tr key={key}>
-                      <td
-                        style={{
-                          padding: '8px 8px 8px 0',
-                          color: 'var(--text-secondary)',
-                          overflow: 'hidden',
-                          textOverflow: 'ellipsis',
-                          whiteSpace: 'nowrap',
-                          maxWidth: '180px',
-                          borderBottom: '1px solid var(--border)',
-                        }}
-                      >
-                        {key}
-                      </td>
-                      <td
-                        style={{
-                          padding: '8px',
-                          whiteSpace: 'nowrap',
-                          borderBottom: '1px solid var(--border)',
-                        }}
-                      >
+                      <td className={styles['td-key']}>{key}</td>
+                      <td className={styles['td-status']}>
                         {isCurrent ? (
-                          <span
-                            style={{
-                              display: 'inline-block',
-                              padding: '1px 7px',
-                              borderRadius: '10px',
-                              fontSize: '0.72rem',
-                              fontWeight: 700,
-                              color: 'var(--accent)',
-                              background: 'color-mix(in oklch, var(--accent) 12%, transparent)',
-                              border: '1px solid var(--accent)',
-                            }}
-                          >
-                            Current
-                          </span>
+                          <span className={styles['badge-current']}>Current</span>
                         ) : (
-                          <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-                            Personal
-                          </span>
+                          <span className={styles['badge-personal']}>Personal</span>
                         )}
                       </td>
-                      <td
-                        style={{
-                          padding: '8px 0 8px 8px',
-                          textAlign: 'right',
-                          borderBottom: '1px solid var(--border)',
-                        }}
-                      >
+                      <td className={styles['td-action']}>
                         <button
-                          className="btn btn-secondary"
-                          style={{
-                            fontSize: '0.78rem',
-                            padding: '3px 10px',
-                            color: 'var(--offline)',
-                          }}
+                          className={`btn btn-secondary ${styles['btn-delete']}`}
                           onClick={() => setPendingDelete(key)}
                         >
                           Delete
