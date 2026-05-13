@@ -91,8 +91,9 @@ public sealed class Plugin : IAsyncDalamudPlugin
             HelpMessage = "Open ChatAnywhere settings. Use 'start' or 'stop' to control the server.",
         });
 
-        Framework.Update  += OnFrameworkUpdate;
-        ClientState.Login += OnLogin;
+        Framework.Update   += OnFrameworkUpdate;
+        ClientState.Login  += OnLogin;
+        ClientState.Logout += OnLogout;
         Interface.UiBuilder.Draw         += WindowSystem.Draw;
         Interface.UiBuilder.OpenConfigUi += OnOpenConfigUi;
         Interface.UiBuilder.OpenMainUi   += OnOpenConfigUi;
@@ -178,6 +179,14 @@ public sealed class Plugin : IAsyncDalamudPlugin
         }
     }
 
+    private void OnLogout(int type, int code)
+    {
+        LocalPlayerName = string.Empty;
+        LocalPlayerWorld = string.Empty;
+        if (Server.IsRunning)
+            Server.BroadcastPlayerInfo(string.Empty, string.Empty);
+    }
+
     private void OnLogin()
     {
         if (!Server.IsRunning) return;
@@ -198,8 +207,9 @@ public sealed class Plugin : IAsyncDalamudPlugin
     {
         CommandManager.RemoveHandler(CommandName);
 
-        Framework.Update  -= OnFrameworkUpdate;
-        ClientState.Login -= OnLogin;
+        Framework.Update   -= OnFrameworkUpdate;
+        ClientState.Login  -= OnLogin;
+        ClientState.Logout -= OnLogout;
         Interface.UiBuilder.Draw         -= WindowSystem.Draw;
         Interface.UiBuilder.OpenConfigUi -= OnOpenConfigUi;
         Interface.UiBuilder.OpenMainUi   -= OnOpenConfigUi;
