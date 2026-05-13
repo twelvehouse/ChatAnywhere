@@ -285,13 +285,14 @@ internal class SettingsHandler
             if (!personalChars.Contains(characterKey))
                 personalChars.Add(characterKey);
 
-            // Create or overwrite char file from global when requested, or on first fork
+            // Create or overwrite char file from global when requested, or on first fork.
+            // Strip personalFilterCharacters — it's a global-only field that must not leak into character files.
             if (!File.Exists(charPath) || copyFromGlobal)
             {
-                var globalJson = File.Exists(GlobalSettingsPath)
-                    ? await File.ReadAllTextAsync(GlobalSettingsPath)
+                var charJson = global != null
+                    ? BuildSettingsWithPersonalFilterCharacters(global.RootElement, [])
                     : "{}";
-                await File.WriteAllTextAsync(charPath, globalJson);
+                await File.WriteAllTextAsync(charPath, charJson);
             }
 
             await UpdatePersonalFilterCharacters(personalChars);
