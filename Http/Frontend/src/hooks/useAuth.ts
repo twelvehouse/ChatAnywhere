@@ -23,8 +23,7 @@ export function useAuth() {
           if (cancelled) return;
           if (res.ok) setStatus('authenticated');
           else if (res.status === 503) setStatus('not-configured');
-          else if (res.status === 401) setStatus('unauthenticated');
-          else throw new Error('unexpected');
+          else setStatus('unauthenticated'); // 401 or any other server error
         })
         .catch(() => {
           if (cancelled) return;
