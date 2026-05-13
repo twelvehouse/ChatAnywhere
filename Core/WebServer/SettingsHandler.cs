@@ -114,21 +114,6 @@ internal class SettingsHandler
         return GlobalSettingsPath;
     }
 
-    // Saves to the character-specific file if the character is in personalFilterCharacters; otherwise global.
-    private async Task<string> GetSavePathAsync()
-    {
-        var name = _plugin.LocalPlayerName;
-        var world = _plugin.LocalPlayerWorld;
-        if (!string.IsNullOrEmpty(name) && !string.IsNullOrEmpty(world))
-        {
-            var key = $"{name}@{world}";
-            using var global = await ReadGlobalAsync();
-            if (GetPersonalFilterCharacters(global).Contains(key))
-                return CharacterSettingsPath(name, world);
-        }
-        return GlobalSettingsPath;
-    }
-
     internal async Task HandleGetSettings(HttpContextBase ctx)
     {
         if (!await _auth.RequireAuth(ctx)) return;
@@ -418,17 +403,24 @@ internal class SettingsHandler
             if (!string.IsNullOrEmpty(body))
             {
                 using var doc = JsonDocument.Parse(body); // validate JSON before storing
-                var savePath = await GetSavePathAsync();
+
+                // Determine save path and personalFilterCharacters with a single global read.
+                using var globalDoc = await ReadGlobalAsync();
+                var personalChars = GetPersonalFilterCharacters(globalDoc);
+
+                var name = _plugin.LocalPlayerName;
+                var world = _plugin.LocalPlayerWorld;
+                string savePath;
+                if (!string.IsNullOrEmpty(name) && !string.IsNullOrEmpty(world)
+                    && personalChars.Contains($"{name}@{world}"))
+                    savePath = CharacterSettingsPath(name, world);
+                else
+                    savePath = GlobalSettingsPath;
 
                 // When writing to the global file, preserve personalFilterCharacters
                 // (the frontend is unaware of this field and would otherwise erase it)
-                if (savePath == GlobalSettingsPath)
-                {
-                    using var globalDoc = await ReadGlobalAsync();
-                    var personalChars = GetPersonalFilterCharacters(globalDoc).ToList();
-                    if (personalChars.Count > 0)
-                        body = BuildSettingsWithPersonalFilterCharacters(doc.RootElement, personalChars);
-                }
+                if (savePath == GlobalSettingsPath && personalChars.Count > 0)
+                    body = BuildSettingsWithPersonalFilterCharacters(doc.RootElement, personalChars);
 
                 await File.WriteAllTextAsync(savePath, body);
             }
