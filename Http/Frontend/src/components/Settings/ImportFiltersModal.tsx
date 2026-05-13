@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import styles from './ImportFiltersModal.module.css';
 import { RELAY_ADDR } from '../../constants/config';
+import { dispatchUnauthorized } from '../../lib/authEvent';
 import type { CustomFilter, FilterFolder } from '../../types/filter';
 
 interface CharacterData {
@@ -69,10 +70,15 @@ export function ImportFiltersModal({ currentFilters, currentFolders, onImport, o
   useEffect(() => {
     fetch(`${RELAY_ADDR}/settings/characters`, { credentials: 'include' })
       .then((r) => {
+        if (r.status === 401) {
+          dispatchUnauthorized();
+          return;
+        }
         if (!r.ok) throw new Error('fetch failed');
         return r.json() as Promise<CharacterData[]>;
       })
       .then((data) => {
+        if (!data) return;
         setCharacters(data);
         setLoading(false);
       })
