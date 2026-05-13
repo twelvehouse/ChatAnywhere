@@ -8,6 +8,7 @@ import { OthersSettings } from './OthersSettings';
 import { SecuritySettings } from './SecuritySettings';
 import type { ChannelOption } from '../../types/chat';
 import type { CustomFilter, FilterFolder } from '../../types/filter';
+import type { FilterMode } from '../../hooks/useFilterMode';
 
 type SettingsCategory = 'appearance' | 'send-channels' | 'filters' | 'chat-input' | 'security';
 
@@ -45,6 +46,8 @@ interface Props {
   currentFilters: CustomFilter[];
   currentFolders: FilterFolder[];
   onImportFilters: (newFilters: CustomFilter[], newFolders: FilterFolder[]) => void;
+  filterMode: FilterMode | null;
+  onDeletePersonalFilters: (key: string) => Promise<void>;
   // Control
   onClose: () => void;
 }
@@ -78,6 +81,8 @@ export function SettingsModal({
   currentFilters,
   currentFolders,
   onImportFilters,
+  filterMode,
+  onDeletePersonalFilters,
   onClose,
 }: Props) {
   const [category, setCategory] = useState<SettingsCategory>('appearance');
@@ -240,6 +245,8 @@ export function SettingsModal({
                 currentFilters={currentFilters}
                 currentFolders={currentFolders}
                 onImport={onImportFilters}
+                filterMode={filterMode}
+                onDeletePersonalFilters={onDeletePersonalFilters}
               />
             )}
             {category === 'chat-input' && (

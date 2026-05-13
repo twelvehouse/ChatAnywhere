@@ -24,27 +24,109 @@ internal class SettingsHandler
     private string CharacterSettingsPath(string name, string world) =>
         Path.Combine(_plugin.Interface.ConfigDirectory.FullName, $"{name}@{world}.json");
 
-    // Prefers character-specific file when logged in; falls back to the global file.
-    private string GetReadPath()
+    private async Task<JsonDocument?> ReadGlobalAsync()
+    {
+        if (!File.Exists(GlobalSettingsPath)) return null;
+        try
+        {
+            var json = await File.ReadAllTextAsync(GlobalSettingsPath);
+            return JsonDocument.Parse(json);
+        }
+        catch
+        {
+            return null;
+        }
+    }
+
+    private static IReadOnlyList<string> GetPersonalFilterCharacters(JsonDocument? global)
+    {
+        if (global == null) return [];
+        if (!global.RootElement.TryGetProperty("personalFilterCharacters", out var arr))
+            return [];
+        var list = new List<string>();
+        foreach (var item in arr.EnumerateArray())
+        {
+            var s = item.GetString();
+            if (s != null) list.Add(s);
+        }
+        return list;
+    }
+
+    // Rebuilds the global settings JSON with the given personalFilterCharacters list, preserving all other fields.
+    private static string BuildSettingsWithPersonalFilterCharacters(JsonElement root, IReadOnlyList<string> personalChars)
+    {
+        using var stream = new MemoryStream();
+        using var writer = new Utf8JsonWriter(stream);
+        writer.WriteStartObject();
+        foreach (var prop in root.EnumerateObject())
+        {
+            if (prop.Name == "personalFilterCharacters") continue;
+            prop.WriteTo(writer);
+        }
+        writer.WritePropertyName("personalFilterCharacters");
+        writer.WriteStartArray();
+        foreach (var key in personalChars)
+            writer.WriteStringValue(key);
+        writer.WriteEndArray();
+        writer.WriteEndObject();
+        writer.Flush();
+        return Encoding.UTF8.GetString(stream.ToArray());
+    }
+
+    private async Task UpdatePersonalFilterCharacters(List<string> updatedList)
+    {
+        JsonElement root;
+        if (File.Exists(GlobalSettingsPath))
+        {
+            try
+            {
+                var existing = await File.ReadAllTextAsync(GlobalSettingsPath);
+                using var doc = JsonDocument.Parse(existing);
+                root = doc.RootElement.Clone();
+            }
+            catch
+            {
+                root = JsonDocument.Parse("{}").RootElement.Clone();
+            }
+        }
+        else
+        {
+            root = JsonDocument.Parse("{}").RootElement.Clone();
+        }
+        await File.WriteAllTextAsync(GlobalSettingsPath, BuildSettingsWithPersonalFilterCharacters(root, updatedList));
+    }
+
+    // Reads from the character-specific file if the character is in personalFilterCharacters; otherwise global.
+    private async Task<string> GetReadPathAsync()
     {
         var name = _plugin.LocalPlayerName;
         var world = _plugin.LocalPlayerWorld;
         if (!string.IsNullOrEmpty(name) && !string.IsNullOrEmpty(world))
         {
-            var charPath = CharacterSettingsPath(name, world);
-            if (File.Exists(charPath)) return charPath;
+            var key = $"{name}@{world}";
+            using var global = await ReadGlobalAsync();
+            if (GetPersonalFilterCharacters(global).Contains(key))
+            {
+                var charPath = CharacterSettingsPath(name, world);
+                if (File.Exists(charPath)) return charPath;
+            }
         }
         return GlobalSettingsPath;
     }
 
-    // Uses a character-specific file when logged in; otherwise uses the global file.
-    private string GetSavePath()
+    // Saves to the character-specific file if the character is in personalFilterCharacters; otherwise global.
+    private async Task<string> GetSavePathAsync()
     {
         var name = _plugin.LocalPlayerName;
         var world = _plugin.LocalPlayerWorld;
-        return !string.IsNullOrEmpty(name) && !string.IsNullOrEmpty(world)
-            ? CharacterSettingsPath(name, world)
-            : GlobalSettingsPath;
+        if (!string.IsNullOrEmpty(name) && !string.IsNullOrEmpty(world))
+        {
+            var key = $"{name}@{world}";
+            using var global = await ReadGlobalAsync();
+            if (GetPersonalFilterCharacters(global).Contains(key))
+                return CharacterSettingsPath(name, world);
+        }
+        return GlobalSettingsPath;
     }
 
     internal async Task HandleGetSettings(HttpContextBase ctx)
@@ -53,7 +135,7 @@ internal class SettingsHandler
 
         try
         {
-            var path = GetReadPath();
+            var path = await GetReadPathAsync();
             var json = File.Exists(path) ? await File.ReadAllTextAsync(path) : "{}";
 
             ctx.Response.StatusCode = 200;
@@ -122,6 +204,201 @@ internal class SettingsHandler
         }
     }
 
+    internal async Task HandleGetFilterMode(HttpContextBase ctx)
+    {
+        if (!await _auth.RequireAuth(ctx)) return;
+
+        try
+        {
+            var name = _plugin.LocalPlayerName;
+            var world = _plugin.LocalPlayerWorld;
+
+            using var global = await ReadGlobalAsync();
+            var personalChars = GetPersonalFilterCharacters(global).ToList();
+
+            if (string.IsNullOrEmpty(name) || string.IsNullOrEmpty(world))
+            {
+                var notLoggedIn = $"{{\"characterKey\":null,\"isPersonal\":false,\"hasExistingFile\":false,\"personalFilterCharacters\":{JsonSerializer.Serialize(personalChars)}}}";
+                ctx.Response.StatusCode = 200;
+                _auth.AddCorsHeaders(ctx);
+                ctx.Response.Headers.Add("Content-Type", "application/json");
+                await ctx.Response.Send(notLoggedIn);
+                return;
+            }
+
+            var characterKey = $"{name}@{world}";
+            var isPersonal = personalChars.Contains(characterKey);
+            var hasExistingFile = File.Exists(CharacterSettingsPath(name, world));
+
+            var result = $"{{\"characterKey\":{JsonSerializer.Serialize(characterKey)},\"isPersonal\":{(isPersonal ? "true" : "false")},\"hasExistingFile\":{(hasExistingFile ? "true" : "false")},\"personalFilterCharacters\":{JsonSerializer.Serialize(personalChars)}}}";
+
+            ctx.Response.StatusCode = 200;
+            _auth.AddCorsHeaders(ctx);
+            ctx.Response.Headers.Add("Content-Type", "application/json");
+            await ctx.Response.Send(result);
+        }
+        catch (Exception ex)
+        {
+            _log.Error(ex, "Failed to get filter mode.");
+            ctx.Response.StatusCode = 500;
+            _auth.AddCorsHeaders(ctx);
+            await ctx.Response.Send("Internal Server Error");
+        }
+    }
+
+    internal async Task HandleEnablePersonalFilters(HttpContextBase ctx)
+    {
+        if (!await _auth.RequireAuth(ctx)) return;
+
+        try
+        {
+            var name = _plugin.LocalPlayerName;
+            var world = _plugin.LocalPlayerWorld;
+
+            if (string.IsNullOrEmpty(name) || string.IsNullOrEmpty(world))
+            {
+                ctx.Response.StatusCode = 400;
+                _auth.AddCorsHeaders(ctx);
+                await ctx.Response.Send("{\"error\":\"not-logged-in\"}");
+                return;
+            }
+
+            var characterKey = $"{name}@{world}";
+            var charPath = CharacterSettingsPath(name, world);
+
+            var copyFromGlobal = true;
+            var body = await HttpHelper.ReadBodyAsync(ctx, 256);
+            if (!string.IsNullOrEmpty(body))
+            {
+                try
+                {
+                    using var bodyDoc = JsonDocument.Parse(body);
+                    if (bodyDoc.RootElement.TryGetProperty("copyFromGlobal", out var copyProp))
+                        copyFromGlobal = copyProp.GetBoolean();
+                }
+                catch { /* ignore parse errors */ }
+            }
+
+            using var global = await ReadGlobalAsync();
+            var personalChars = GetPersonalFilterCharacters(global).ToList();
+
+            if (!personalChars.Contains(characterKey))
+                personalChars.Add(characterKey);
+
+            // Create or overwrite char file from global when requested, or on first fork
+            if (!File.Exists(charPath) || copyFromGlobal)
+            {
+                var globalJson = File.Exists(GlobalSettingsPath)
+                    ? await File.ReadAllTextAsync(GlobalSettingsPath)
+                    : "{}";
+                await File.WriteAllTextAsync(charPath, globalJson);
+            }
+
+            await UpdatePersonalFilterCharacters(personalChars);
+
+            ctx.Response.StatusCode = 200;
+            _auth.AddCorsHeaders(ctx);
+            ctx.Response.Headers.Add("Content-Type", "application/json");
+            await ctx.Response.Send("{\"ok\":true}");
+        }
+        catch (Exception ex)
+        {
+            _log.Error(ex, "Failed to enable personal filters.");
+            ctx.Response.StatusCode = 500;
+            _auth.AddCorsHeaders(ctx);
+            await ctx.Response.Send("Internal Server Error");
+        }
+    }
+
+    internal async Task HandleDisablePersonalFilters(HttpContextBase ctx)
+    {
+        if (!await _auth.RequireAuth(ctx)) return;
+
+        try
+        {
+            var name = _plugin.LocalPlayerName;
+            var world = _plugin.LocalPlayerWorld;
+
+            if (string.IsNullOrEmpty(name) || string.IsNullOrEmpty(world))
+            {
+                ctx.Response.StatusCode = 400;
+                _auth.AddCorsHeaders(ctx);
+                await ctx.Response.Send("{\"error\":\"not-logged-in\"}");
+                return;
+            }
+
+            var characterKey = $"{name}@{world}";
+            using var global = await ReadGlobalAsync();
+            var personalChars = GetPersonalFilterCharacters(global).ToList();
+            personalChars.Remove(characterKey);
+
+            await UpdatePersonalFilterCharacters(personalChars);
+
+            ctx.Response.StatusCode = 200;
+            _auth.AddCorsHeaders(ctx);
+            ctx.Response.Headers.Add("Content-Type", "application/json");
+            await ctx.Response.Send("{\"ok\":true}");
+        }
+        catch (Exception ex)
+        {
+            _log.Error(ex, "Failed to disable personal filters.");
+            ctx.Response.StatusCode = 500;
+            _auth.AddCorsHeaders(ctx);
+            await ctx.Response.Send("Internal Server Error");
+        }
+    }
+
+    internal async Task HandleDeleteCharacter(HttpContextBase ctx)
+    {
+        if (!await _auth.RequireAuth(ctx)) return;
+
+        try
+        {
+            var keyRaw = ctx.Request.Query.Elements["key"] ?? string.Empty;
+            var key = System.Net.WebUtility.UrlDecode(keyRaw);
+
+            if (string.IsNullOrEmpty(key) || key.Contains("..") || key.Contains('/') || key.Contains('\\'))
+            {
+                ctx.Response.StatusCode = 400;
+                _auth.AddCorsHeaders(ctx);
+                await ctx.Response.Send("{\"error\":\"invalid-key\"}");
+                return;
+            }
+
+            var configDir = _plugin.Interface.ConfigDirectory.FullName;
+            var filePath = Path.GetFullPath(Path.Combine(configDir, $"{key}.json"));
+            var configDirFull = Path.GetFullPath(configDir) + Path.DirectorySeparatorChar;
+
+            if (!filePath.StartsWith(configDirFull, StringComparison.OrdinalIgnoreCase))
+            {
+                ctx.Response.StatusCode = 400;
+                _auth.AddCorsHeaders(ctx);
+                await ctx.Response.Send("{\"error\":\"invalid-key\"}");
+                return;
+            }
+
+            if (File.Exists(filePath))
+                File.Delete(filePath);
+
+            using var global = await ReadGlobalAsync();
+            var personalChars = GetPersonalFilterCharacters(global).ToList();
+            if (personalChars.Remove(key))
+                await UpdatePersonalFilterCharacters(personalChars);
+
+            ctx.Response.StatusCode = 200;
+            _auth.AddCorsHeaders(ctx);
+            ctx.Response.Headers.Add("Content-Type", "application/json");
+            await ctx.Response.Send("{\"ok\":true}");
+        }
+        catch (Exception ex)
+        {
+            _log.Error(ex, "Failed to delete character settings.");
+            ctx.Response.StatusCode = 500;
+            _auth.AddCorsHeaders(ctx);
+            await ctx.Response.Send("Internal Server Error");
+        }
+    }
+
     internal async Task HandlePutSettings(HttpContextBase ctx)
     {
         if (!await _auth.RequireAuth(ctx)) return;
@@ -139,8 +416,20 @@ internal class SettingsHandler
 
             if (!string.IsNullOrEmpty(body))
             {
-                JsonDocument.Parse(body).Dispose(); // validate JSON before storing
-                await File.WriteAllTextAsync(GetSavePath(), body);
+                using var doc = JsonDocument.Parse(body); // validate JSON before storing
+                var savePath = await GetSavePathAsync();
+
+                // When writing to the global file, preserve personalFilterCharacters
+                // (the frontend is unaware of this field and would otherwise erase it)
+                if (savePath == GlobalSettingsPath)
+                {
+                    using var globalDoc = await ReadGlobalAsync();
+                    var personalChars = GetPersonalFilterCharacters(globalDoc).ToList();
+                    if (personalChars.Count > 0)
+                        body = BuildSettingsWithPersonalFilterCharacters(doc.RootElement, personalChars);
+                }
+
+                await File.WriteAllTextAsync(savePath, body);
             }
 
             ctx.Response.StatusCode = 200;

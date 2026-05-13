@@ -27,6 +27,47 @@ import { AvatarImage } from '../ChatArea/AvatarImage';
 import { FilterEditModal } from './FilterEditModal';
 import { FilterFolderModal } from './FilterFolderModal';
 import { ConfirmDialog } from './ConfirmDialog';
+import { FilterModeModal } from './FilterModeModal';
+import type { FilterMode } from '../../hooks/useFilterMode';
+
+function PersonalFilterIcon() {
+  return (
+    <svg
+      width="10"
+      height="10"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+      <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+    </svg>
+  );
+}
+
+function SharedFilterIcon() {
+  return (
+    <svg
+      width="10"
+      height="10"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <circle cx="12" cy="12" r="10" />
+      <line x1="2" y1="12" x2="22" y2="12" />
+      <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+    </svg>
+  );
+}
 
 const FOLDER_PREFIX = 'folder:';
 const FILTER_PREFIX = 'filter:';
@@ -240,6 +281,7 @@ interface Props {
   isConnected: boolean;
   localPlayerName: string;
   localPlayerWorld: string;
+  filterMode: FilterMode | null;
   filters: CustomFilter[];
   folders: FilterFolder[];
   activeFilterName: string;
@@ -257,6 +299,8 @@ interface Props {
   onRenameFolder: (oldName: string, newName: string) => void;
   onDeleteFolder: (name: string) => void;
   onReorderFolders: (newFolders: FilterFolder[]) => void;
+  onEnablePersonalFilters: (copyFromGlobal: boolean) => Promise<void>;
+  onDisablePersonalFilters: () => Promise<void>;
 }
 
 export function Sidebar({
@@ -264,6 +308,7 @@ export function Sidebar({
   isConnected,
   localPlayerName,
   localPlayerWorld,
+  filterMode,
   filters,
   folders,
   activeFilterName,
@@ -281,9 +326,12 @@ export function Sidebar({
   onRenameFolder,
   onDeleteFolder,
   onReorderFolders,
+  onEnablePersonalFilters,
+  onDisablePersonalFilters,
 }: Props) {
   const [menu, setMenu] = useState<MenuTarget | null>(null);
   const [modal, setModal] = useState<ModalState>(null);
+  const [showFilterModeModal, setShowFilterModeModal] = useState(false);
   const [dragActiveId, setDragActiveId] = useState<string | null>(null);
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -415,9 +463,32 @@ export function Sidebar({
         {/* ── Player row ── */}
         {localPlayerName && (
           <>
-            <div className={styles['player-row']}>
-              <div className={styles['player-avatar']}>
-                <AvatarImage name={localPlayerName} world={localPlayerWorld || undefined} />
+            <button
+              className={[styles['player-row'], filterMode ? styles['player-row-clickable'] : '']
+                .filter(Boolean)
+                .join(' ')}
+              onClick={filterMode ? () => setShowFilterModeModal(true) : undefined}
+              disabled={!filterMode}
+              data-tooltip={filterMode ? 'Switch Shared / Personal' : undefined}
+              data-tooltip-pos="bottom"
+              aria-label="Switch Shared / Personal"
+            >
+              <div className={styles['player-avatar-wrapper']}>
+                <div className={styles['player-avatar']}>
+                  <AvatarImage name={localPlayerName} world={localPlayerWorld || undefined} />
+                </div>
+                {filterMode && (
+                  <span
+                    className={[
+                      styles['filter-mode-badge'],
+                      filterMode.isPersonal
+                        ? styles['filter-mode-badge-personal']
+                        : styles['filter-mode-badge-shared'],
+                    ].join(' ')}
+                  >
+                    {filterMode.isPersonal ? <PersonalFilterIcon /> : <SharedFilterIcon />}
+                  </span>
+                )}
               </div>
               <div className={styles['player-info']}>
                 <span className={styles['player-name']}>
@@ -434,7 +505,7 @@ export function Sidebar({
                   <span className={styles['player-world']}>{localPlayerWorld}</span>
                 )}
               </div>
-            </div>
+            </button>
             <div className={styles['player-divider']} />
           </>
         )}
@@ -646,6 +717,15 @@ export function Sidebar({
             setModal(null);
           }}
           onClose={() => setModal(null)}
+        />
+      )}
+
+      {showFilterModeModal && filterMode && (
+        <FilterModeModal
+          filterMode={filterMode}
+          onEnable={onEnablePersonalFilters}
+          onDisable={onDisablePersonalFilters}
+          onClose={() => setShowFilterModeModal(false)}
         />
       )}
     </>

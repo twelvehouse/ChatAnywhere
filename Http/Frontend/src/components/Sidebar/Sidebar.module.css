@@ -148,11 +148,41 @@
 
 /* ========== Player Row ========== */
 .player-row {
+  --badge-ring: var(--bg-secondary);
   padding: 10px 16px;
   display: flex;
   align-items: center;
   gap: 12px;
   flex-shrink: 0;
+  width: 100%;
+  background: none;
+  border: none;
+  font-family: inherit;
+  text-align: left;
+  cursor: default;
+  border-radius: 0;
+  transition: background 0.15s;
+}
+
+.player-row-clickable {
+  cursor: pointer;
+}
+
+.player-row-clickable:hover {
+  background: var(--bg-hover);
+  --badge-ring: color-mix(in srgb, var(--bg-secondary) 96%, white);
+}
+
+.player-row-clickable:active {
+  background: var(--bg-active);
+  --badge-ring: color-mix(in srgb, var(--bg-secondary) 85%, var(--accent));
+}
+
+.player-avatar-wrapper {
+  position: relative;
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
 }
 
 .player-avatar {
@@ -160,8 +190,32 @@
   height: 40px;
   border-radius: 50%;
   overflow: hidden;
-  flex-shrink: 0;
   background: linear-gradient(135deg, oklch(70% 0.1 210), oklch(55% 0.13 250));
+}
+
+.filter-mode-badge {
+  position: absolute;
+  bottom: -5px;
+  right: -5px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--badge-ring);
+  border: 2px solid var(--badge-ring);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition:
+    background 0.15s,
+    border-color 0.15s;
+}
+
+.filter-mode-badge-personal {
+  color: var(--accent);
+}
+
+.filter-mode-badge-shared {
+  color: var(--text-dim);
 }
 
 .player-info {

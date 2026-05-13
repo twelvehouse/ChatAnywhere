@@ -79,6 +79,11 @@ public class WebServer : IAsyncDisposable
             _host.Routes.PreAuthentication.Static.Add(HttpMethod.PUT,     "/settings",            _settings.HandlePutSettings,         ExceptionRoute);
             _host.Routes.PreAuthentication.Static.Add(HttpMethod.OPTIONS, "/settings/characters", _auth.HandleCorsPreflight,           ExceptionRoute);
             _host.Routes.PreAuthentication.Static.Add(HttpMethod.GET,     "/settings/characters", _settings.HandleGetCharacters,       ExceptionRoute);
+            _host.Routes.PreAuthentication.Static.Add(HttpMethod.DELETE,  "/settings/characters", _settings.HandleDeleteCharacter,     ExceptionRoute);
+            _host.Routes.PreAuthentication.Static.Add(HttpMethod.OPTIONS, "/settings/filter-mode", _auth.HandleCorsPreflight,                ExceptionRoute);
+            _host.Routes.PreAuthentication.Static.Add(HttpMethod.GET,     "/settings/filter-mode", _settings.HandleGetFilterMode,            ExceptionRoute);
+            _host.Routes.PreAuthentication.Static.Add(HttpMethod.POST,    "/settings/filter-mode", _settings.HandleEnablePersonalFilters,    ExceptionRoute);
+            _host.Routes.PreAuthentication.Static.Add(HttpMethod.DELETE,  "/settings/filter-mode", _settings.HandleDisablePersonalFilters,   ExceptionRoute);
             _host.Routes.PreAuthentication.Static.Add(HttpMethod.GET,     "/files/gfdata.gfd",              _gameFiles.GetGfdData,       ExceptionRoute);
             _host.Routes.PreAuthentication.Static.Add(HttpMethod.GET,     "/files/fonticon_ps5.tex",        _gameFiles.GetTexData,       ExceptionRoute);
             _host.Routes.PreAuthentication.Static.Add(HttpMethod.GET,     "/files/FFXIV_Lodestone_SSF.ttf", _gameFiles.GetLodestoneFont, ExceptionRoute);

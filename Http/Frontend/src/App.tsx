@@ -16,6 +16,7 @@ import { ChatArea } from './components/ChatArea/ChatArea';
 import { SettingsModal } from './components/Settings/SettingsModal';
 import { LinkConfirmModal } from './components/Settings/LinkConfirmModal';
 import { PasscodeModal } from './components/Auth/PasscodeModal';
+import { useFilterMode } from './hooks/useFilterMode';
 import type { ChatMessage, ChannelOption, TellPartner } from './types/chat';
 import type { CustomFilter, FilterFolder } from './types/filter';
 
@@ -119,6 +120,15 @@ function AppContent() {
   // ── Settings reload epoch (increments on character change) ────
   const [settingsEpoch, setSettingsEpoch] = useState(0);
 
+  // ── Filter mode (personal vs shared) ──────────────────────────
+  const {
+    filterMode,
+    fetchFilterMode,
+    enablePersonalFilters,
+    disablePersonalFilters,
+    deletePersonalFilters,
+  } = useFilterMode();
+
   // ── Login overlay (delayed to avoid flash on initial SSE connect) ──
   const [showLoginOverlay, setShowLoginOverlay] = useState(false);
 
@@ -171,6 +181,19 @@ function AppContent() {
 
   const handleReset = useCallback(() => setSettingsEpoch((n) => n + 1), []);
 
+  const handleEnablePersonalFilters = useCallback(
+    async (copyFromGlobal: boolean) => {
+      await enablePersonalFilters(copyFromGlobal);
+      setSettingsEpoch((n) => n + 1);
+    },
+    [enablePersonalFilters],
+  );
+
+  const handleDisablePersonalFilters = useCallback(async () => {
+    await disablePersonalFilters();
+    setSettingsEpoch((n) => n + 1);
+  }, [disablePersonalFilters]);
+
   useEffect(() => {
     if (isConnected && !localPlayerName) {
       const t = setTimeout(() => setShowLoginOverlay(true), 300);
@@ -180,6 +203,10 @@ function AppContent() {
       };
     }
   }, [isConnected, localPlayerName]);
+
+  useEffect(() => {
+    if (localPlayerName) fetchFilterMode();
+  }, [localPlayerName, fetchFilterMode]);
 
   // ── Settings sync (filters/folders + initial selection) ───────
   useSettingsSync({
@@ -473,6 +500,7 @@ function AppContent() {
         isConnected={isConnected}
         localPlayerName={localPlayerName}
         localPlayerWorld={localPlayerWorld}
+        filterMode={filterMode}
         filters={filters}
         folders={folders}
         activeFilterName={activeFilterName}
@@ -490,6 +518,8 @@ function AppContent() {
         onRenameFolder={handleRenameFolder}
         onDeleteFolder={handleDeleteFolder}
         onReorderFolders={handleReorderFolders}
+        onEnablePersonalFilters={handleEnablePersonalFilters}
+        onDisablePersonalFilters={handleDisablePersonalFilters}
       />
 
       <ChatArea
@@ -571,6 +601,8 @@ function AppContent() {
             setFilters(nf);
             setFolders(nfold);
           }}
+          filterMode={filterMode}
+          onDeletePersonalFilters={deletePersonalFilters}
           onClose={() => setShowSettings(false)}
         />
       )}
