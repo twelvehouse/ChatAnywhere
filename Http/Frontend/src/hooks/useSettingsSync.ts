@@ -88,10 +88,13 @@ export function useSettingsSync({
     isLoggedInRef.current = isLoggedIn;
   });
 
-  // Load from server on mount and whenever refetchEpoch increments (character change)
+  // Load from server on mount and whenever refetchEpoch increments (character change).
+  // AbortController cancels the previous in-flight request so a stale response
+  // from a prior character cannot overwrite the settings of the new one.
   useEffect(() => {
+    const controller = new AbortController();
     serverLoadedRef.current = false;
-    fetch(`${RELAY_ADDR}/settings`, { credentials: 'include' })
+    fetch(`${RELAY_ADDR}/settings`, { credentials: 'include', signal: controller.signal })
       .then((r) => {
         if (r.status === 401) {
           dispatchUnauthorized();
@@ -134,14 +137,17 @@ export function useSettingsSync({
           onFiltersReady(loadedFilters, loadedFolders);
         }
       })
-      .catch(() => {
+      .catch((err: unknown) => {
+        if (err instanceof DOMException && err.name === 'AbortError') return;
         setFilters([DEFAULT_FILTER]);
         setFolders([DEFAULT_FOLDER]);
         onFiltersReady([DEFAULT_FILTER], [DEFAULT_FOLDER]);
       })
       .finally(() => {
-        serverLoadedRef.current = true;
+        if (!controller.signal.aborted) serverLoadedRef.current = true;
       });
+
+    return () => controller.abort();
   }, [refetchEpoch]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Debounced PUT to server whenever settings change (after initial load)
