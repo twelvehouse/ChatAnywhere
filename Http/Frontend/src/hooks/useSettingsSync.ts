@@ -156,6 +156,9 @@ export function useSettingsSync({
 
     if (timerRef.current) clearTimeout(timerRef.current);
     timerRef.current = setTimeout(() => {
+      // Re-check here because the timer may fire after a logout that happened
+      // before the 500ms debounce elapsed (the effect cleanup doesn't cancel it).
+      if (!isLoggedInRef.current) return;
       fetch(`${RELAY_ADDR}/settings`, {
         method: 'PUT',
         credentials: 'include',
