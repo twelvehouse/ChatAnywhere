@@ -147,13 +147,13 @@ internal class SettingsHandler
             var sb = new StringBuilder("[");
             var first = true;
 
+            var globalPathFull = Path.GetFullPath(GlobalSettingsPath);
             foreach (var file in Directory.EnumerateFiles(configDir, "*.json"))
             {
-                var fileName = Path.GetFileName(file);
-                if (fileName.Equals("frontend-settings.json", StringComparison.OrdinalIgnoreCase))
+                if (Path.GetFullPath(file).Equals(globalPathFull, StringComparison.OrdinalIgnoreCase))
                     continue;
 
-                var key = Path.GetFileNameWithoutExtension(fileName);
+                var key = Path.GetFileNameWithoutExtension(file);
                 try
                 {
                     var json = await File.ReadAllTextAsync(file);
