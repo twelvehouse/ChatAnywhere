@@ -83,7 +83,7 @@ export function AppearanceSettings({
       </div>
 
       <div className="form-section">
-        <h3>Font</h3>
+        <div className="form-section-title">FONT</div>
         <p>
           Change the main text font. FFXIV special characters use a dedicated font regardless of
           this setting.
@@ -139,7 +139,10 @@ export function AppearanceSettings({
             <div className="toggle-knob" />
           </div>
         </div>
+      </div>
 
+      <div className="form-section">
+        <div className="form-section-title">DISPLAY</div>
         <div
           className="form-row"
           style={{ cursor: 'pointer' }}

@@ -1,25 +1,4 @@
 /* ========== Security Settings UI ========== */
-.section-header-row {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 16px;
-  margin-bottom: 20px;
-}
-
-.section-header-titles {
-  flex: 1;
-}
-
-.section-label {
-  display: block;
-  font-size: 0.65rem;
-  font-weight: 700;
-  color: var(--text-muted);
-  letter-spacing: 0.1em;
-  margin-bottom: 8px;
-}
-
 .domain-list {
   display: flex;
   flex-direction: column;

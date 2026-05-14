@@ -130,6 +130,25 @@ export function SettingsModal({
               Appearance
             </button>
             <button
+              className={`${styles['settings-nav-item']}${category === 'chat-input' ? ` ${styles.active}` : ''}`}
+              onClick={() => selectCategory('chat-input')}
+            >
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 16 16"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.5"
+              >
+                <path
+                  d="M2 3h12a1 1 0 0 1 1 1v7a1 1 0 0 1-1 1H5l-3 2V4a1 1 0 0 1 1-1z"
+                  strokeLinejoin="round"
+                />
+              </svg>
+              Chat &amp; Input
+            </button>
+            <button
               className={`${styles['settings-nav-item']}${category === 'send-channels' ? ` ${styles.active}` : ''}`}
               onClick={() => selectCategory('send-channels')}
             >
@@ -158,25 +177,6 @@ export function SettingsModal({
                 <path d="M2 3h12l-4.5 5.5V13l-3-1.5V8.5L2 3z" strokeLinejoin="round" />
               </svg>
               Filters
-            </button>
-            <button
-              className={`${styles['settings-nav-item']}${category === 'chat-input' ? ` ${styles.active}` : ''}`}
-              onClick={() => selectCategory('chat-input')}
-            >
-              <svg
-                width="16"
-                height="16"
-                viewBox="0 0 16 16"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.5"
-              >
-                <path
-                  d="M2 3h12a1 1 0 0 1 1 1v7a1 1 0 0 1-1 1H5l-3 2V4a1 1 0 0 1 1-1z"
-                  strokeLinejoin="round"
-                />
-              </svg>
-              Chat &amp; Input
             </button>
             <button
               className={`${styles['settings-nav-item']}${category === 'security' ? ` ${styles.active}` : ''}`}

@@ -18,16 +18,11 @@ export function SecuritySettings({ trustedDomains, setTrustedDomains }: Props) {
 
   return (
     <div className="form-section">
-      <div className={styles['section-header-row']}>
-        <div className={styles['section-header-titles']}>
-          <span className={styles['section-label']}>SECURITY</span>
-          <h3>Trusted Link Domains</h3>
-          <p>
-            Manage domains that are allowed to open without a confirmation prompt. New domains can
-            be added through the link opening dialog.
-          </p>
-        </div>
-      </div>
+      <div className="form-section-title">TRUSTED LINK DOMAINS</div>
+      <p>
+        Manage domains that are allowed to open without a confirmation prompt. New domains can be
+        added through the link opening dialog.
+      </p>
 
       <div className={styles['domain-list']}>
         {Array.from(BUILT_IN_TRUSTED_DOMAINS).map((domain) => (
