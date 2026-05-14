@@ -27,6 +27,31 @@
     background 0.15s;
 }
 
+/* Compact: text left, thumbnail right */
+.ogp-card-compact {
+  flex-direction: row;
+}
+
+.ogp-card-compact .ogp-body {
+  flex: 1;
+  min-width: 0;
+  padding: 8px 10px;
+}
+
+.ogp-card-compact .ogp-image-wrapper {
+  /* Height set by JS (= body height); width derived from inherited aspect-ratio: 16/9 */
+  /* On mobile, max-width caps the image and object-fit: cover crops without black bars */
+  width: auto;
+  max-width: 50%;
+  flex-shrink: 0;
+  align-self: flex-start;
+  border-left: 1px solid var(--border);
+}
+
+.ogp-card-compact .ogp-skeleton {
+  height: 60px;
+}
+
 .ogp-card:hover {
   background: var(--bg-tertiary);
   border-color: var(--border-focus);

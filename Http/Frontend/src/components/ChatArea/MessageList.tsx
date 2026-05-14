@@ -109,6 +109,7 @@ interface Props {
   onReply: (name: string, world?: string) => void;
   trustedDomains: Set<string>;
   disableTellRef?: boolean;
+  largeLinkPreviews?: boolean;
 }
 
 export function MessageList({
@@ -133,6 +134,7 @@ export function MessageList({
   onReply,
   trustedDomains,
   disableTellRef = false,
+  largeLinkPreviews = false,
 }: Props) {
   const tellRefs = disableTellRef
     ? messages.map(() => null)
@@ -292,6 +294,7 @@ export function MessageList({
                 tellModeAll={tellModeAll}
                 onReply={onReply}
                 trustedDomains={trustedDomains}
+                linkPreviewSize={largeLinkPreviews ? 'full' : 'compact'}
               />
             ))}
           </div>

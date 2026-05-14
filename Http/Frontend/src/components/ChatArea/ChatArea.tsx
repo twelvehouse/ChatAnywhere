@@ -40,6 +40,7 @@ interface Props {
   onClearReply: () => void;
   onToggleReplyPin: () => void;
   trustedDomains: Set<string>;
+  largeLinkPreviews: boolean;
   // Input
   sendChannels: ChannelOption[];
   selectedSendPrefix: string;
@@ -84,6 +85,7 @@ export function ChatArea({
   onClearReply,
   onToggleReplyPin,
   trustedDomains,
+  largeLinkPreviews,
   sendChannels,
   selectedSendPrefix,
   showCharPicker,
@@ -129,6 +131,7 @@ export function ChatArea({
         tellModeAll={tellModeAll}
         onReply={onReply}
         trustedDomains={trustedDomains}
+        largeLinkPreviews={largeLinkPreviews}
       />
 
       <InputArea

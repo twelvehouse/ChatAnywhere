@@ -35,10 +35,12 @@ interface Props {
   fontSize: number;
   italicizeSystem: boolean;
   useColoredBackground: boolean;
+  largeLinkPreviews: boolean;
   setFontFamily: Dispatch<SetStateAction<string>>;
   setFontSize: Dispatch<SetStateAction<number>>;
   setItalicizeSystem: Dispatch<SetStateAction<boolean>>;
   setUseColoredBackground: Dispatch<SetStateAction<boolean>>;
+  setLargeLinkPreviews: Dispatch<SetStateAction<boolean>>;
 }
 
 export function AppearanceSettings({
@@ -46,10 +48,12 @@ export function AppearanceSettings({
   fontSize,
   italicizeSystem,
   useColoredBackground,
+  largeLinkPreviews,
   setFontFamily,
   setFontSize,
   setItalicizeSystem,
   setUseColoredBackground,
+  setLargeLinkPreviews,
 }: Props) {
   return (
     <>
@@ -143,6 +147,17 @@ export function AppearanceSettings({
         >
           <span className="form-row-label">Colorize backgrounds by type</span>
           <div className={`toggle-switch${useColoredBackground ? ' on' : ''}`}>
+            <div className="toggle-knob" />
+          </div>
+        </div>
+
+        <div
+          className="form-row"
+          style={{ cursor: 'pointer' }}
+          onClick={() => setLargeLinkPreviews((v) => !v)}
+        >
+          <span className="form-row-label">Large link previews</span>
+          <div className={`toggle-switch${largeLinkPreviews ? ' on' : ''}`}>
             <div className="toggle-knob" />
           </div>
         </div>

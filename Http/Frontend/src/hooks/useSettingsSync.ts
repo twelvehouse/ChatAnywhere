@@ -31,6 +31,7 @@ interface Props {
   emoteConfirm: boolean;
   emoteSortByName: boolean;
   retainSyncSendPrefix: boolean;
+  largeLinkPreviews: boolean;
   refetchEpoch: number;
   isLoggedIn: boolean;
   setFontFamily: Dispatch<SetStateAction<string>>;
@@ -46,6 +47,7 @@ interface Props {
   setEmoteConfirm: Dispatch<SetStateAction<boolean>>;
   setEmoteSortByName: Dispatch<SetStateAction<boolean>>;
   setRetainSyncSendPrefix: Dispatch<SetStateAction<boolean>>;
+  setLargeLinkPreviews: Dispatch<SetStateAction<boolean>>;
   onFiltersReady: (filters: CustomFilter[], folders: FilterFolder[]) => void;
 }
 
@@ -63,6 +65,7 @@ export function useSettingsSync({
   emoteConfirm,
   emoteSortByName,
   retainSyncSendPrefix,
+  largeLinkPreviews,
   refetchEpoch,
   isLoggedIn,
   setFontFamily,
@@ -78,6 +81,7 @@ export function useSettingsSync({
   setEmoteConfirm,
   setEmoteSortByName,
   setRetainSyncSendPrefix,
+  setLargeLinkPreviews,
   onFiltersReady,
 }: Props) {
   const serverLoadedRef = useRef(false);
@@ -118,6 +122,8 @@ export function useSettingsSync({
         if (typeof data.emoteSortByName === 'boolean') setEmoteSortByName(data.emoteSortByName);
         if (typeof data.retainSyncSendPrefix === 'boolean')
           setRetainSyncSendPrefix(data.retainSyncSendPrefix);
+        if (typeof data.largeLinkPreviews === 'boolean')
+          setLargeLinkPreviews(data.largeLinkPreviews);
 
         // Restore filters / folders, or initialize with defaults if both are empty
         const loadedFilters: CustomFilter[] = Array.isArray(data.filters)
@@ -177,6 +183,7 @@ export function useSettingsSync({
           emoteConfirm,
           emoteSortByName,
           retainSyncSendPrefix,
+          largeLinkPreviews,
         }),
       }).catch(() => {});
     }, 500);
@@ -198,5 +205,6 @@ export function useSettingsSync({
     emoteConfirm,
     emoteSortByName,
     retainSyncSendPrefix,
+    largeLinkPreviews,
   ]);
 }

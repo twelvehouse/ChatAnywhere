@@ -18,10 +18,12 @@ interface Props {
   fontSize: number;
   italicizeSystem: boolean;
   useColoredBackground: boolean;
+  largeLinkPreviews: boolean;
   setFontFamily: Dispatch<SetStateAction<string>>;
   setFontSize: Dispatch<SetStateAction<number>>;
   setItalicizeSystem: Dispatch<SetStateAction<boolean>>;
   setUseColoredBackground: Dispatch<SetStateAction<boolean>>;
+  setLargeLinkPreviews: Dispatch<SetStateAction<boolean>>;
   // Send Channels
   serverChannels: ChannelOption[];
   disabledChannels: Set<string>;
@@ -57,10 +59,12 @@ export function SettingsModal({
   fontSize,
   italicizeSystem,
   useColoredBackground,
+  largeLinkPreviews,
   setFontFamily,
   setFontSize,
   setItalicizeSystem,
   setUseColoredBackground,
+  setLargeLinkPreviews,
   serverChannels,
   disabledChannels,
   selectedSendPrefix,
@@ -225,10 +229,12 @@ export function SettingsModal({
                 fontSize={fontSize}
                 italicizeSystem={italicizeSystem}
                 useColoredBackground={useColoredBackground}
+                largeLinkPreviews={largeLinkPreviews}
                 setFontFamily={setFontFamily}
                 setFontSize={setFontSize}
                 setItalicizeSystem={setItalicizeSystem}
                 setUseColoredBackground={setUseColoredBackground}
+                setLargeLinkPreviews={setLargeLinkPreviews}
               />
             )}
             {category === 'send-channels' && (

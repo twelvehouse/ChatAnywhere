@@ -39,6 +39,7 @@ interface Props {
   italicizeSystem: boolean;
   useColoredBackground: boolean;
   tellModeAll: boolean;
+  linkPreviewSize?: 'compact' | 'full';
   onReply: (name: string, world?: string) => void;
   trustedDomains?: Set<string>;
 }
@@ -52,6 +53,7 @@ export function MessageItem({
   italicizeSystem,
   useColoredBackground,
   tellModeAll,
+  linkPreviewSize = 'compact',
   onReply,
   trustedDomains = new Set(),
 }: Props) {
@@ -153,7 +155,7 @@ export function MessageItem({
               const ytId = getYouTubeId(url);
               if (ytId) return <YouTubeCard key={url} videoId={ytId} url={url} />;
               if (isImageUrl(url)) return <ImagePreview key={url} url={url} />;
-              return <OgpCard key={url} url={url} />;
+              return <OgpCard key={url} url={url} size={linkPreviewSize} />;
             }
             return null;
           })()}

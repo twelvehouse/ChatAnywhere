@@ -91,6 +91,7 @@ function AppContent() {
   const [emoteConfirm, setEmoteConfirm] = useState(true);
   const [emoteSortByName, setEmoteSortByName] = useState(false);
   const [retainSyncSendPrefix, setRetainSyncSendPrefix] = useState(true);
+  const [largeLinkPreviews, setLargeLinkPreviews] = useState(false);
 
   // ── Sync tab prefix map (session only) ─────────────────────────
   const [syncTabPrefixMap, setSyncTabPrefixMap] = useState<Record<string, string>>({});
@@ -223,6 +224,7 @@ function AppContent() {
     emoteConfirm,
     emoteSortByName,
     retainSyncSendPrefix,
+    largeLinkPreviews,
     refetchEpoch: settingsEpoch,
     isLoggedIn: !!localPlayerName,
     setFontFamily,
@@ -238,6 +240,7 @@ function AppContent() {
     setEmoteConfirm,
     setEmoteSortByName,
     setRetainSyncSendPrefix,
+    setLargeLinkPreviews,
     onFiltersReady: (loadedFilters) => {
       const urlFilterName = new URL(window.location.href).searchParams.get('filter');
       const targetName =
@@ -566,6 +569,7 @@ function AppContent() {
         onClearReply={handleClearReply}
         onToggleReplyPin={handleToggleReplyPin}
         trustedDomains={trustedDomains}
+        largeLinkPreviews={largeLinkPreviews}
       />
 
       {showSettings && (
@@ -595,6 +599,8 @@ function AppContent() {
           setEmoteSortByName={setEmoteSortByName}
           retainSyncSendPrefix={retainSyncSendPrefix}
           setRetainSyncSendPrefix={setRetainSyncSendPrefix}
+          largeLinkPreviews={largeLinkPreviews}
+          setLargeLinkPreviews={setLargeLinkPreviews}
           currentFilters={filters}
           currentFolders={folders}
           onImportFilters={(nf, nfold) => {

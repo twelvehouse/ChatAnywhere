@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useLayoutEffect } from 'react';
 import styles from './LinkPreview.module.css';
 import { RELAY_ADDR } from '../../constants/config';
 
@@ -14,6 +14,7 @@ interface OgpData {
 
 interface OgpCardProps {
   url: string;
+  size?: 'compact' | 'full';
 }
 
 function ExternalLinkIcon() {
@@ -37,10 +38,25 @@ function ExternalLinkIcon() {
   );
 }
 
-export function OgpCard({ url }: OgpCardProps) {
+export function OgpCard({ url, size = 'compact' }: OgpCardProps) {
   const [data, setData] = useState<OgpData | 'loading' | 'error'>(
     () => ogpCache.get(url) ?? 'loading',
   );
+  const bodyRef = useRef<HTMLDivElement>(null);
+  const [bodyHeight, setBodyHeight] = useState<number | null>(null);
+
+  // Measure body height to drive image height in compact mode (avoid CSS circular dependency)
+  useLayoutEffect(() => {
+    if (size !== 'compact') return;
+    const el = bodyRef.current;
+    if (!el) return;
+    setBodyHeight(el.offsetHeight);
+    const ro = new ResizeObserver(() => {
+      if (bodyRef.current) setBodyHeight(bodyRef.current.offsetHeight);
+    });
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [size, data]);
 
   useEffect(() => {
     const cached = ogpCache.get(url);
@@ -60,9 +76,12 @@ export function OgpCard({ url }: OgpCardProps) {
       });
   }, [url]);
 
+  const sizeClass = size === 'compact' ? styles['ogp-card-compact'] : '';
+  const imageStyle = size === 'compact' && bodyHeight ? { height: bodyHeight } : undefined;
+
   if (data === 'loading') {
     return (
-      <div className={styles['ogp-card']}>
+      <div className={`${styles['ogp-card']} ${sizeClass}`}>
         <div className={styles['ogp-skeleton']} />
       </div>
     );
@@ -75,14 +94,14 @@ export function OgpCard({ url }: OgpCardProps) {
   return (
     <a
       href={url}
-      className={styles['ogp-card']}
+      className={`${styles['ogp-card']} ${sizeClass}`}
       onClick={(e) => {
         e.preventDefault();
         e.stopPropagation();
         window.open(url, '_blank', 'noopener,noreferrer');
       }}
     >
-      <div className={styles['ogp-body']}>
+      <div className={styles['ogp-body']} ref={bodyRef}>
         {siteName && (
           <span className={styles['ogp-site']}>
             {siteName}
@@ -93,7 +112,7 @@ export function OgpCard({ url }: OgpCardProps) {
         {description && <span className={styles['ogp-desc']}>{description}</span>}
       </div>
       {image && (
-        <div className={styles['ogp-image-wrapper']}>
+        <div className={styles['ogp-image-wrapper']} style={imageStyle}>
           <img
             src={image}
             alt=""
