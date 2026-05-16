@@ -17,12 +17,6 @@
 ChatAnywhere is a [Dalamud](https://github.com/goatcorp/Dalamud) plugin that runs a lightweight web server inside FFXIV.
 It streams your in-game chat to any browser in real time, and lets you send messages back without switching to the game window.
 
-> **A note on ChatTwo:**
-> ChatAnywhere started as a personal reimplementation of the ideas first realized by **ChatTwo** — one of the best chat plugins ever made for FFXIV.
-> The channel handling, UI concept, and overall approach all owe a deep debt to that project and its author.
-> I have enormous respect for ChatTwo. If you haven't tried it, please do.
-> *(I would have asked permission before publishing this, but the language barrier made that difficult — I'm sorry for that.)*
-
 ---
 
 ## Features
@@ -154,6 +148,14 @@ ChatAnywhere would not exist without these projects:
 | [OpenGraph-Net](https://github.com/ghorsey/OpenGraph-Net) | URL Open Graph preview metadata |
 | [Watson.Lite](https://github.com/jchristn/WatsonWebserver) | Embedded HTTP server and SSE support |
 | [@dnd-kit](https://dndkit.com/) | Drag-and-drop filter and folder reordering |
+
+> **A note on ChatTwo:**
+> This project started as a fork of similar functionality found in ChatTwo. It has been largely rewritten for my own needs, but some code and approaches remain. Thanks for the OSS.
+> 
+> P.S. The author mentioned above has taken a keen interest in this project on the official Dalamud Discord — you can search "chat anywhere" (the space matters) to see for yourself.  
+> I've muted him — but my gratitude remains. 😊
+>
+> (Written with Claude Sonnet 4.6)
 
 <details>
 <summary>How it works (technical overview)</summary>
