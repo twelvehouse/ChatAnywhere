@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import { QueryClient, QueryClientProvider, QueryCache } from '@tanstack/react-query';
+import { QueryClient, QueryClientProvider, QueryCache, MutationCache } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import App from './App.tsx';
 import { dispatchUnauthorized } from './lib/authEvent';
@@ -20,6 +20,13 @@ const queryClient = new QueryClient({
     },
   },
   queryCache: new QueryCache({
+    onError: (error) => {
+      if (error instanceof Response && error.status === 401) {
+        dispatchUnauthorized();
+      }
+    },
+  }),
+  mutationCache: new MutationCache({
     onError: (error) => {
       if (error instanceof Response && error.status === 401) {
         dispatchUnauthorized();

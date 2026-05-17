@@ -122,13 +122,8 @@ function AppContent() {
   const [settingsEpoch, setSettingsEpoch] = useState(0);
 
   // ── Filter mode (personal vs shared) ──────────────────────────
-  const {
-    filterMode,
-    fetchFilterMode,
-    enablePersonalFilters,
-    disablePersonalFilters,
-    deletePersonalFilters,
-  } = useFilterMode();
+  const { filterMode, enablePersonalFilters, disablePersonalFilters, deletePersonalFilters } =
+    useFilterMode({ enabled: !!localPlayerName });
 
   // ── Login overlay (delayed to avoid flash on initial SSE connect) ──
   const [showLoginOverlay, setShowLoginOverlay] = useState(false);
@@ -204,10 +199,6 @@ function AppContent() {
       };
     }
   }, [isConnected, localPlayerName]);
-
-  useEffect(() => {
-    if (localPlayerName) fetchFilterMode();
-  }, [localPlayerName, fetchFilterMode]);
 
   // ── Settings sync (filters/folders + initial selection) ───────
   useSettingsSync({
