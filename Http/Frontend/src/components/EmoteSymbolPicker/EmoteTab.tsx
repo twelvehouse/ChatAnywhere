@@ -4,6 +4,7 @@ import { Search, X, FileText } from 'lucide-react';
 import styles from './EmoteTab.module.css';
 import type { Emote } from '../../hooks/useEmoteList';
 import { RELAY_ADDR } from '../../constants/config';
+import { useSettingsStore } from '../../store/settingsStore';
 
 interface Props {
   emotes: Emote[];
@@ -11,19 +12,11 @@ interface Props {
   error: string | null;
   /** Called with the final command string (including optional " motion" suffix). */
   onExecute: (command: string) => void;
-  /** When true, requires a second tap to confirm before executing. */
-  emoteConfirm: boolean;
-  emoteSortByName: boolean;
 }
 
-export function EmoteTab({
-  emotes,
-  loading,
-  error,
-  onExecute,
-  emoteConfirm,
-  emoteSortByName,
-}: Props) {
+export function EmoteTab({ emotes, loading, error, onExecute }: Props) {
+  const emoteConfirm = useSettingsStore((s) => s.emoteConfirm);
+  const emoteSortByName = useSettingsStore((s) => s.emoteSortByName);
   const [search, setSearch] = useState('');
   const [filterQuery, setFilterQuery] = useState('');
   const [, startTransition] = useTransition();

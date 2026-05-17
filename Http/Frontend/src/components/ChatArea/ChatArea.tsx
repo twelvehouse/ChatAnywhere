@@ -4,14 +4,12 @@ import { ChatHeader } from './ChatHeader';
 import { MessageList } from './MessageList';
 import { InputArea } from './InputArea';
 import type { ChatMessage, ChannelOption, TellPartner } from '../../types/chat';
-import type { CustomFilter, FilterFolder } from '../../types/filter';
+import type { CustomFilter } from '../../types/filter';
 
 interface Props {
   activeDmTarget: TellPartner | null;
   // Header
   activeFilter: CustomFilter | null;
-  filters: CustomFilter[];
-  folders: FilterFolder[];
   isSidebarOpen: boolean;
   onToggleSidebar: () => void;
   onEditFilter: (filter: CustomFilter, oldName: string) => void;
@@ -30,35 +28,25 @@ interface Props {
   onDismissBanner: () => void;
   onScrollToBottom: () => void;
   onLinkClick: (url: string) => void;
-  italicizeSystem: boolean;
-  useColoredBackground: boolean;
-  // Tell mode
+  // Tell mode (replyTarget/replyPinned stay as props for now)
   replyTarget: { name: string; world?: string } | null;
   replyPinned: boolean;
-  tellModeAll: boolean;
   onReply: (name: string, world?: string) => void;
   onClearReply: () => void;
   onToggleReplyPin: () => void;
-  trustedDomains: Set<string>;
-  largeLinkPreviews: boolean;
   // Input
   sendChannels: ChannelOption[];
   selectedSendPrefix: string;
   showCharPicker: boolean;
-  ctrlEnterToSend: boolean;
   onSend: (text: string) => void;
   onSendPrefixChange: (prefix: string) => void;
   onToggleCharPicker: () => void;
   onExecuteEmote: (command: string) => void;
-  emoteConfirm: boolean;
-  emoteSortByName: boolean;
 }
 
 export function ChatArea({
   activeDmTarget,
   activeFilter,
-  filters,
-  folders,
   isSidebarOpen,
   onToggleSidebar,
   onEditFilter,
@@ -76,34 +64,24 @@ export function ChatArea({
   onDismissBanner,
   onScrollToBottom,
   onLinkClick,
-  italicizeSystem,
-  useColoredBackground,
   replyTarget,
   replyPinned,
-  tellModeAll,
   onReply,
   onClearReply,
   onToggleReplyPin,
-  trustedDomains,
-  largeLinkPreviews,
   sendChannels,
   selectedSendPrefix,
   showCharPicker,
-  ctrlEnterToSend,
   onSend,
   onSendPrefixChange,
   onToggleCharPicker,
   onExecuteEmote,
-  emoteConfirm,
-  emoteSortByName,
 }: Props) {
   return (
     <div className={styles['chat-area']}>
       <ChatHeader
         activeFilter={activeFilter}
         activeDmTarget={activeDmTarget}
-        filters={filters}
-        folders={folders}
         isSidebarOpen={isSidebarOpen}
         onToggleSidebar={onToggleSidebar}
         onEditFilter={onEditFilter}
@@ -126,12 +104,7 @@ export function ChatArea({
         onDismissBanner={onDismissBanner}
         onScrollToBottom={onScrollToBottom}
         onLinkClick={onLinkClick}
-        italicizeSystem={italicizeSystem}
-        useColoredBackground={useColoredBackground}
-        tellModeAll={tellModeAll}
         onReply={onReply}
-        trustedDomains={trustedDomains}
-        largeLinkPreviews={largeLinkPreviews}
       />
 
       <InputArea
@@ -139,13 +112,10 @@ export function ChatArea({
         sendChannels={sendChannels}
         selectedSendPrefix={selectedSendPrefix}
         showCharPicker={showCharPicker}
-        ctrlEnterToSend={ctrlEnterToSend}
         onSend={onSend}
         onSendPrefixChange={onSendPrefixChange}
         onToggleCharPicker={onToggleCharPicker}
         onExecuteEmote={onExecuteEmote}
-        emoteConfirm={emoteConfirm}
-        emoteSortByName={emoteSortByName}
         replyTarget={replyTarget}
         replyPinned={replyPinned}
         isDmView={activeDmTarget !== null}

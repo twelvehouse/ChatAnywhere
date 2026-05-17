@@ -78,19 +78,13 @@ function AppContent() {
   // ── Input state ────────────────────────────────────────────────
   const [showCharPicker, setShowCharPicker] = useState(false);
 
-  // ── Persisted settings (mirrored via useSettingsSync to /settings) ──
+  // ── Persisted settings consumed directly in App (fields used only by deeper
+  //    components read from the store there instead of being plumbed through). ──
   const {
     fontFamily,
     fontSize,
     disabledChannels,
-    italicizeSystem,
-    useColoredBackground,
-    tellModeAll,
-    ctrlEnterToSend,
-    emoteConfirm,
-    emoteSortByName,
     retainSyncSendPrefix,
-    largeLinkPreviews,
     trustedDomains,
     filters,
     folders,
@@ -99,14 +93,7 @@ function AppContent() {
       fontFamily: s.fontFamily,
       fontSize: s.fontSize,
       disabledChannels: s.disabledChannels,
-      italicizeSystem: s.italicizeSystem,
-      useColoredBackground: s.useColoredBackground,
-      tellModeAll: s.tellModeAll,
-      ctrlEnterToSend: s.ctrlEnterToSend,
-      emoteConfirm: s.emoteConfirm,
-      emoteSortByName: s.emoteSortByName,
       retainSyncSendPrefix: s.retainSyncSendPrefix,
-      largeLinkPreviews: s.largeLinkPreviews,
       trustedDomains: s.trustedDomains,
       filters: s.filters,
       folders: s.folders,
@@ -515,8 +502,6 @@ function AppContent() {
       <ChatArea
         activeDmTarget={activeDmTarget}
         activeFilter={activeFilter}
-        filters={filters}
-        folders={folders}
         isSidebarOpen={isSidebarOpen}
         onToggleSidebar={() => setIsSidebarOpen((prev) => !prev)}
         filteredMessages={filteredMessages}
@@ -536,27 +521,19 @@ function AppContent() {
           setHasUnreadDown(false);
         }}
         onLinkClick={openLink}
-        italicizeSystem={italicizeSystem}
-        useColoredBackground={useColoredBackground}
         sendChannels={sendChannels}
         selectedSendPrefix={selectedSendPrefix}
         showCharPicker={showCharPicker}
-        ctrlEnterToSend={ctrlEnterToSend}
         onSend={sendMessage}
         onSendPrefixChange={setSelectedSendPrefix}
         onToggleCharPicker={() => setShowCharPicker((o) => !o)}
         onExecuteEmote={handleExecuteEmote}
-        emoteConfirm={emoteConfirm}
-        emoteSortByName={emoteSortByName}
         onEditFilter={handleEditFilter}
         replyTarget={replyTarget}
         replyPinned={replyPinned}
-        tellModeAll={tellModeAll}
         onReply={handleReply}
         onClearReply={handleClearReply}
         onToggleReplyPin={handleToggleReplyPin}
-        trustedDomains={trustedDomains}
-        largeLinkPreviews={largeLinkPreviews}
       />
 
       {showSettings && (

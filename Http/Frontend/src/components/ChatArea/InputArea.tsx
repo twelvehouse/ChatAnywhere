@@ -2,6 +2,7 @@ import { useCallback, useRef, useState } from 'react';
 import type { KeyboardEvent } from 'react';
 import clsx from 'clsx';
 import { Pin, Send } from 'lucide-react';
+import { useSettingsStore } from '../../store/settingsStore';
 import styles from './InputArea.module.css';
 import { ChannelSelect } from '../ChannelSelect/ChannelSelect';
 import { EmoteSymbolPicker } from '../EmoteSymbolPicker/EmoteSymbolPicker';
@@ -48,8 +49,6 @@ interface ChatInputRowProps {
   onToggleCharPicker: () => void;
   onSend: () => void;
   onExecuteEmote: (command: string) => void;
-  emoteConfirm: boolean;
-  emoteSortByName: boolean;
   effectiveLimit: number;
   isOverLimit: boolean;
 }
@@ -69,8 +68,6 @@ function ChatInputRow({
   onToggleCharPicker,
   onSend,
   onExecuteEmote,
-  emoteConfirm,
-  emoteSortByName,
   effectiveLimit,
   isOverLimit,
 }: ChatInputRowProps) {
@@ -156,8 +153,6 @@ function ChatInputRow({
         <EmoteSymbolPicker
           onInsert={(text) => onInputChange(inputText + text)}
           onExecute={onExecuteEmote}
-          emoteConfirm={emoteConfirm}
-          emoteSortByName={emoteSortByName}
         />
       )}
     </div>
@@ -169,13 +164,10 @@ interface Props {
   sendChannels: ChannelOption[];
   selectedSendPrefix: string;
   showCharPicker: boolean;
-  ctrlEnterToSend: boolean;
   onSend: (text: string) => void;
   onSendPrefixChange: (prefix: string) => void;
   onToggleCharPicker: () => void;
   onExecuteEmote: (command: string) => void;
-  emoteConfirm: boolean;
-  emoteSortByName: boolean;
   replyTarget: { name: string; world?: string } | null;
   replyPinned: boolean;
   isDmView?: boolean;
@@ -188,19 +180,17 @@ export function InputArea({
   sendChannels,
   selectedSendPrefix,
   showCharPicker,
-  ctrlEnterToSend,
   onSend,
   onSendPrefixChange,
   onToggleCharPicker,
   onExecuteEmote,
-  emoteConfirm,
-  emoteSortByName,
   replyTarget,
   replyPinned,
   isDmView = false,
   onClearReply,
   onToggleReplyPin,
 }: Props) {
+  const ctrlEnterToSend = useSettingsStore((s) => s.ctrlEnterToSend);
   const inputAreaRef = useRef<HTMLDivElement>(null);
   const [inputText, setInputText] = useState('');
 
@@ -254,8 +244,6 @@ export function InputArea({
     onToggleCharPicker,
     onSend: handleSend,
     onExecuteEmote,
-    emoteConfirm,
-    emoteSortByName,
     effectiveLimit,
     isOverLimit,
   };

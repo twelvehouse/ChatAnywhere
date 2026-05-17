@@ -1,4 +1,5 @@
 import clsx from 'clsx';
+import { useSettingsStore } from '../../store/settingsStore';
 import { getChannelInfo, getBadgeStyle } from '../../lib/channelUtils';
 import { sanitizeName, formatTime } from '../../lib/formatUtils';
 import { renderPayloads, urlRegex } from '../../lib/renderUtils';
@@ -37,12 +38,15 @@ interface Props {
   nextMsg: ChatMessage | null;
   tellRef: ChatMessage | null;
   onLinkClick: (url: string) => void;
-  italicizeSystem: boolean;
-  useColoredBackground: boolean;
-  tellModeAll: boolean;
-  linkPreviewSize?: 'compact' | 'full';
   onReply: (name: string, world?: string) => void;
-  trustedDomains?: Set<string>;
+  /**
+   * Override the message-display settings normally read from the store.
+   * Used by AppearanceSettings preview to render with fixed sample values.
+   */
+  italicizeSystem?: boolean;
+  useColoredBackground?: boolean;
+  tellModeAll?: boolean;
+  largeLinkPreviews?: boolean;
 }
 
 export function MessageItem({
@@ -51,13 +55,22 @@ export function MessageItem({
   nextMsg,
   tellRef,
   onLinkClick,
-  italicizeSystem,
-  useColoredBackground,
-  tellModeAll,
-  linkPreviewSize = 'compact',
   onReply,
-  trustedDomains = new Set(),
+  italicizeSystem: italicizeSystemProp,
+  useColoredBackground: useColoredBackgroundProp,
+  tellModeAll: tellModeAllProp,
+  largeLinkPreviews: largeLinkPreviewsProp,
 }: Props) {
+  const storeItalicize = useSettingsStore((s) => s.italicizeSystem);
+  const storeColored = useSettingsStore((s) => s.useColoredBackground);
+  const storeTellModeAll = useSettingsStore((s) => s.tellModeAll);
+  const storeLargePreviews = useSettingsStore((s) => s.largeLinkPreviews);
+  const trustedDomains = useSettingsStore((s) => s.trustedDomains);
+  const italicizeSystem = italicizeSystemProp ?? storeItalicize;
+  const useColoredBackground = useColoredBackgroundProp ?? storeColored;
+  const tellModeAll = tellModeAllProp ?? storeTellModeAll;
+  const linkPreviewSize: 'compact' | 'full' =
+    (largeLinkPreviewsProp ?? storeLargePreviews) ? 'full' : 'compact';
   const ch = getChannelInfo(msg.Type);
   const hasAuthor = !!msg.SenderName && !ch.isSystem;
 

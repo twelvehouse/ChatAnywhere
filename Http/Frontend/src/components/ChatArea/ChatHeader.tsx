@@ -2,15 +2,14 @@ import { useState } from 'react';
 import clsx from 'clsx';
 import { Pencil } from 'lucide-react';
 import styles from './ChatHeader.module.css';
-import type { CustomFilter, FilterFolder } from '../../types/filter';
+import type { CustomFilter } from '../../types/filter';
 import type { TellPartner } from '../../types/chat';
 import { FilterEditModal } from '../Sidebar/FilterEditModal';
+import { useSettingsStore } from '../../store/settingsStore';
 
 interface Props {
   activeDmTarget: TellPartner | null;
   activeFilter: CustomFilter | null;
-  filters: CustomFilter[];
-  folders: FilterFolder[];
   isSidebarOpen: boolean;
   onToggleSidebar: () => void;
   onEditFilter: (filter: CustomFilter, oldName: string) => void;
@@ -19,12 +18,12 @@ interface Props {
 export function ChatHeader({
   activeDmTarget,
   activeFilter,
-  filters,
-  folders,
   isSidebarOpen,
   onToggleSidebar,
   onEditFilter,
 }: Props) {
+  const filters = useSettingsStore((s) => s.filters);
+  const folders = useSettingsStore((s) => s.folders);
   const [showEditModal, setShowEditModal] = useState(false);
 
   return (

@@ -104,13 +104,8 @@ interface Props {
   onDismissBanner: () => void;
   onScrollToBottom: () => void;
   onLinkClick: (url: string) => void;
-  italicizeSystem: boolean;
-  useColoredBackground: boolean;
-  tellModeAll: boolean;
   onReply: (name: string, world?: string) => void;
-  trustedDomains: Set<string>;
   disableTellRef?: boolean;
-  largeLinkPreviews?: boolean;
 }
 
 export function MessageList({
@@ -129,13 +124,8 @@ export function MessageList({
   onDismissBanner,
   onScrollToBottom,
   onLinkClick,
-  italicizeSystem,
-  useColoredBackground,
-  tellModeAll,
   onReply,
-  trustedDomains,
   disableTellRef = false,
-  largeLinkPreviews = false,
 }: Props) {
   const tellRefs = disableTellRef
     ? messages.map(() => null)
@@ -272,12 +262,7 @@ export function MessageList({
                 nextMsg={index < messages.length - 1 ? messages[index + 1] : null}
                 tellRef={tellRefs[index]}
                 onLinkClick={onLinkClick}
-                italicizeSystem={italicizeSystem}
-                useColoredBackground={useColoredBackground}
-                tellModeAll={tellModeAll}
                 onReply={onReply}
-                trustedDomains={trustedDomains}
-                linkPreviewSize={largeLinkPreviews ? 'full' : 'compact'}
               />
             ))}
           </div>

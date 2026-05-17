@@ -51,8 +51,6 @@ export function AppearanceSettings() {
           nextMsg={PREVIEW_EMOTE}
           tellRef={null}
           onLinkClick={NOOP}
-          italicizeSystem={italicizeSystem}
-          useColoredBackground={useColoredBackground}
           tellModeAll={false}
           onReply={NOOP}
         />
@@ -62,8 +60,6 @@ export function AppearanceSettings() {
           nextMsg={null}
           tellRef={null}
           onLinkClick={NOOP}
-          italicizeSystem={italicizeSystem}
-          useColoredBackground={useColoredBackground}
           tellModeAll={false}
           onReply={NOOP}
         />

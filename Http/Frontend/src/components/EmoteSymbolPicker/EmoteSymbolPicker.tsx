@@ -17,12 +17,9 @@ interface Props {
   onInsert: (text: string) => void;
   /** Directly executes the emote command (used by Emotes tab). */
   onExecute: (command: string) => void;
-  /** When true, Emotes tab requires a second tap to confirm before executing. */
-  emoteConfirm: boolean;
-  emoteSortByName: boolean;
 }
 
-export function EmoteSymbolPicker({ onInsert, onExecute, emoteConfirm, emoteSortByName }: Props) {
+export function EmoteSymbolPicker({ onInsert, onExecute }: Props) {
   const [activeTab, setActiveTab] = useState<ActiveTab>('emotes');
   const { emotes, loading, error } = useEmoteList();
 
@@ -42,14 +39,7 @@ export function EmoteSymbolPicker({ onInsert, onExecute, emoteConfirm, emoteSort
       </div>
 
       {activeTab === 'emotes' ? (
-        <EmoteTab
-          emotes={emotes}
-          loading={loading}
-          error={error}
-          onExecute={onExecute}
-          emoteConfirm={emoteConfirm}
-          emoteSortByName={emoteSortByName}
-        />
+        <EmoteTab emotes={emotes} loading={loading} error={error} onExecute={onExecute} />
       ) : (
         <SymbolsTab onSelect={onInsert} />
       )}
