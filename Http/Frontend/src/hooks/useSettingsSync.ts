@@ -1,9 +1,9 @@
 import { useEffect, useRef } from 'react';
-import type { Dispatch, SetStateAction } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { RELAY_ADDR } from '../constants/config';
 import type { CustomFilter, FilterFolder } from '../types/filter';
 import { TRACKED_CHANNEL_TYPES } from '../constants/channels';
+import { useSettingsStore, type SettingsState } from '../store/settingsStore';
 
 const DEFAULT_FILTER: CustomFilter = {
   name: 'General',
@@ -18,77 +18,19 @@ const DEFAULT_FOLDER: FilterFolder = {
 };
 
 interface Props {
-  fontFamily: string;
-  fontSize: number;
-  italicizeSystem: boolean;
-  useColoredBackground: boolean;
-  disabledChannels: Set<string>;
-  trustedDomains: Set<string>;
-  filters: CustomFilter[];
-  folders: FilterFolder[];
-  tellModeAll: boolean;
-  ctrlEnterToSend: boolean;
-  emoteConfirm: boolean;
-  emoteSortByName: boolean;
-  retainSyncSendPrefix: boolean;
-  largeLinkPreviews: boolean;
   refetchEpoch: number;
   isLoggedIn: boolean;
-  setFontFamily: Dispatch<SetStateAction<string>>;
-  setFontSize: Dispatch<SetStateAction<number>>;
-  setItalicizeSystem: Dispatch<SetStateAction<boolean>>;
-  setUseColoredBackground: Dispatch<SetStateAction<boolean>>;
-  setDisabledChannels: Dispatch<SetStateAction<Set<string>>>;
-  setTrustedDomains: Dispatch<SetStateAction<Set<string>>>;
-  setFilters: Dispatch<SetStateAction<CustomFilter[]>>;
-  setFolders: Dispatch<SetStateAction<FilterFolder[]>>;
-  setTellModeAll: Dispatch<SetStateAction<boolean>>;
-  setCtrlEnterToSend: Dispatch<SetStateAction<boolean>>;
-  setEmoteConfirm: Dispatch<SetStateAction<boolean>>;
-  setEmoteSortByName: Dispatch<SetStateAction<boolean>>;
-  setRetainSyncSendPrefix: Dispatch<SetStateAction<boolean>>;
-  setLargeLinkPreviews: Dispatch<SetStateAction<boolean>>;
   onFiltersReady: (filters: CustomFilter[], folders: FilterFolder[]) => void;
 }
 
-export function useSettingsSync({
-  fontFamily,
-  fontSize,
-  italicizeSystem,
-  useColoredBackground,
-  disabledChannels,
-  trustedDomains,
-  filters,
-  folders,
-  tellModeAll,
-  ctrlEnterToSend,
-  emoteConfirm,
-  emoteSortByName,
-  retainSyncSendPrefix,
-  largeLinkPreviews,
-  refetchEpoch,
-  isLoggedIn,
-  setFontFamily,
-  setFontSize,
-  setItalicizeSystem,
-  setUseColoredBackground,
-  setDisabledChannels,
-  setTrustedDomains,
-  setFilters,
-  setFolders,
-  setTellModeAll,
-  setCtrlEnterToSend,
-  setEmoteConfirm,
-  setEmoteSortByName,
-  setRetainSyncSendPrefix,
-  setLargeLinkPreviews,
-  onFiltersReady,
-}: Props) {
+export function useSettingsSync({ refetchEpoch, isLoggedIn, onFiltersReady }: Props) {
   const isLoggedInRef = useRef(isLoggedIn);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const onFiltersReadyRef = useRef(onFiltersReady);
 
   useEffect(() => {
     isLoggedInRef.current = isLoggedIn;
+    onFiltersReadyRef.current = onFiltersReady;
   });
 
   // Load from server, re-fetching whenever refetchEpoch changes (character switch).
@@ -107,22 +49,24 @@ export function useSettingsSync({
   useEffect(() => {
     if (!serverSettings) return;
     const data = serverSettings;
-    if (typeof data.fontFamily === 'string') setFontFamily(data.fontFamily);
-    if (typeof data.fontSize === 'number') setFontSize(data.fontSize);
-    if (typeof data.italicizeSystem === 'boolean') setItalicizeSystem(data.italicizeSystem);
+    const patch: Partial<SettingsState> = {};
+    if (typeof data.fontFamily === 'string') patch.fontFamily = data.fontFamily;
+    if (typeof data.fontSize === 'number') patch.fontSize = data.fontSize;
+    if (typeof data.italicizeSystem === 'boolean') patch.italicizeSystem = data.italicizeSystem;
     if (typeof data.useColoredBackground === 'boolean')
-      setUseColoredBackground(data.useColoredBackground);
+      patch.useColoredBackground = data.useColoredBackground;
     if (Array.isArray(data.disabledChannels))
-      setDisabledChannels(new Set<string>(data.disabledChannels as string[]));
+      patch.disabledChannels = new Set<string>(data.disabledChannels as string[]);
     if (Array.isArray(data.trustedDomains))
-      setTrustedDomains(new Set<string>(data.trustedDomains as string[]));
-    if (typeof data.tellModeAll === 'boolean') setTellModeAll(data.tellModeAll);
-    if (typeof data.ctrlEnterToSend === 'boolean') setCtrlEnterToSend(data.ctrlEnterToSend);
-    if (typeof data.emoteConfirm === 'boolean') setEmoteConfirm(data.emoteConfirm);
-    if (typeof data.emoteSortByName === 'boolean') setEmoteSortByName(data.emoteSortByName);
+      patch.trustedDomains = new Set<string>(data.trustedDomains as string[]);
+    if (typeof data.tellModeAll === 'boolean') patch.tellModeAll = data.tellModeAll;
+    if (typeof data.ctrlEnterToSend === 'boolean') patch.ctrlEnterToSend = data.ctrlEnterToSend;
+    if (typeof data.emoteConfirm === 'boolean') patch.emoteConfirm = data.emoteConfirm;
+    if (typeof data.emoteSortByName === 'boolean') patch.emoteSortByName = data.emoteSortByName;
     if (typeof data.retainSyncSendPrefix === 'boolean')
-      setRetainSyncSendPrefix(data.retainSyncSendPrefix);
-    if (typeof data.largeLinkPreviews === 'boolean') setLargeLinkPreviews(data.largeLinkPreviews);
+      patch.retainSyncSendPrefix = data.retainSyncSendPrefix;
+    if (typeof data.largeLinkPreviews === 'boolean')
+      patch.largeLinkPreviews = data.largeLinkPreviews;
 
     const loadedFilters: CustomFilter[] = Array.isArray(data.filters)
       ? (data.filters as CustomFilter[])
@@ -132,66 +76,55 @@ export function useSettingsSync({
       : [];
 
     if (loadedFilters.length === 0 && loadedFolders.length === 0) {
-      setFilters([DEFAULT_FILTER]);
-      setFolders([DEFAULT_FOLDER]);
-      onFiltersReady([DEFAULT_FILTER], [DEFAULT_FOLDER]);
+      patch.filters = [DEFAULT_FILTER];
+      patch.folders = [DEFAULT_FOLDER];
+      useSettingsStore.getState().hydrate(patch);
+      onFiltersReadyRef.current([DEFAULT_FILTER], [DEFAULT_FOLDER]);
     } else {
-      setFilters(loadedFilters);
-      setFolders(loadedFolders);
-      onFiltersReady(loadedFilters, loadedFolders);
+      patch.filters = loadedFilters;
+      patch.folders = loadedFolders;
+      useSettingsStore.getState().hydrate(patch);
+      onFiltersReadyRef.current(loadedFilters, loadedFolders);
     }
-  }, [serverSettings]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [serverSettings]);
 
-  // Debounced PUT to server whenever settings change (after initial load)
+  // Debounced PUT to server whenever any settings field changes (after initial load).
   useEffect(() => {
-    if (!serverLoaded || !isLoggedInRef.current) return;
-
-    if (timerRef.current) clearTimeout(timerRef.current);
-    timerRef.current = setTimeout(() => {
-      // Re-check here because the timer may fire after a logout that happened
-      // before the 500ms debounce elapsed (the effect cleanup doesn't cancel it).
+    if (!serverLoaded) return;
+    const unsubscribe = useSettingsStore.subscribe((state, prev) => {
+      // Skip if nothing relevant changed (action functions are stable references)
+      if (state === prev) return;
       if (!isLoggedInRef.current) return;
-      fetch(`${RELAY_ADDR}/settings`, {
-        method: 'PUT',
-        credentials: 'include',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          fontFamily,
-          fontSize,
-          italicizeSystem,
-          useColoredBackground,
-          disabledChannels: Array.from(disabledChannels),
-          trustedDomains: Array.from(trustedDomains),
-          filters,
-          folders,
-          tellModeAll,
-          ctrlEnterToSend,
-          emoteConfirm,
-          emoteSortByName,
-          retainSyncSendPrefix,
-          largeLinkPreviews,
-        }),
-      }).catch(() => {});
-    }, 500);
-
+      if (timerRef.current) clearTimeout(timerRef.current);
+      timerRef.current = setTimeout(() => {
+        if (!isLoggedInRef.current) return;
+        const s = useSettingsStore.getState();
+        fetch(`${RELAY_ADDR}/settings`, {
+          method: 'PUT',
+          credentials: 'include',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            fontFamily: s.fontFamily,
+            fontSize: s.fontSize,
+            italicizeSystem: s.italicizeSystem,
+            useColoredBackground: s.useColoredBackground,
+            disabledChannels: Array.from(s.disabledChannels),
+            trustedDomains: Array.from(s.trustedDomains),
+            filters: s.filters,
+            folders: s.folders,
+            tellModeAll: s.tellModeAll,
+            ctrlEnterToSend: s.ctrlEnterToSend,
+            emoteConfirm: s.emoteConfirm,
+            emoteSortByName: s.emoteSortByName,
+            retainSyncSendPrefix: s.retainSyncSendPrefix,
+            largeLinkPreviews: s.largeLinkPreviews,
+          }),
+        }).catch(() => {});
+      }, 500);
+    });
     return () => {
+      unsubscribe();
       if (timerRef.current) clearTimeout(timerRef.current);
     };
-  }, [
-    fontFamily,
-    fontSize,
-    italicizeSystem,
-    useColoredBackground,
-    disabledChannels,
-    trustedDomains,
-    filters,
-    folders,
-    tellModeAll,
-    ctrlEnterToSend,
-    emoteConfirm,
-    emoteSortByName,
-    retainSyncSendPrefix,
-    largeLinkPreviews,
-    serverLoaded,
-  ]);
+  }, [serverLoaded]);
 }

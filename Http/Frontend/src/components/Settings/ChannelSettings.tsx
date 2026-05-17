@@ -4,41 +4,39 @@ import styles from './ChannelSettings.module.css';
 import { ALL_CHANNELS } from '../../constants/channels';
 import { getBadgeInfoByPrefix, getBadgeStyle } from '../../lib/channelUtils';
 import type { ChannelOption } from '../../types/chat';
+import { useSettingsStore } from '../../store/settingsStore';
 
 interface Props {
   serverChannels: ChannelOption[];
-  disabledChannels: Set<string>;
   selectedSendPrefix: string;
-  setDisabledChannels: Dispatch<SetStateAction<Set<string>>>;
   setSelectedSendPrefix: Dispatch<SetStateAction<string>>;
 }
 
 export function ChannelSettings({
   serverChannels,
-  disabledChannels,
   selectedSendPrefix,
-  setDisabledChannels,
   setSelectedSendPrefix,
 }: Props) {
+  const disabledChannels = useSettingsStore((s) => s.disabledChannels);
+  const setDisabledChannels = useSettingsStore((s) => s.setDisabledChannels);
+
   const mergedChannels: ChannelOption[] = [
     ...ALL_CHANNELS,
     ...serverChannels.filter((sc) => !ALL_CHANNELS.some((ac) => ac.prefix === sc.prefix)),
   ];
 
   const toggleChannel = (prefix: string) => {
-    setDisabledChannels((prev) => {
-      const next = new Set(prev);
-      if (next.has(prefix)) {
-        next.delete(prefix);
-      } else {
-        next.add(prefix);
-      }
-      if (next.has(selectedSendPrefix)) {
-        const first = mergedChannels.find((c) => !next.has(c.prefix));
-        if (first) setSelectedSendPrefix(first.prefix);
-      }
-      return next;
-    });
+    const next = new Set(disabledChannels);
+    if (next.has(prefix)) {
+      next.delete(prefix);
+    } else {
+      next.add(prefix);
+    }
+    if (next.has(selectedSendPrefix)) {
+      const first = mergedChannels.find((c) => !next.has(c.prefix));
+      if (first) setSelectedSendPrefix(first.prefix);
+    }
+    setDisabledChannels(next);
   };
 
   return (

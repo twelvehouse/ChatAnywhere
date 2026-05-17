@@ -1,15 +1,12 @@
-import type { Dispatch, SetStateAction } from 'react';
 import clsx from 'clsx';
 import { X } from 'lucide-react';
 import styles from './SecuritySettings.module.css';
 import { BUILT_IN_TRUSTED_DOMAINS } from '../../constants/trustedDomains';
+import { useSettingsStore } from '../../store/settingsStore';
 
-interface Props {
-  trustedDomains: Set<string>;
-  setTrustedDomains: Dispatch<SetStateAction<Set<string>>>;
-}
-
-export function SecuritySettings({ trustedDomains, setTrustedDomains }: Props) {
+export function SecuritySettings() {
+  const trustedDomains = useSettingsStore((s) => s.trustedDomains);
+  const setTrustedDomains = useSettingsStore((s) => s.setTrustedDomains);
   const handleRemoveDomain = (domain: string) => {
     setTrustedDomains((prev) => {
       const next = new Set(prev);

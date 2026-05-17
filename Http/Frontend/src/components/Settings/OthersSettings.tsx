@@ -1,31 +1,17 @@
-import type { Dispatch, SetStateAction } from 'react';
 import clsx from 'clsx';
+import { useSettingsStore } from '../../store/settingsStore';
 
-interface Props {
-  tellModeAll: boolean;
-  setTellModeAll: Dispatch<SetStateAction<boolean>>;
-  ctrlEnterToSend: boolean;
-  setCtrlEnterToSend: Dispatch<SetStateAction<boolean>>;
-  emoteConfirm: boolean;
-  setEmoteConfirm: Dispatch<SetStateAction<boolean>>;
-  emoteSortByName: boolean;
-  setEmoteSortByName: Dispatch<SetStateAction<boolean>>;
-  retainSyncSendPrefix: boolean;
-  setRetainSyncSendPrefix: Dispatch<SetStateAction<boolean>>;
-}
-
-export function OthersSettings({
-  tellModeAll,
-  setTellModeAll,
-  ctrlEnterToSend,
-  setCtrlEnterToSend,
-  emoteConfirm,
-  setEmoteConfirm,
-  emoteSortByName,
-  setEmoteSortByName,
-  retainSyncSendPrefix,
-  setRetainSyncSendPrefix,
-}: Props) {
+export function OthersSettings() {
+  const tellModeAll = useSettingsStore((s) => s.tellModeAll);
+  const ctrlEnterToSend = useSettingsStore((s) => s.ctrlEnterToSend);
+  const emoteConfirm = useSettingsStore((s) => s.emoteConfirm);
+  const emoteSortByName = useSettingsStore((s) => s.emoteSortByName);
+  const retainSyncSendPrefix = useSettingsStore((s) => s.retainSyncSendPrefix);
+  const setTellModeAll = useSettingsStore((s) => s.setTellModeAll);
+  const setCtrlEnterToSend = useSettingsStore((s) => s.setCtrlEnterToSend);
+  const setEmoteConfirm = useSettingsStore((s) => s.setEmoteConfirm);
+  const setEmoteSortByName = useSettingsStore((s) => s.setEmoteSortByName);
+  const setRetainSyncSendPrefix = useSettingsStore((s) => s.setRetainSyncSendPrefix);
   return (
     <>
       <div className="form-section">
@@ -33,7 +19,7 @@ export function OthersSettings({
         <div
           className="form-row"
           style={{ cursor: 'pointer' }}
-          onClick={() => setTellModeAll((v) => !v)}
+          onClick={() => setTellModeAll(!tellModeAll)}
         >
           <span className="form-row-label">Enable Tell mode for all messages</span>
           <div className={clsx('toggle-switch', tellModeAll && 'on')}>
@@ -43,7 +29,7 @@ export function OthersSettings({
         <div
           className="form-row"
           style={{ cursor: 'pointer' }}
-          onClick={() => setCtrlEnterToSend((v) => !v)}
+          onClick={() => setCtrlEnterToSend(!ctrlEnterToSend)}
         >
           <span className="form-row-label">Send message with Ctrl+Enter only</span>
           <div className={clsx('toggle-switch', ctrlEnterToSend && 'on')}>
@@ -57,7 +43,7 @@ export function OthersSettings({
         <div
           className="form-row"
           style={{ cursor: 'pointer' }}
-          onClick={() => setEmoteConfirm((v) => !v)}
+          onClick={() => setEmoteConfirm(!emoteConfirm)}
         >
           <span className="form-row-label">Confirm before executing emote</span>
           <div className={clsx('toggle-switch', emoteConfirm && 'on')}>
@@ -67,7 +53,7 @@ export function OthersSettings({
         <div
           className="form-row"
           style={{ cursor: 'pointer' }}
-          onClick={() => setEmoteSortByName((v) => !v)}
+          onClick={() => setEmoteSortByName(!emoteSortByName)}
         >
           <span className="form-row-label">Sort emotes by name</span>
           <div className={clsx('toggle-switch', emoteSortByName && 'on')}>
@@ -81,7 +67,7 @@ export function OthersSettings({
         <div
           className="form-row"
           style={{ cursor: 'pointer' }}
-          onClick={() => setRetainSyncSendPrefix((v) => !v)}
+          onClick={() => setRetainSyncSendPrefix(!retainSyncSendPrefix)}
         >
           <span className="form-row-label">
             Retain send destination when returning to a Sync tab

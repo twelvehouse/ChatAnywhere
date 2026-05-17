@@ -1,9 +1,9 @@
-import type { Dispatch, SetStateAction } from 'react';
 import clsx from 'clsx';
 import type { ChatMessage } from '../../types/chat';
 import styles from './AppearanceSettings.module.css';
 import { FONTS } from '../../constants/config';
 import { MessageItem } from '../ChatArea/MessageItem';
+import { useSettingsStore } from '../../store/settingsStore';
 
 // Static preview messages — defined at module level to avoid purity lint warnings
 const PREVIEW_BASE_TIME = Date.now();
@@ -31,31 +31,17 @@ const PREVIEW_EMOTE: ChatMessage = {
 
 const NOOP = () => {};
 
-interface Props {
-  fontFamily: string;
-  fontSize: number;
-  italicizeSystem: boolean;
-  useColoredBackground: boolean;
-  largeLinkPreviews: boolean;
-  setFontFamily: Dispatch<SetStateAction<string>>;
-  setFontSize: Dispatch<SetStateAction<number>>;
-  setItalicizeSystem: Dispatch<SetStateAction<boolean>>;
-  setUseColoredBackground: Dispatch<SetStateAction<boolean>>;
-  setLargeLinkPreviews: Dispatch<SetStateAction<boolean>>;
-}
-
-export function AppearanceSettings({
-  fontFamily,
-  fontSize,
-  italicizeSystem,
-  useColoredBackground,
-  largeLinkPreviews,
-  setFontFamily,
-  setFontSize,
-  setItalicizeSystem,
-  setUseColoredBackground,
-  setLargeLinkPreviews,
-}: Props) {
+export function AppearanceSettings() {
+  const fontFamily = useSettingsStore((s) => s.fontFamily);
+  const fontSize = useSettingsStore((s) => s.fontSize);
+  const italicizeSystem = useSettingsStore((s) => s.italicizeSystem);
+  const useColoredBackground = useSettingsStore((s) => s.useColoredBackground);
+  const largeLinkPreviews = useSettingsStore((s) => s.largeLinkPreviews);
+  const setFontFamily = useSettingsStore((s) => s.setFontFamily);
+  const setFontSize = useSettingsStore((s) => s.setFontSize);
+  const setItalicizeSystem = useSettingsStore((s) => s.setItalicizeSystem);
+  const setUseColoredBackground = useSettingsStore((s) => s.setUseColoredBackground);
+  const setLargeLinkPreviews = useSettingsStore((s) => s.setLargeLinkPreviews);
   return (
     <>
       <div className="form-section">
@@ -133,7 +119,7 @@ export function AppearanceSettings({
         <div
           className="form-row"
           style={{ cursor: 'pointer' }}
-          onClick={() => setItalicizeSystem((v) => !v)}
+          onClick={() => setItalicizeSystem(!italicizeSystem)}
         >
           <span className="form-row-label">Italicize System & Emote</span>
           <div className={clsx('toggle-switch', italicizeSystem && 'on')}>
@@ -147,7 +133,7 @@ export function AppearanceSettings({
         <div
           className="form-row"
           style={{ cursor: 'pointer' }}
-          onClick={() => setUseColoredBackground((v) => !v)}
+          onClick={() => setUseColoredBackground(!useColoredBackground)}
         >
           <span className="form-row-label">Colorize backgrounds by type</span>
           <div className={clsx('toggle-switch', useColoredBackground && 'on')}>
@@ -158,7 +144,7 @@ export function AppearanceSettings({
         <div
           className="form-row"
           style={{ cursor: 'pointer' }}
-          onClick={() => setLargeLinkPreviews((v) => !v)}
+          onClick={() => setLargeLinkPreviews(!largeLinkPreviews)}
         >
           <span className="form-row-label">Large link previews</span>
           <div className={clsx('toggle-switch', largeLinkPreviews && 'on')}>

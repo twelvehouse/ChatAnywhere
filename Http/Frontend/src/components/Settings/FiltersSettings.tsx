@@ -3,24 +3,20 @@ import clsx from 'clsx';
 import styles from './FiltersSettings.module.css';
 import { ImportFiltersModal } from './ImportFiltersModal';
 import { ConfirmDialog } from '../Sidebar/ConfirmDialog';
-import type { CustomFilter, FilterFolder } from '../../types/filter';
 import type { FilterMode } from '../../hooks/useFilterMode';
+import { useSettingsStore } from '../../store/settingsStore';
 
 interface Props {
-  currentFilters: CustomFilter[];
-  currentFolders: FilterFolder[];
-  onImport: (newFilters: CustomFilter[], newFolders: FilterFolder[]) => void;
   filterMode: FilterMode | null;
   onDeletePersonalFilters: (key: string) => Promise<void>;
 }
 
-export function FiltersSettings({
-  currentFilters,
-  currentFolders,
-  onImport,
-  filterMode,
-  onDeletePersonalFilters,
-}: Props) {
+export function FiltersSettings({ filterMode, onDeletePersonalFilters }: Props) {
+  const currentFilters = useSettingsStore((s) => s.filters);
+  const currentFolders = useSettingsStore((s) => s.folders);
+  const setFilters = useSettingsStore((s) => s.setFilters);
+  const setFolders = useSettingsStore((s) => s.setFolders);
+
   const [showImportModal, setShowImportModal] = useState(false);
   const [pendingDelete, setPendingDelete] = useState<string | null>(null);
 
@@ -90,7 +86,10 @@ export function FiltersSettings({
         <ImportFiltersModal
           currentFilters={currentFilters}
           currentFolders={currentFolders}
-          onImport={onImport}
+          onImport={(nf, nfold) => {
+            setFilters(nf);
+            setFolders(nfold);
+          }}
           onClose={() => setShowImportModal(false)}
         />
       )}

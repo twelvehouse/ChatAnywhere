@@ -9,47 +9,16 @@ import { FiltersSettings } from './FiltersSettings';
 import { OthersSettings } from './OthersSettings';
 import { SecuritySettings } from './SecuritySettings';
 import type { ChannelOption } from '../../types/chat';
-import type { CustomFilter, FilterFolder } from '../../types/filter';
 import type { FilterMode } from '../../hooks/useFilterMode';
 
 type SettingsCategory = 'appearance' | 'send-channels' | 'filters' | 'chat-input' | 'security';
 
 interface Props {
-  // Appearance
-  fontFamily: string;
-  fontSize: number;
-  italicizeSystem: boolean;
-  useColoredBackground: boolean;
-  largeLinkPreviews: boolean;
-  setFontFamily: Dispatch<SetStateAction<string>>;
-  setFontSize: Dispatch<SetStateAction<number>>;
-  setItalicizeSystem: Dispatch<SetStateAction<boolean>>;
-  setUseColoredBackground: Dispatch<SetStateAction<boolean>>;
-  setLargeLinkPreviews: Dispatch<SetStateAction<boolean>>;
-  // Send Channels
+  // Send Channels (selectedSendPrefix is transient UI state owned by App)
   serverChannels: ChannelOption[];
-  disabledChannels: Set<string>;
   selectedSendPrefix: string;
-  setDisabledChannels: Dispatch<SetStateAction<Set<string>>>;
   setSelectedSendPrefix: Dispatch<SetStateAction<string>>;
-  // Security
-  trustedDomains: Set<string>;
-  setTrustedDomains: Dispatch<SetStateAction<Set<string>>>;
-  // Chat & Input
-  tellModeAll: boolean;
-  setTellModeAll: Dispatch<SetStateAction<boolean>>;
-  ctrlEnterToSend: boolean;
-  setCtrlEnterToSend: Dispatch<SetStateAction<boolean>>;
-  emoteConfirm: boolean;
-  setEmoteConfirm: Dispatch<SetStateAction<boolean>>;
-  emoteSortByName: boolean;
-  setEmoteSortByName: Dispatch<SetStateAction<boolean>>;
-  retainSyncSendPrefix: boolean;
-  setRetainSyncSendPrefix: Dispatch<SetStateAction<boolean>>;
   // Filters
-  currentFilters: CustomFilter[];
-  currentFolders: FilterFolder[];
-  onImportFilters: (newFilters: CustomFilter[], newFolders: FilterFolder[]) => void;
   filterMode: FilterMode | null;
   onDeletePersonalFilters: (key: string) => Promise<void>;
   // Control
@@ -57,36 +26,9 @@ interface Props {
 }
 
 export function SettingsModal({
-  fontFamily,
-  fontSize,
-  italicizeSystem,
-  useColoredBackground,
-  largeLinkPreviews,
-  setFontFamily,
-  setFontSize,
-  setItalicizeSystem,
-  setUseColoredBackground,
-  setLargeLinkPreviews,
   serverChannels,
-  disabledChannels,
   selectedSendPrefix,
-  setDisabledChannels,
   setSelectedSendPrefix,
-  trustedDomains,
-  setTrustedDomains,
-  tellModeAll,
-  setTellModeAll,
-  ctrlEnterToSend,
-  setCtrlEnterToSend,
-  emoteConfirm,
-  setEmoteConfirm,
-  emoteSortByName,
-  setEmoteSortByName,
-  retainSyncSendPrefix,
-  setRetainSyncSendPrefix,
-  currentFilters,
-  currentFolders,
-  onImportFilters,
   filterMode,
   onDeletePersonalFilters,
   onClose,
@@ -197,58 +139,22 @@ export function SettingsModal({
           </div>
 
           <div className={styles['settings-content-body']} key={category}>
-            {category === 'appearance' && (
-              <AppearanceSettings
-                fontFamily={fontFamily}
-                fontSize={fontSize}
-                italicizeSystem={italicizeSystem}
-                useColoredBackground={useColoredBackground}
-                largeLinkPreviews={largeLinkPreviews}
-                setFontFamily={setFontFamily}
-                setFontSize={setFontSize}
-                setItalicizeSystem={setItalicizeSystem}
-                setUseColoredBackground={setUseColoredBackground}
-                setLargeLinkPreviews={setLargeLinkPreviews}
-              />
-            )}
+            {category === 'appearance' && <AppearanceSettings />}
             {category === 'send-channels' && (
               <ChannelSettings
                 serverChannels={serverChannels}
-                disabledChannels={disabledChannels}
                 selectedSendPrefix={selectedSendPrefix}
-                setDisabledChannels={setDisabledChannels}
                 setSelectedSendPrefix={setSelectedSendPrefix}
               />
             )}
             {category === 'filters' && (
               <FiltersSettings
-                currentFilters={currentFilters}
-                currentFolders={currentFolders}
-                onImport={onImportFilters}
                 filterMode={filterMode}
                 onDeletePersonalFilters={onDeletePersonalFilters}
               />
             )}
-            {category === 'chat-input' && (
-              <OthersSettings
-                tellModeAll={tellModeAll}
-                setTellModeAll={setTellModeAll}
-                ctrlEnterToSend={ctrlEnterToSend}
-                setCtrlEnterToSend={setCtrlEnterToSend}
-                emoteConfirm={emoteConfirm}
-                setEmoteConfirm={setEmoteConfirm}
-                emoteSortByName={emoteSortByName}
-                setEmoteSortByName={setEmoteSortByName}
-                retainSyncSendPrefix={retainSyncSendPrefix}
-                setRetainSyncSendPrefix={setRetainSyncSendPrefix}
-              />
-            )}
-            {category === 'security' && (
-              <SecuritySettings
-                trustedDomains={trustedDomains}
-                setTrustedDomains={setTrustedDomains}
-              />
-            )}
+            {category === 'chat-input' && <OthersSettings />}
+            {category === 'security' && <SecuritySettings />}
           </div>
         </div>
       </div>

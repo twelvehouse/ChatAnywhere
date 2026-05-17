@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
+import { useShallow } from 'zustand/react/shallow';
 import styles from './App.module.css';
 import { addGfdStylesheet } from './lib/gfd';
 import { usePaginatedHistory } from './hooks/useHistory';
@@ -7,6 +8,7 @@ import { useSSE } from './hooks/useSSE';
 import { useSettingsSync } from './hooks/useSettingsSync';
 import { useFilterManagement } from './hooks/useFilterManagement';
 import { useAuth } from './hooks/useAuth';
+import { useSettingsStore } from './store/settingsStore';
 import { DEFAULT_CHANNELS, TELL_INCOMING, TELL_OUTGOING } from './constants/channels';
 import { formatPlayerName, isSamePlayer } from './lib/formatUtils';
 import { RELAY_ADDR } from './constants/config';
@@ -18,7 +20,6 @@ import { LinkConfirmModal } from './components/Settings/LinkConfirmModal';
 import { PasscodeModal } from './components/Auth/PasscodeModal';
 import { useFilterMode } from './hooks/useFilterMode';
 import type { ChatMessage, ChannelOption, TellPartner } from './types/chat';
-import type { CustomFilter, FilterFolder } from './types/filter';
 
 function collectTellPartners(messages: ChatMessage[]): TellPartner[] {
   const seen = new Map<
@@ -69,9 +70,7 @@ function AppContent() {
   const [serverChannels, setServerChannels] = useState<ChannelOption[]>(DEFAULT_CHANNELS);
   const [selectedSendPrefix, setSelectedSendPrefix] = useState(DEFAULT_CHANNELS[0].prefix);
 
-  // ── Filter state ───────────────────────────────────────────────
-  const [filters, setFilters] = useState<CustomFilter[]>([]);
-  const [folders, setFolders] = useState<FilterFolder[]>([]);
+  // ── Filter state (active selection / unread — transient) ──────
   const [activeFilterName, setActiveFilterName] = useState('');
   const [unreadMap, setUnreadMap] = useState<Record<string, number>>({});
   const [bannerCount, setBannerCount] = useState(0);
@@ -79,19 +78,45 @@ function AppContent() {
   // ── Input state ────────────────────────────────────────────────
   const [showCharPicker, setShowCharPicker] = useState(false);
 
-  // ── Settings state ─────────────────────────────────────────────
+  // ── Persisted settings (mirrored via useSettingsSync to /settings) ──
+  const {
+    fontFamily,
+    fontSize,
+    disabledChannels,
+    italicizeSystem,
+    useColoredBackground,
+    tellModeAll,
+    ctrlEnterToSend,
+    emoteConfirm,
+    emoteSortByName,
+    retainSyncSendPrefix,
+    largeLinkPreviews,
+    trustedDomains,
+    filters,
+    folders,
+  } = useSettingsStore(
+    useShallow((s) => ({
+      fontFamily: s.fontFamily,
+      fontSize: s.fontSize,
+      disabledChannels: s.disabledChannels,
+      italicizeSystem: s.italicizeSystem,
+      useColoredBackground: s.useColoredBackground,
+      tellModeAll: s.tellModeAll,
+      ctrlEnterToSend: s.ctrlEnterToSend,
+      emoteConfirm: s.emoteConfirm,
+      emoteSortByName: s.emoteSortByName,
+      retainSyncSendPrefix: s.retainSyncSendPrefix,
+      largeLinkPreviews: s.largeLinkPreviews,
+      trustedDomains: s.trustedDomains,
+      filters: s.filters,
+      folders: s.folders,
+    })),
+  );
+  const setTrustedDomains = useSettingsStore((s) => s.setTrustedDomains);
+  const setFilters = useSettingsStore((s) => s.setFilters);
+  const setFolders = useSettingsStore((s) => s.setFolders);
+
   const [showSettings, setShowSettings] = useState(false);
-  const [fontFamily, setFontFamily] = useState('Inter');
-  const [fontSize, setFontSize] = useState(14);
-  const [disabledChannels, setDisabledChannels] = useState<Set<string>>(new Set());
-  const [italicizeSystem, setItalicizeSystem] = useState(true);
-  const [useColoredBackground, setUseColoredBackground] = useState(false);
-  const [tellModeAll, setTellModeAll] = useState(true);
-  const [ctrlEnterToSend, setCtrlEnterToSend] = useState(false);
-  const [emoteConfirm, setEmoteConfirm] = useState(true);
-  const [emoteSortByName, setEmoteSortByName] = useState(false);
-  const [retainSyncSendPrefix, setRetainSyncSendPrefix] = useState(true);
-  const [largeLinkPreviews, setLargeLinkPreviews] = useState(false);
 
   // ── Sync tab prefix map (session only) ─────────────────────────
   const [syncTabPrefixMap, setSyncTabPrefixMap] = useState<Record<string, string>>({});
@@ -113,7 +138,6 @@ function AppContent() {
   // ── Link modal state ───────────────────────────────────────────
   const [confirmLink, setConfirmLink] = useState<string | null>(null);
   const [trustDomain, setTrustDomain] = useState(false);
-  const [trustedDomains, setTrustedDomains] = useState<Set<string>>(new Set());
 
   // ── Sidebar state ──────────────────────────────────────────────
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -202,36 +226,8 @@ function AppContent() {
 
   // ── Settings sync (filters/folders + initial selection) ───────
   useSettingsSync({
-    fontFamily,
-    fontSize,
-    italicizeSystem,
-    useColoredBackground,
-    disabledChannels,
-    trustedDomains,
-    filters,
-    folders,
-    tellModeAll,
-    ctrlEnterToSend,
-    emoteConfirm,
-    emoteSortByName,
-    retainSyncSendPrefix,
-    largeLinkPreviews,
     refetchEpoch: settingsEpoch,
     isLoggedIn: !!localPlayerName,
-    setFontFamily,
-    setFontSize,
-    setItalicizeSystem,
-    setUseColoredBackground,
-    setDisabledChannels,
-    setTrustedDomains,
-    setFilters,
-    setFolders,
-    setTellModeAll,
-    setCtrlEnterToSend,
-    setEmoteConfirm,
-    setEmoteSortByName,
-    setRetainSyncSendPrefix,
-    setLargeLinkPreviews,
     onFiltersReady: (loadedFilters) => {
       const urlFilterName = new URL(window.location.href).searchParams.get('filter');
       const targetName =
@@ -565,39 +561,9 @@ function AppContent() {
 
       {showSettings && (
         <SettingsModal
-          fontFamily={fontFamily}
-          fontSize={fontSize}
-          italicizeSystem={italicizeSystem}
-          useColoredBackground={useColoredBackground}
-          setFontFamily={setFontFamily}
-          setFontSize={setFontSize}
-          setItalicizeSystem={setItalicizeSystem}
-          setUseColoredBackground={setUseColoredBackground}
           serverChannels={serverChannels}
-          disabledChannels={disabledChannels}
           selectedSendPrefix={selectedSendPrefix}
-          setDisabledChannels={setDisabledChannels}
           setSelectedSendPrefix={setSelectedSendPrefix}
-          trustedDomains={trustedDomains}
-          setTrustedDomains={setTrustedDomains}
-          tellModeAll={tellModeAll}
-          setTellModeAll={setTellModeAll}
-          ctrlEnterToSend={ctrlEnterToSend}
-          setCtrlEnterToSend={setCtrlEnterToSend}
-          emoteConfirm={emoteConfirm}
-          setEmoteConfirm={setEmoteConfirm}
-          emoteSortByName={emoteSortByName}
-          setEmoteSortByName={setEmoteSortByName}
-          retainSyncSendPrefix={retainSyncSendPrefix}
-          setRetainSyncSendPrefix={setRetainSyncSendPrefix}
-          largeLinkPreviews={largeLinkPreviews}
-          setLargeLinkPreviews={setLargeLinkPreviews}
-          currentFilters={filters}
-          currentFolders={folders}
-          onImportFilters={(nf, nfold) => {
-            setFilters(nf);
-            setFolders(nfold);
-          }}
           filterMode={filterMode}
           onDeletePersonalFilters={deletePersonalFilters}
           onClose={() => setShowSettings(false)}
