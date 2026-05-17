@@ -1,6 +1,9 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
+import { QueryClient, QueryClientProvider, QueryCache } from '@tanstack/react-query';
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import App from './App.tsx';
+import { dispatchUnauthorized } from './lib/authEvent';
 import './index.css';
 
 if (import.meta.env.DEV && new URLSearchParams(location.search).has('demo')) {
@@ -8,8 +11,28 @@ if (import.meta.env.DEV && new URLSearchParams(location.search).has('demo')) {
   installMockMode();
 }
 
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: false,
+      staleTime: 30_000,
+      refetchOnWindowFocus: false,
+    },
+  },
+  queryCache: new QueryCache({
+    onError: (error) => {
+      if (error instanceof Response && error.status === 401) {
+        dispatchUnauthorized();
+      }
+    },
+  }),
+});
+
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
-    <App />
+    <QueryClientProvider client={queryClient}>
+      <App />
+      {import.meta.env.DEV && <ReactQueryDevtools initialIsOpen={false} />}
+    </QueryClientProvider>
   </React.StrictMode>,
 );
