@@ -1,4 +1,5 @@
 import type { Dispatch, SetStateAction } from 'react';
+import clsx from 'clsx';
 import styles from './ChannelSettings.module.css';
 import { ALL_CHANNELS } from '../../constants/channels';
 import { getBadgeInfoByPrefix, getBadgeStyle } from '../../lib/channelUtils';
@@ -63,7 +64,7 @@ export function ChannelSettings({
                 {badge.label}
               </span>
               <span className={styles['ch-toggle-label']}>{ch.label}</span>
-              <div className={`toggle-switch${enabled ? ' on' : ''}`}>
+              <div className={clsx('toggle-switch', enabled && 'on')}>
                 <div className="toggle-knob" />
               </div>
             </div>

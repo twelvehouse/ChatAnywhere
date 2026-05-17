@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useLayoutEffect } from 'react';
+import clsx from 'clsx';
 import styles from './LinkPreview.module.css';
 import { RELAY_ADDR } from '../../constants/config';
 
@@ -76,12 +77,12 @@ export function OgpCard({ url, size = 'compact' }: OgpCardProps) {
       });
   }, [url]);
 
-  const sizeClass = size === 'compact' ? styles['ogp-card-compact'] : '';
-  const imageStyle = size === 'compact' && bodyHeight ? { height: bodyHeight } : undefined;
+  const isCompact = size === 'compact';
+  const imageStyle = isCompact && bodyHeight ? { height: bodyHeight } : undefined;
 
   if (data === 'loading') {
     return (
-      <div className={`${styles['ogp-card']} ${sizeClass}`}>
+      <div className={clsx(styles['ogp-card'], isCompact && styles['ogp-card-compact'])}>
         <div className={styles['ogp-skeleton']} />
       </div>
     );
@@ -94,7 +95,7 @@ export function OgpCard({ url, size = 'compact' }: OgpCardProps) {
   return (
     <a
       href={url}
-      className={`${styles['ogp-card']} ${sizeClass}`}
+      className={clsx(styles['ogp-card'], isCompact && styles['ogp-card-compact'])}
       onClick={(e) => {
         e.preventDefault();
         e.stopPropagation();
@@ -154,7 +155,7 @@ export function YouTubeCard({ videoId, url }: YouTubeCardProps) {
 
   if (loaded) {
     return (
-      <div className={`${styles['ogp-card']} ${styles['ogp-card-youtube-embed']}`}>
+      <div className={clsx(styles['ogp-card'], styles['ogp-card-youtube-embed'])}>
         <div className={styles['youtube-wrapper']}>
           <iframe
             src={`https://www.youtube.com/embed/${videoId}?autoplay=1`}

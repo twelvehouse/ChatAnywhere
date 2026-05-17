@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import clsx from 'clsx';
 import styles from './ChatHeader.module.css';
 import type { CustomFilter, FilterFolder } from '../../types/filter';
 import type { TellPartner } from '../../types/chat';
@@ -34,7 +35,7 @@ export function ChatHeader({
           aria-label="Toggle menu"
           aria-expanded={isSidebarOpen}
         >
-          <span className={`hamburger-icon${isSidebarOpen ? ' open' : ''}`}>
+          <span className={clsx('hamburger-icon', isSidebarOpen && 'open')}>
             <span />
             <span />
             <span />

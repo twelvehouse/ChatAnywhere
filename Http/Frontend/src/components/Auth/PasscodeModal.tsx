@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import type { KeyboardEvent } from 'react';
+import clsx from 'clsx';
 import type { AuthResult, AuthStatus } from '../../hooks/useAuth';
 import styles from './PasscodeModal.module.css';
 
@@ -97,7 +98,7 @@ export function PasscodeModal({ status, onAuthenticate }: Props) {
           </div>
         )}
 
-        <div className={`${styles.formBody} ${formRevealed ? styles.formRevealed : ''}`}>
+        <div className={clsx(styles.formBody, formRevealed && styles.formRevealed)}>
           <div className={styles.formBodyInner}>
             <p className={styles.subtitle}>
               {isNotConfigured

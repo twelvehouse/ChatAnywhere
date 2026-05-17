@@ -1,3 +1,4 @@
+import clsx from 'clsx';
 import styles from './ConfirmDialog.module.css';
 
 interface Props {
@@ -15,10 +16,10 @@ export function ConfirmDialog({ title, body, confirmLabel = 'Delete', onConfirm,
         <p className={styles.title}>{title}</p>
         <p className={styles.body}>{body}</p>
         <div className={styles.actions}>
-          <button className={`btn btn-secondary ${styles['btn-cancel']}`} onClick={onClose}>
+          <button className={clsx('btn btn-secondary', styles['btn-cancel'])} onClick={onClose}>
             Cancel
           </button>
-          <button className={`btn ${styles['btn-danger']}`} onClick={onConfirm}>
+          <button className={clsx('btn', styles['btn-danger'])} onClick={onConfirm}>
             {confirmLabel}
           </button>
         </div>

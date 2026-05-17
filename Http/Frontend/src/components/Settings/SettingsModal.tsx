@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import type { Dispatch, SetStateAction } from 'react';
+import clsx from 'clsx';
 import styles from './SettingsModal.module.css';
 import { AppearanceSettings } from './AppearanceSettings';
 import { ChannelSettings } from './ChannelSettings';
@@ -113,14 +114,17 @@ export function SettingsModal({
           />
         )}
 
-        <div className={`${styles['settings-sidebar']}${isSidebarOpen ? ` ${styles.open}` : ''}`}>
+        <div className={clsx(styles['settings-sidebar'], isSidebarOpen && styles.open)}>
           <div className={styles['settings-sidebar-title']}>
             Settings
             <span className={styles['version-label']}>v{__APP_VERSION__}</span>
           </div>
           <nav className={styles['settings-nav']}>
             <button
-              className={`${styles['settings-nav-item']}${category === 'appearance' ? ` ${styles.active}` : ''}`}
+              className={clsx(
+                styles['settings-nav-item'],
+                category === 'appearance' && styles.active,
+              )}
               onClick={() => selectCategory('appearance')}
             >
               <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
@@ -130,7 +134,10 @@ export function SettingsModal({
               Appearance
             </button>
             <button
-              className={`${styles['settings-nav-item']}${category === 'chat-input' ? ` ${styles.active}` : ''}`}
+              className={clsx(
+                styles['settings-nav-item'],
+                category === 'chat-input' && styles.active,
+              )}
               onClick={() => selectCategory('chat-input')}
             >
               <svg
@@ -149,7 +156,10 @@ export function SettingsModal({
               Chat &amp; Input
             </button>
             <button
-              className={`${styles['settings-nav-item']}${category === 'send-channels' ? ` ${styles.active}` : ''}`}
+              className={clsx(
+                styles['settings-nav-item'],
+                category === 'send-channels' && styles.active,
+              )}
               onClick={() => selectCategory('send-channels')}
             >
               <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
@@ -163,7 +173,7 @@ export function SettingsModal({
               Send Channels
             </button>
             <button
-              className={`${styles['settings-nav-item']}${category === 'filters' ? ` ${styles.active}` : ''}`}
+              className={clsx(styles['settings-nav-item'], category === 'filters' && styles.active)}
               onClick={() => selectCategory('filters')}
             >
               <svg
@@ -179,7 +189,10 @@ export function SettingsModal({
               Filters
             </button>
             <button
-              className={`${styles['settings-nav-item']}${category === 'security' ? ` ${styles.active}` : ''}`}
+              className={clsx(
+                styles['settings-nav-item'],
+                category === 'security' && styles.active,
+              )}
               onClick={() => selectCategory('security')}
             >
               <svg
@@ -204,7 +217,7 @@ export function SettingsModal({
               onClick={() => setIsSidebarOpen((prev) => !prev)}
               aria-label="Toggle settings categories"
             >
-              <span className={`hamburger-icon${isSidebarOpen ? ' open' : ''}`}>
+              <span className={clsx('hamburger-icon', isSidebarOpen && 'open')}>
                 <span />
                 <span />
                 <span />

@@ -1,4 +1,5 @@
 import type { Dispatch, SetStateAction } from 'react';
+import clsx from 'clsx';
 import styles from './SecuritySettings.module.css';
 import { BUILT_IN_TRUSTED_DOMAINS } from '../../constants/trustedDomains';
 
@@ -26,7 +27,7 @@ export function SecuritySettings({ trustedDomains, setTrustedDomains }: Props) {
 
       <div className={styles['domain-list']}>
         {Array.from(BUILT_IN_TRUSTED_DOMAINS).map((domain) => (
-          <div key={domain} className={`${styles['domain-item']} ${styles['domain-item-builtin']}`}>
+          <div key={domain} className={clsx(styles['domain-item'], styles['domain-item-builtin'])}>
             <span className={styles['domain-name']}>{domain}</span>
             <span className={styles['builtin-badge']}>built-in</span>
           </div>

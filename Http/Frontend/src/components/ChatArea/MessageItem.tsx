@@ -1,3 +1,4 @@
+import clsx from 'clsx';
 import { getChannelInfo, getBadgeStyle } from '../../lib/channelUtils';
 import { sanitizeName, formatTime } from '../../lib/formatUtils';
 import { renderPayloads, urlRegex } from '../../lib/renderUtils';
@@ -97,7 +98,11 @@ export function MessageItem({
 
   return (
     <div
-      className={`message ${hideHeader ? 'message-compact' : ''} ${hasNextGrouped ? 'message-has-next' : ''}`}
+      className={clsx(
+        'message',
+        hideHeader && 'message-compact',
+        hasNextGrouped && 'message-has-next',
+      )}
       style={{
         background: useColoredBackground ? ch.bg : undefined,
         borderLeft: `3px solid ${ch.color}44`,
@@ -143,7 +148,11 @@ export function MessageItem({
             </div>
           )}
           <div
-            className={`message-content${isSystemContent ? ' message-content-system' : ''}${isItalic ? ' message-content-italic' : ''}`}
+            className={clsx(
+              'message-content',
+              isSystemContent && 'message-content-system',
+              isItalic && 'message-content-italic',
+            )}
           >
             {renderPayloads(msg.MessagePayloads, onLinkClick)}
           </div>

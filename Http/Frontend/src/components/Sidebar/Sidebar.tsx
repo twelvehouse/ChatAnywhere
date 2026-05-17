@@ -1,4 +1,5 @@
 import { useState, useRef } from 'react';
+import clsx from 'clsx';
 import {
   DndContext,
   DragOverlay,
@@ -116,13 +117,11 @@ function SortableFilterRow({
         transition,
         opacity: isDragging ? 0.3 : 1,
       }}
-      className={[
+      className={clsx(
         styles['filter-row'],
-        isActive ? styles.active : '',
-        unread > 0 ? styles['has-unread'] : '',
-      ]
-        .filter(Boolean)
-        .join(' ')}
+        isActive && styles.active,
+        unread > 0 && styles['has-unread'],
+      )}
     >
       <button className={styles['channel-item']} onClick={onSelect}>
         <span className={styles['channel-hash']}>#</span>
@@ -243,10 +242,7 @@ function DmRow({ partner, isActive, onSelect }: DmRowProps) {
     .join('');
 
   return (
-    <button
-      className={[styles['dm-row'], isActive ? styles['dm-active'] : ''].filter(Boolean).join(' ')}
-      onClick={onSelect}
-    >
+    <button className={clsx(styles['dm-row'], isActive && styles['dm-active'])} onClick={onSelect}>
       <div className={styles['dm-avatar']}>
         <AvatarImage name={partner.name} world={partner.world} />
       </div>
@@ -420,7 +416,7 @@ export function Sidebar({
 
   return (
     <>
-      <aside className={`${styles.sidebar}${isOpen ? ` ${styles.open}` : ''}`}>
+      <aside className={clsx(styles.sidebar, isOpen && styles.open)}>
         {/* ── Header ── */}
         <div className={styles['sidebar-header']}>
           <span className={styles['sidebar-logo']}>ChatAnywhere</span>
@@ -448,7 +444,10 @@ export function Sidebar({
               </svg>
             </button>
             <div
-              className={`${styles['connection-indicator']} ${isConnected ? styles.online : styles.offline}`}
+              className={clsx(
+                styles['connection-indicator'],
+                isConnected ? styles.online : styles.offline,
+              )}
               data-tooltip={isConnected ? 'Connected' : 'Disconnected'}
               data-tooltip-pos="bottom"
             >
@@ -611,7 +610,7 @@ export function Sidebar({
                 Edit
               </button>
               <button
-                className={`${styles['context-item']} ${styles['context-danger']}`}
+                className={clsx(styles['context-item'], styles['context-danger'])}
                 onClick={() => {
                   setModal({ type: 'deleteFilter', name: menu.name });
                   setMenu(null);
@@ -633,7 +632,7 @@ export function Sidebar({
                 Rename
               </button>
               <button
-                className={`${styles['context-item']} ${styles['context-danger']}`}
+                className={clsx(styles['context-item'], styles['context-danger'])}
                 onClick={() => {
                   setModal({ type: 'deleteFolder', name: menu.name });
                   setMenu(null);

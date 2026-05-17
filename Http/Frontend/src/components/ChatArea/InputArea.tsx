@@ -1,5 +1,6 @@
 import { useCallback, useRef, useState } from 'react';
 import type { KeyboardEvent } from 'react';
+import clsx from 'clsx';
 import styles from './InputArea.module.css';
 import { ChannelSelect } from '../ChannelSelect/ChannelSelect';
 import { EmoteSymbolPicker } from '../EmoteSymbolPicker/EmoteSymbolPicker';
@@ -289,7 +290,7 @@ export function InputArea({
             {!isDmView && (
               <button
                 type="button"
-                className={`${styles['tell-pin-btn']}${replyPinned ? ` ${styles.pinned}` : ''}`}
+                className={clsx(styles['tell-pin-btn'], replyPinned && styles.pinned)}
                 onClick={onToggleReplyPin}
                 aria-label={
                   replyPinned ? 'Unpin (auto-dismiss after send)' : 'Pin (keep after send)'

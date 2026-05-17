@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import clsx from 'clsx';
 import styles from './FilterFolderModal.module.css';
 import { FILTER_NAME_REGEX, FILTER_NAME_ERROR } from '../../types/filter';
 
@@ -38,7 +39,7 @@ export function FilterFolderModal({ initialName = '', existingNames, onSave, onC
         <label className={styles.label}>
           Folder Name
           <input
-            className={`${styles.input}${error ? ` ${styles['input-error']}` : ''}`}
+            className={clsx(styles.input, error && styles['input-error'])}
             type="text"
             value={name}
             onChange={(e) => {

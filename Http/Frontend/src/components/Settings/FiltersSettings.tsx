@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import clsx from 'clsx';
 import styles from './FiltersSettings.module.css';
 import { ImportFiltersModal } from './ImportFiltersModal';
 import { ConfirmDialog } from '../Sidebar/ConfirmDialog';
@@ -70,7 +71,7 @@ export function FiltersSettings({
                       </td>
                       <td className={styles['td-action']}>
                         <button
-                          className={`btn btn-secondary ${styles['btn-delete']}`}
+                          className={clsx('btn btn-secondary', styles['btn-delete'])}
                           onClick={() => setPendingDelete(key)}
                         >
                           Delete

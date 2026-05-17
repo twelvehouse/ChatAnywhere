@@ -1,4 +1,5 @@
 import type { Dispatch, SetStateAction } from 'react';
+import clsx from 'clsx';
 import type { ChatMessage } from '../../types/chat';
 import styles from './AppearanceSettings.module.css';
 import { FONTS } from '../../constants/config';
@@ -135,7 +136,7 @@ export function AppearanceSettings({
           onClick={() => setItalicizeSystem((v) => !v)}
         >
           <span className="form-row-label">Italicize System & Emote</span>
-          <div className={`toggle-switch${italicizeSystem ? ' on' : ''}`}>
+          <div className={clsx('toggle-switch', italicizeSystem && 'on')}>
             <div className="toggle-knob" />
           </div>
         </div>
@@ -149,7 +150,7 @@ export function AppearanceSettings({
           onClick={() => setUseColoredBackground((v) => !v)}
         >
           <span className="form-row-label">Colorize backgrounds by type</span>
-          <div className={`toggle-switch${useColoredBackground ? ' on' : ''}`}>
+          <div className={clsx('toggle-switch', useColoredBackground && 'on')}>
             <div className="toggle-knob" />
           </div>
         </div>
@@ -160,7 +161,7 @@ export function AppearanceSettings({
           onClick={() => setLargeLinkPreviews((v) => !v)}
         >
           <span className="form-row-label">Large link previews</span>
-          <div className={`toggle-switch${largeLinkPreviews ? ' on' : ''}`}>
+          <div className={clsx('toggle-switch', largeLinkPreviews && 'on')}>
             <div className="toggle-knob" />
           </div>
         </div>

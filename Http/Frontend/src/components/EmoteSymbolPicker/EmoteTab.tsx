@@ -1,4 +1,5 @@
 import { useState, useEffect, useTransition } from 'react';
+import clsx from 'clsx';
 import styles from './EmoteTab.module.css';
 import type { Emote } from '../../hooks/useEmoteList';
 import { RELAY_ADDR } from '../../constants/config';
@@ -89,7 +90,7 @@ export function EmoteTab({
       <button
         key={`${keyPrefix}-${emote.id}`}
         type="button"
-        className={`${styles['emote-row']}${isPendingRow ? ` ${styles.pending}` : ''}`}
+        className={clsx(styles['emote-row'], isPendingRow && styles.pending)}
         onClick={() => handleEmoteClick(emote, keyPrefix)}
       >
         <img
@@ -202,7 +203,7 @@ export function EmoteTab({
             <line x1="5.5" y1="8" x2="10.5" y2="8" />
             <line x1="5.5" y1="10.5" x2="8.5" y2="10.5" />
           </svg>
-          <div className={`toggle-switch${logOutput ? ' on' : ''}`}>
+          <div className={clsx('toggle-switch', logOutput && 'on')}>
             <div className="toggle-knob" />
           </div>
         </button>

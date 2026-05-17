@@ -1,4 +1,5 @@
 import { useState, useRef } from 'react';
+import clsx from 'clsx';
 import styles from './ChannelSelect.module.css';
 import { useOnClickOutside } from '../../hooks/useOnClickOutside';
 import { FALLBACK_CHANNEL } from '../../constants/channels';
@@ -42,7 +43,7 @@ export function ChannelSelect({ channels, value, onChange, tellMode = false }: P
           {currentBadge.label}
         </span>
         <svg
-          className={`${styles['ch-select-chevron']}${open ? ` ${styles.open}` : ''}`}
+          className={clsx(styles['ch-select-chevron'], open && styles.open)}
           width="10"
           height="6"
           viewBox="0 0 10 6"
@@ -68,7 +69,7 @@ export function ChannelSelect({ channels, value, onChange, tellMode = false }: P
               <button
                 key={ch.prefix}
                 type="button"
-                className={`${styles['ch-select-item']}${active ? ` ${styles.active}` : ''}`}
+                className={clsx(styles['ch-select-item'], active && styles.active)}
                 style={{
                   color: badge.color,
                   background: active ? `${badge.color}22` : undefined,

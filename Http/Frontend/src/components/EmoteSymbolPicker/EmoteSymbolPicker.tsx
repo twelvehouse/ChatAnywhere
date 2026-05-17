@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import clsx from 'clsx';
 import styles from './EmoteSymbolPicker.module.css';
 import { EmoteTab } from './EmoteTab';
 import { SymbolsTab } from './SymbolsTab';
@@ -32,7 +33,7 @@ export function EmoteSymbolPicker({ onInsert, onExecute, emoteConfirm, emoteSort
           <button
             key={tab.id}
             type="button"
-            className={`${styles['tab-btn']}${activeTab === tab.id ? ` ${styles.active}` : ''}`}
+            className={clsx(styles['tab-btn'], activeTab === tab.id && styles.active)}
             onClick={() => setActiveTab(tab.id)}
           >
             {tab.label}

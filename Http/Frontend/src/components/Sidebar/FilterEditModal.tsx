@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import clsx from 'clsx';
 import styles from './FilterEditModal.module.css';
 import type { CustomFilter } from '../../types/filter';
 import { FILTER_NAME_REGEX, FILTER_NAME_ERROR } from '../../types/filter';
@@ -145,7 +146,7 @@ export function FilterEditModal({
         <div className="form-field">
           <label className="form-field-label">Filter Name</label>
           <input
-            className={`form-input${nameError ? ' form-input-error' : ''}`}
+            className={clsx('form-input', nameError && 'form-input-error')}
             type="text"
             value={name}
             onChange={(e) => {
@@ -166,12 +167,12 @@ export function FilterEditModal({
         </div>
 
         {/* ── Notification ── */}
-        <div className={`form-section ${styles['modal-section']}`}>
+        <div className={clsx('form-section', styles['modal-section'])}>
           <div className="form-section-title">Notification</div>
           <div className="form-row">
             <span className="form-row-label">Badge (Unread)</span>
             <button
-              className={`toggle-switch${notifyUnread ? ' on' : ''}`}
+              className={clsx('toggle-switch', notifyUnread && 'on')}
               role="switch"
               aria-checked={notifyUnread}
               onClick={() => setNotifyUnread((v) => !v)}
@@ -182,7 +183,7 @@ export function FilterEditModal({
         </div>
 
         {/* ── Default Send Channel ── */}
-        <div className={`form-section ${styles['modal-section']}`}>
+        <div className={clsx('form-section', styles['modal-section'])}>
           <div className="form-section-title">Default Send Channel</div>
           <select
             className="form-select"
@@ -203,7 +204,7 @@ export function FilterEditModal({
         </div>
 
         {/* ── Show Channel Types ── */}
-        <div className={`form-section ${styles['modal-section']}`}>
+        <div className={clsx('form-section', styles['modal-section'])}>
           <div className={styles['section-header']}>
             <div className="form-section-title">Show Channel Types</div>
             <div className={styles['select-all-btns']}>

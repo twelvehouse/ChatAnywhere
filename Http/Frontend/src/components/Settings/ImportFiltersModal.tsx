@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import clsx from 'clsx';
 import styles from './ImportFiltersModal.module.css';
 import { RELAY_ADDR } from '../../constants/config';
 import { dispatchUnauthorized } from '../../lib/authEvent';
@@ -246,7 +247,10 @@ export function ImportFiltersModal({ currentFilters, currentFolders, onImport, o
                   {characters.map((c) => (
                     <div
                       key={c.key}
-                      className={`${styles['char-item']}${selectedKey === c.key ? ` ${styles.selected}` : ''}`}
+                      className={clsx(
+                        styles['char-item'],
+                        selectedKey === c.key && styles.selected,
+                      )}
                       onClick={() => setSelectedKey(c.key)}
                     >
                       <div className={styles['char-radio']} />
@@ -270,7 +274,11 @@ export function ImportFiltersModal({ currentFilters, currentFolders, onImport, o
                     return (
                       <div key={folder.name} className={styles['tree-folder']}>
                         <div
-                          className={`${styles['tree-folder-row']}${state === 'checked' ? ` ${styles['folder-checked']}` : state === 'indeterminate' ? ` ${styles['folder-indeterminate']}` : ''}`}
+                          className={clsx(
+                            styles['tree-folder-row'],
+                            state === 'checked' && styles['folder-checked'],
+                            state === 'indeterminate' && styles['folder-indeterminate'],
+                          )}
                           onClick={() => toggleFolder(folder)}
                         >
                           <FolderIcon />
@@ -284,7 +292,10 @@ export function ImportFiltersModal({ currentFilters, currentFolders, onImport, o
                             .map((name) => (
                               <div
                                 key={name}
-                                className={`${styles['tree-leaf']}${selectedFilters.has(name) ? ` ${styles['leaf-selected']}` : ''}`}
+                                className={clsx(
+                                  styles['tree-leaf'],
+                                  selectedFilters.has(name) && styles['leaf-selected'],
+                                )}
                                 onClick={() => toggleFilter(name)}
                               >
                                 <FilterIcon />
@@ -303,7 +314,10 @@ export function ImportFiltersModal({ currentFilters, currentFolders, onImport, o
                       {orphanFilters.map((f) => (
                         <div
                           key={f.name}
-                          className={`${styles['tree-leaf']}${selectedFilters.has(f.name) ? ` ${styles['leaf-selected']}` : ''}`}
+                          className={clsx(
+                            styles['tree-leaf'],
+                            selectedFilters.has(f.name) && styles['leaf-selected'],
+                          )}
                           onClick={() => toggleFilter(f.name)}
                         >
                           <FilterIcon />

@@ -1,4 +1,5 @@
 import type { Dispatch, SetStateAction } from 'react';
+import clsx from 'clsx';
 
 interface Props {
   tellModeAll: boolean;
@@ -35,7 +36,7 @@ export function OthersSettings({
           onClick={() => setTellModeAll((v) => !v)}
         >
           <span className="form-row-label">Enable Tell mode for all messages</span>
-          <div className={`toggle-switch${tellModeAll ? ' on' : ''}`}>
+          <div className={clsx('toggle-switch', tellModeAll && 'on')}>
             <div className="toggle-knob" />
           </div>
         </div>
@@ -45,7 +46,7 @@ export function OthersSettings({
           onClick={() => setCtrlEnterToSend((v) => !v)}
         >
           <span className="form-row-label">Send message with Ctrl+Enter only</span>
-          <div className={`toggle-switch${ctrlEnterToSend ? ' on' : ''}`}>
+          <div className={clsx('toggle-switch', ctrlEnterToSend && 'on')}>
             <div className="toggle-knob" />
           </div>
         </div>
@@ -59,7 +60,7 @@ export function OthersSettings({
           onClick={() => setEmoteConfirm((v) => !v)}
         >
           <span className="form-row-label">Confirm before executing emote</span>
-          <div className={`toggle-switch${emoteConfirm ? ' on' : ''}`}>
+          <div className={clsx('toggle-switch', emoteConfirm && 'on')}>
             <div className="toggle-knob" />
           </div>
         </div>
@@ -69,7 +70,7 @@ export function OthersSettings({
           onClick={() => setEmoteSortByName((v) => !v)}
         >
           <span className="form-row-label">Sort emotes by name</span>
-          <div className={`toggle-switch${emoteSortByName ? ' on' : ''}`}>
+          <div className={clsx('toggle-switch', emoteSortByName && 'on')}>
             <div className="toggle-knob" />
           </div>
         </div>
@@ -85,7 +86,7 @@ export function OthersSettings({
           <span className="form-row-label">
             Retain send destination when returning to a Sync tab
           </span>
-          <div className={`toggle-switch${retainSyncSendPrefix ? ' on' : ''}`}>
+          <div className={clsx('toggle-switch', retainSyncSendPrefix && 'on')}>
             <div className="toggle-knob" />
           </div>
         </div>
