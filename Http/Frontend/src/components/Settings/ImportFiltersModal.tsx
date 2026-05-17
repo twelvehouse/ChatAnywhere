@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import clsx from 'clsx';
+import { Folder, Filter } from 'lucide-react';
 import styles from './ImportFiltersModal.module.css';
 import { RELAY_ADDR } from '../../constants/config';
 import { dispatchUnauthorized } from '../../lib/authEvent';
@@ -29,33 +30,11 @@ function uniqueName(base: string, existing: Set<string>): string {
 }
 
 const FolderIcon = () => (
-  <svg
-    className={styles['tree-folder-icon']}
-    width="16"
-    height="16"
-    viewBox="0 0 16 16"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="1.4"
-    strokeLinejoin="round"
-  >
-    <path d="M2 5.5C2 4.7 2.6 4 3.5 4H7L8.5 5.5H12.5C13.3 5.5 14 6.2 14 7V11.5C14 12.3 13.3 13 12.5 13H3.5C2.6 13 2 12.3 2 11.5V5.5z" />
-  </svg>
+  <Folder className={styles['tree-folder-icon']} size={16} strokeWidth={1.4} aria-hidden />
 );
 
 const FilterIcon = () => (
-  <svg
-    className={styles['tree-leaf-icon']}
-    width="16"
-    height="16"
-    viewBox="0 0 16 16"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="1.5"
-    strokeLinejoin="round"
-  >
-    <path d="M2 3h12l-4.5 5.5V13l-3-1.5V8.5L2 3z" />
-  </svg>
+  <Filter className={styles['tree-leaf-icon']} size={16} strokeWidth={1.5} aria-hidden />
 );
 
 export function ImportFiltersModal({ currentFilters, currentFolders, onImport, onClose }: Props) {

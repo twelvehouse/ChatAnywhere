@@ -1,5 +1,6 @@
 import type { Dispatch, SetStateAction } from 'react';
 import clsx from 'clsx';
+import { X } from 'lucide-react';
 import styles from './SecuritySettings.module.css';
 import { BUILT_IN_TRUSTED_DOMAINS } from '../../constants/trustedDomains';
 
@@ -43,16 +44,7 @@ export function SecuritySettings({ trustedDomains, setTrustedDomains }: Props) {
               onClick={() => handleRemoveDomain(domain)}
               aria-label="Remove"
             >
-              <svg
-                width="14"
-                height="14"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2.5"
-              >
-                <path d="M18 6L6 18M6 6l12 12" />
-              </svg>
+              <X size={14} strokeWidth={2.5} aria-hidden />
             </button>
           </div>
         ))}

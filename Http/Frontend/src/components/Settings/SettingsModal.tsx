@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import type { Dispatch, SetStateAction } from 'react';
 import clsx from 'clsx';
+import { Palette, MessageSquare, AlignLeft, Filter as FilterIcon, Shield } from 'lucide-react';
 import styles from './SettingsModal.module.css';
 import { AppearanceSettings } from './AppearanceSettings';
 import { ChannelSettings } from './ChannelSettings';
@@ -127,10 +128,7 @@ export function SettingsModal({
               )}
               onClick={() => selectCategory('appearance')}
             >
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                <circle cx="8" cy="8" r="7" stroke="currentColor" strokeWidth="1.5" />
-                <path d="M8 5a3 3 0 1 1 0 6 3 3 0 0 1 0-6z" fill="currentColor" opacity=".6" />
-              </svg>
+              <Palette size={16} strokeWidth={1.5} aria-hidden />
               Appearance
             </button>
             <button
@@ -140,19 +138,7 @@ export function SettingsModal({
               )}
               onClick={() => selectCategory('chat-input')}
             >
-              <svg
-                width="16"
-                height="16"
-                viewBox="0 0 16 16"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.5"
-              >
-                <path
-                  d="M2 3h12a1 1 0 0 1 1 1v7a1 1 0 0 1-1 1H5l-3 2V4a1 1 0 0 1 1-1z"
-                  strokeLinejoin="round"
-                />
-              </svg>
+              <MessageSquare size={16} strokeWidth={1.5} aria-hidden />
               Chat &amp; Input
             </button>
             <button
@@ -162,30 +148,14 @@ export function SettingsModal({
               )}
               onClick={() => selectCategory('send-channels')}
             >
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                <path
-                  d="M2 4h12M2 8h8M2 12h10"
-                  stroke="currentColor"
-                  strokeWidth="1.5"
-                  strokeLinecap="round"
-                />
-              </svg>
+              <AlignLeft size={16} strokeWidth={1.5} aria-hidden />
               Send Channels
             </button>
             <button
               className={clsx(styles['settings-nav-item'], category === 'filters' && styles.active)}
               onClick={() => selectCategory('filters')}
             >
-              <svg
-                width="16"
-                height="16"
-                viewBox="0 0 16 16"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.5"
-              >
-                <path d="M2 3h12l-4.5 5.5V13l-3-1.5V8.5L2 3z" strokeLinejoin="round" />
-              </svg>
+              <FilterIcon size={16} strokeWidth={1.5} aria-hidden />
               Filters
             </button>
             <button
@@ -195,16 +165,7 @@ export function SettingsModal({
               )}
               onClick={() => selectCategory('security')}
             >
-              <svg
-                width="16"
-                height="16"
-                viewBox="0 0 16 16"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.5"
-              >
-                <path d="M8 2L3 4.5v4c0 2.5 2 4.5 5 5.5 3-1 5-3 5-5.5v-4L8 2z" />
-              </svg>
+              <Shield size={16} strokeWidth={1.5} aria-hidden />
               Security
             </button>
           </nav>

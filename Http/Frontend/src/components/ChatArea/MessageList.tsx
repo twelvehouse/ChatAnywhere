@@ -1,5 +1,6 @@
 import type { UIEvent } from 'react';
 import { useEffect, useRef, useLayoutEffect, useCallback } from 'react';
+import { MessageSquare, AlertCircle } from 'lucide-react';
 import styles from './MessageList.module.css';
 import { ErrorBoundary } from '../ErrorBoundary';
 import { MessageItem } from './MessageItem';
@@ -235,19 +236,11 @@ export function MessageList({
               <div className={styles['messages-empty']}>
                 {isConnected ? (
                   <>
-                    <svg
+                    <MessageSquare
                       className={styles['messages-empty-icon']}
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="1.2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      aria-hidden="true"
-                    >
-                      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
-                    </svg>
+                      strokeWidth={1.2}
+                      aria-hidden
+                    />
                     <div className={styles['messages-empty-title']}>
                       {filterName ? `#${filterName} is quiet` : 'Nothing here yet'}
                     </div>
@@ -257,21 +250,11 @@ export function MessageList({
                   </>
                 ) : (
                   <>
-                    <svg
+                    <AlertCircle
                       className={styles['messages-empty-icon']}
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="1.2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      aria-hidden="true"
-                    >
-                      <circle cx="12" cy="12" r="10" />
-                      <line x1="12" y1="8" x2="12" y2="12" />
-                      <line x1="12" y1="16" x2="12.01" y2="16" />
-                    </svg>
+                      strokeWidth={1.2}
+                      aria-hidden
+                    />
                     <div className={styles['messages-empty-title']}>Waiting for chat stream...</div>
                     <div className={styles['messages-empty-subtitle']}>
                       Make sure the plugin is running in-game.

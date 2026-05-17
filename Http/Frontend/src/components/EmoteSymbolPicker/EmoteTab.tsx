@@ -1,5 +1,6 @@
 import { useState, useEffect, useTransition } from 'react';
 import clsx from 'clsx';
+import { Search, X, FileText } from 'lucide-react';
 import styles from './EmoteTab.module.css';
 import type { Emote } from '../../hooks/useEmoteList';
 import { RELAY_ADDR } from '../../constants/config';
@@ -121,20 +122,7 @@ export function EmoteTab({
     <div className={styles['emote-tab']}>
       <div className={styles['search-bar']}>
         <div className={styles['search-input-wrapper']}>
-          <svg
-            className={styles['search-icon']}
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 16 16"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1.6"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            aria-hidden
-          >
-            <circle cx="6.5" cy="6.5" r="4" />
-            <line x1="10" y1="10" x2="14" y2="14" />
-          </svg>
+          <Search className={styles['search-icon']} size={14} strokeWidth={1.6} aria-hidden />
           <input
             type="text"
             className={styles['search-input']}
@@ -162,18 +150,7 @@ export function EmoteTab({
                 });
               }}
             >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 16 16"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                aria-hidden
-              >
-                <line x1="4" y1="4" x2="12" y2="12" />
-                <line x1="12" y1="4" x2="4" y2="12" />
-              </svg>
+              <X size={14} strokeWidth={2} aria-hidden />
             </button>
           )}
         </div>
@@ -185,24 +162,7 @@ export function EmoteTab({
           data-tooltip="Emote Log"
           onClick={() => setLogOutput((v) => !v)}
         >
-          <svg
-            className={styles['log-icon']}
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 16 16"
-            width="14"
-            height="14"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1.5"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            aria-hidden
-          >
-            <rect x="3" y="1.5" width="10" height="13" rx="1.5" />
-            <line x1="5.5" y1="5.5" x2="10.5" y2="5.5" />
-            <line x1="5.5" y1="8" x2="10.5" y2="8" />
-            <line x1="5.5" y1="10.5" x2="8.5" y2="10.5" />
-          </svg>
+          <FileText className={styles['log-icon']} size={14} strokeWidth={1.5} aria-hidden />
           <div className={clsx('toggle-switch', logOutput && 'on')}>
             <div className="toggle-knob" />
           </div>

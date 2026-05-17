@@ -1,5 +1,6 @@
 import { useState, useRef } from 'react';
 import clsx from 'clsx';
+import { ChevronDown, Check } from 'lucide-react';
 import styles from './ChannelSelect.module.css';
 import { useOnClickOutside } from '../../hooks/useOnClickOutside';
 import { FALLBACK_CHANNEL } from '../../constants/channels';
@@ -42,22 +43,13 @@ export function ChannelSelect({ channels, value, onChange, tellMode = false }: P
         <span className="channel-badge" style={getBadgeStyle(currentBadge)}>
           {currentBadge.label}
         </span>
-        <svg
+        <ChevronDown
           className={clsx(styles['ch-select-chevron'], open && styles.open)}
-          width="10"
-          height="6"
-          viewBox="0 0 10 6"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path
-            d="M1 1L5 5L9 1"
-            stroke={currentBadge.color}
-            strokeWidth="1.5"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-        </svg>
+          size={12}
+          strokeWidth={1.5}
+          color={currentBadge.color}
+          aria-hidden
+        />
       </button>
 
       {open && (
@@ -84,21 +76,13 @@ export function ChannelSelect({ channels, value, onChange, tellMode = false }: P
                 </span>
                 <span className={styles['ch-select-item-label']}>{ch.label}</span>
                 {active && (
-                  <svg
+                  <Check
                     className={styles['ch-select-check']}
-                    width="12"
-                    height="12"
-                    viewBox="0 0 12 12"
-                    fill="none"
-                  >
-                    <path
-                      d="M2 6L5 9L10 3"
-                      stroke={badge.color}
-                      strokeWidth="1.8"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </svg>
+                    size={12}
+                    strokeWidth={1.8}
+                    color={badge.color}
+                    aria-hidden
+                  />
                 )}
               </button>
             );
