@@ -1,6 +1,7 @@
 import { useState, useRef } from 'react';
 import clsx from 'clsx';
 import { Lock, Globe, CornerDownLeft, Settings } from 'lucide-react';
+import { useSessionStore } from '../../store/sessionStore';
 import {
   DndContext,
   DragOverlay,
@@ -232,9 +233,6 @@ function DmRow({ partner, isActive, onSelect }: DmRowProps) {
 // ── Main Sidebar ────────────────────────────────────────────────
 interface Props {
   isOpen: boolean;
-  isConnected: boolean;
-  localPlayerName: string;
-  localPlayerWorld: string;
   filterMode: FilterMode | null;
   filters: CustomFilter[];
   folders: FilterFolder[];
@@ -259,9 +257,6 @@ interface Props {
 
 export function Sidebar({
   isOpen,
-  isConnected,
-  localPlayerName,
-  localPlayerWorld,
   filterMode,
   filters,
   folders,
@@ -283,6 +278,10 @@ export function Sidebar({
   onEnablePersonalFilters,
   onDisablePersonalFilters,
 }: Props) {
+  const isConnected = useSessionStore((s) => s.isConnected);
+  const localPlayerName = useSessionStore((s) => s.playerName);
+  const localPlayerWorld = useSessionStore((s) => s.playerWorld);
+
   const [menu, setMenu] = useState<MenuTarget | null>(null);
   const [modal, setModal] = useState<ModalState>(null);
   const [showFilterModeModal, setShowFilterModeModal] = useState(false);

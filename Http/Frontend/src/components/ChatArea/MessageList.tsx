@@ -1,6 +1,7 @@
 import type { UIEvent } from 'react';
 import { useEffect, useRef, useLayoutEffect, useCallback } from 'react';
 import { MessageSquare, AlertCircle } from 'lucide-react';
+import { useSessionStore } from '../../store/sessionStore';
 import styles from './MessageList.module.css';
 import { ErrorBoundary } from '../ErrorBoundary';
 import { MessageItem } from './MessageItem';
@@ -91,7 +92,6 @@ function findTellRef(messages: ChatMessage[], idx: number): ChatMessage | null {
 interface Props {
   messages: ChatMessage[];
   filterName?: string;
-  isConnected: boolean;
   bannerCount: number;
   hasUnreadDown: boolean;
   loadOlder: () => void;
@@ -111,7 +111,6 @@ interface Props {
 export function MessageList({
   messages,
   filterName,
-  isConnected,
   bannerCount,
   hasUnreadDown,
   loadOlder,
@@ -127,6 +126,8 @@ export function MessageList({
   onReply,
   disableTellRef = false,
 }: Props) {
+  const isConnected = useSessionStore((s) => s.isConnected);
+
   const tellRefs = disableTellRef
     ? messages.map(() => null)
     : messages.map((_, idx) => findTellRef(messages, idx));

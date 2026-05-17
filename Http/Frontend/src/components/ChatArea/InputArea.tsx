@@ -3,6 +3,7 @@ import type { KeyboardEvent } from 'react';
 import clsx from 'clsx';
 import { Pin, Send } from 'lucide-react';
 import { useSettingsStore } from '../../store/settingsStore';
+import { useSessionStore } from '../../store/sessionStore';
 import styles from './InputArea.module.css';
 import { ChannelSelect } from '../ChannelSelect/ChannelSelect';
 import { EmoteSymbolPicker } from '../EmoteSymbolPicker/EmoteSymbolPicker';
@@ -160,7 +161,6 @@ function ChatInputRow({
 }
 
 interface Props {
-  isConnected: boolean;
   sendChannels: ChannelOption[];
   selectedSendPrefix: string;
   showCharPicker: boolean;
@@ -176,7 +176,6 @@ interface Props {
 }
 
 export function InputArea({
-  isConnected,
   sendChannels,
   selectedSendPrefix,
   showCharPicker,
@@ -191,6 +190,7 @@ export function InputArea({
   onToggleReplyPin,
 }: Props) {
   const ctrlEnterToSend = useSettingsStore((s) => s.ctrlEnterToSend);
+  const isConnected = useSessionStore((s) => s.isConnected);
   const inputAreaRef = useRef<HTMLDivElement>(null);
   const [inputText, setInputText] = useState('');
 

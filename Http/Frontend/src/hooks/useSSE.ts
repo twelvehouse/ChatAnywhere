@@ -1,19 +1,17 @@
 import { useEffect } from 'react';
 import type { Dispatch, SetStateAction, RefObject } from 'react';
 import { RELAY_ADDR } from '../constants/config';
+import { useSessionStore } from '../store/sessionStore';
 import type { ChatMessage, ChannelOption } from '../types/chat';
 import type { SseEvent } from '../types/sse';
 import type { CustomFilter } from '../types/filter';
 
 interface UseSSEOptions {
-  setIsConnected: Dispatch<SetStateAction<boolean>>;
   setMessages: Dispatch<SetStateAction<ChatMessage[]>>;
   setServerChannels: Dispatch<SetStateAction<ChannelOption[]>>;
   setSelectedSendPrefix: Dispatch<SetStateAction<string>>;
   setUnreadMap: Dispatch<SetStateAction<Record<string, number>>>;
   setHasUnreadDown: Dispatch<SetStateAction<boolean>>;
-  setLocalPlayerName: Dispatch<SetStateAction<string>>;
-  setLocalPlayerWorld: Dispatch<SetStateAction<string>>;
   onReset: () => void;
   isNearBottomRef: RefObject<boolean>;
   activeFilterNameRef: RefObject<string>;
@@ -22,20 +20,19 @@ interface UseSSEOptions {
 }
 
 export function useSSE({
-  setIsConnected,
   setMessages,
   setServerChannels,
   setSelectedSendPrefix,
   setUnreadMap,
   setHasUnreadDown,
-  setLocalPlayerName,
-  setLocalPlayerWorld,
   onReset,
   isNearBottomRef,
   activeFilterNameRef,
   filtersRef,
   lastGameChannelRef,
 }: UseSSEOptions): void {
+  const setConnected = useSessionStore((s) => s.setConnected);
+  const setPlayer = useSessionStore((s) => s.setPlayer);
   // SSE connection with exponential-backoff reconnect
   useEffect(() => {
     let sse: EventSource | null = null;
@@ -58,7 +55,7 @@ export function useSSE({
           const data = JSON.parse(event.data) as SseEvent;
 
           if (data.type === 'connected') {
-            setIsConnected(true);
+            setConnected(true);
             retryCount = 0;
             return;
           }
@@ -68,15 +65,13 @@ export function useSSE({
             setMessages([]);
             setUnreadMap({});
             setHasUnreadDown(false);
-            setLocalPlayerName('');
-            setLocalPlayerWorld('');
+            setPlayer('', '');
             onReset();
             return;
           }
 
           if (data.type === 'player-info') {
-            setLocalPlayerName(data.name as string);
-            setLocalPlayerWorld(data.world as string);
+            setPlayer(data.name as string, data.world as string);
             return;
           }
 
@@ -127,7 +122,7 @@ export function useSSE({
       };
 
       sse.onerror = () => {
-        setIsConnected(false);
+        setConnected(false);
         if (sse) sse.close();
         retryCount++;
         reconnectTimeout = setTimeout(connectSSE, Math.min(1000 * 2 ** retryCount, 30000));
@@ -140,14 +135,13 @@ export function useSSE({
       clearTimeout(reconnectTimeout);
     };
   }, [
-    setIsConnected,
+    setConnected,
+    setPlayer,
     setMessages,
     setServerChannels,
     setSelectedSendPrefix,
     setUnreadMap,
     setHasUnreadDown,
-    setLocalPlayerName,
-    setLocalPlayerWorld,
     onReset,
     activeFilterNameRef,
     filtersRef,

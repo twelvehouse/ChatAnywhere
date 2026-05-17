@@ -9,6 +9,7 @@ import { useSettingsSync } from './hooks/useSettingsSync';
 import { useFilterManagement } from './hooks/useFilterManagement';
 import { useAuth } from './hooks/useAuth';
 import { useSettingsStore } from './store/settingsStore';
+import { useSessionStore } from './store/sessionStore';
 import { DEFAULT_CHANNELS, TELL_INCOMING, TELL_OUTGOING } from './constants/channels';
 import { formatPlayerName, isSamePlayer } from './lib/formatUtils';
 import { RELAY_ADDR } from './constants/config';
@@ -66,7 +67,7 @@ function App() {
 function AppContent() {
   // ── Core chat state ────────────────────────────────────────────
   const [messages, setMessages] = useState<ChatMessage[]>([]);
-  const [isConnected, setIsConnected] = useState(false);
+  const isConnected = useSessionStore((s) => s.isConnected);
   const [serverChannels, setServerChannels] = useState<ChannelOption[]>(DEFAULT_CHANNELS);
   const [selectedSendPrefix, setSelectedSendPrefix] = useState(DEFAULT_CHANNELS[0].prefix);
 
@@ -111,9 +112,9 @@ function AppContent() {
   // ── Last known game channel (updated by every active-channel SSE event) ──
   const lastGameChannelRef = useRef('');
 
-  // ── Player state ───────────────────────────────────────────────
-  const [localPlayerName, setLocalPlayerName] = useState('');
-  const [localPlayerWorld, setLocalPlayerWorld] = useState('');
+  // ── Player state (lives in sessionStore — SSE writes, many readers) ──
+  const localPlayerName = useSessionStore((s) => s.playerName);
+  const localPlayerWorld = useSessionStore((s) => s.playerWorld);
 
   // ── DM view state ──────────────────────────────────────────────
   const [activeDmTarget, setActiveDmTarget] = useState<TellPartner | null>(null);
@@ -249,14 +250,11 @@ function AppContent() {
   } = useScrollBehavior({ activeFilterName, filteredMessagesLength: filteredMessages.length });
 
   useSSE({
-    setIsConnected,
     setMessages,
     setServerChannels,
     setSelectedSendPrefix,
     setUnreadMap,
     setHasUnreadDown,
-    setLocalPlayerName,
-    setLocalPlayerWorld,
     onReset: handleReset,
     isNearBottomRef,
     activeFilterNameRef,
@@ -474,9 +472,6 @@ function AppContent() {
 
       <Sidebar
         isOpen={isSidebarOpen}
-        isConnected={isConnected}
-        localPlayerName={localPlayerName}
-        localPlayerWorld={localPlayerWorld}
         filterMode={filterMode}
         filters={filters}
         folders={folders}
@@ -505,7 +500,6 @@ function AppContent() {
         isSidebarOpen={isSidebarOpen}
         onToggleSidebar={() => setIsSidebarOpen((prev) => !prev)}
         filteredMessages={filteredMessages}
-        isConnected={isConnected}
         bannerCount={bannerCount}
         hasUnreadDown={hasUnreadDown}
         loadOlder={loadOlder}

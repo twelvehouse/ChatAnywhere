@@ -15,7 +15,6 @@ interface Props {
   onEditFilter: (filter: CustomFilter, oldName: string) => void;
   // Messages
   filteredMessages: ChatMessage[];
-  isConnected: boolean;
   bannerCount: number;
   hasUnreadDown: boolean;
   loadOlder: () => void;
@@ -51,7 +50,6 @@ export function ChatArea({
   onToggleSidebar,
   onEditFilter,
   filteredMessages,
-  isConnected,
   bannerCount,
   hasUnreadDown,
   loadOlder,
@@ -91,7 +89,6 @@ export function ChatArea({
         messages={filteredMessages}
         filterName={activeFilter?.name}
         disableTellRef={activeDmTarget !== null}
-        isConnected={isConnected}
         bannerCount={bannerCount}
         hasUnreadDown={hasUnreadDown}
         loadOlder={loadOlder}
@@ -108,7 +105,6 @@ export function ChatArea({
       />
 
       <InputArea
-        isConnected={isConnected}
         sendChannels={sendChannels}
         selectedSendPrefix={selectedSendPrefix}
         showCharPicker={showCharPicker}
