@@ -1,6 +1,5 @@
-import { useState, useEffect } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { RELAY_ADDR } from '../constants/config';
-import { dispatchUnauthorized } from '../lib/authEvent';
 
 export interface Emote {
   id: number;
@@ -17,28 +16,21 @@ interface State {
 }
 
 export function useEmoteList(): State {
-  const [state, setState] = useState<State>({ emotes: [], loading: true, error: null });
+  const { data, isLoading, error } = useQuery({
+    queryKey: ['emotes'],
+    queryFn: async () => {
+      const r = await fetch(`${RELAY_ADDR}/emotes`, { credentials: 'include' });
+      if (r.status === 401) throw r;
+      if (!r.ok) throw new Error('Failed to fetch emotes');
+      const json = (await r.json()) as { emotes: Emote[] };
+      return json.emotes ?? [];
+    },
+    staleTime: Infinity,
+  });
 
-  useEffect(() => {
-    let cancelled = false;
-    fetch(`${RELAY_ADDR}/emotes`, { credentials: 'include' })
-      .then((r) => {
-        if (r.status === 401) {
-          dispatchUnauthorized();
-          return Promise.reject();
-        }
-        return r.json();
-      })
-      .then((data: { emotes: Emote[] }) => {
-        if (!cancelled) setState({ emotes: data.emotes ?? [], loading: false, error: null });
-      })
-      .catch((err: Error) => {
-        if (!cancelled) setState({ emotes: [], loading: false, error: err.message });
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, []);
-
-  return state;
+  return {
+    emotes: data ?? [],
+    loading: isLoading,
+    error: error instanceof Error ? error.message : null,
+  };
 }

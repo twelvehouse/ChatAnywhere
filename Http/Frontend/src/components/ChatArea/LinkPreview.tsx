@@ -1,11 +1,9 @@
-import { useState, useEffect, useRef, useLayoutEffect } from 'react';
+import { useState, useRef, useLayoutEffect } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import clsx from 'clsx';
 import { ExternalLink } from 'lucide-react';
 import styles from './LinkPreview.module.css';
 import { RELAY_ADDR } from '../../constants/config';
-
-// Module-level cache to avoid re-fetching the same URL across re-renders
-const ogpCache = new Map<string, OgpData | 'loading' | 'error'>();
 
 interface OgpData {
   title: string | null;
@@ -24,9 +22,20 @@ function ExternalLinkIcon() {
 }
 
 export function OgpCard({ url, size = 'compact' }: OgpCardProps) {
-  const [data, setData] = useState<OgpData | 'loading' | 'error'>(
-    () => ogpCache.get(url) ?? 'loading',
-  );
+  const { data, isLoading } = useQuery({
+    queryKey: ['ogp', url],
+    queryFn: async () => {
+      const r = await fetch(`${RELAY_ADDR}/ogp?url=${encodeURIComponent(url)}`, {
+        credentials: 'include',
+      });
+      if (r.status === 401) throw r;
+      const d = (await r.json()) as OgpData;
+      return d.title || d.image ? d : null;
+    },
+    staleTime: Infinity,
+    gcTime: 1000 * 60 * 30,
+  });
+
   const bodyRef = useRef<HTMLDivElement>(null);
   const [bodyHeight, setBodyHeight] = useState<number | null>(null);
 
@@ -43,35 +52,17 @@ export function OgpCard({ url, size = 'compact' }: OgpCardProps) {
     return () => ro.disconnect();
   }, [size, data]);
 
-  useEffect(() => {
-    const cached = ogpCache.get(url);
-    if (cached && cached !== 'loading') return;
-
-    ogpCache.set(url, 'loading');
-    fetch(`${RELAY_ADDR}/ogp?url=${encodeURIComponent(url)}`, { credentials: 'include' })
-      .then((r) => r.json())
-      .then((d: OgpData) => {
-        const result = d.title || d.image ? d : 'error';
-        ogpCache.set(url, result);
-        setData(result);
-      })
-      .catch(() => {
-        ogpCache.set(url, 'error');
-        setData('error');
-      });
-  }, [url]);
-
   const isCompact = size === 'compact';
   const imageStyle = isCompact && bodyHeight ? { height: bodyHeight } : undefined;
 
-  if (data === 'loading') {
+  if (isLoading) {
     return (
       <div className={clsx(styles['ogp-card'], isCompact && styles['ogp-card-compact'])}>
         <div className={styles['ogp-skeleton']} />
       </div>
     );
   }
-  if (data === 'error' || typeof data === 'string') return null;
+  if (!data) return null;
 
   const { title, description, image, siteName } = data;
   if (!title && !image) return null;

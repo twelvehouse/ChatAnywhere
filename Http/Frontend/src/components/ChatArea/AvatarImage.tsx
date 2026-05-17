@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { RELAY_ADDR } from '../../constants/config';
 import { sanitizeName } from '../../lib/formatUtils';
 
@@ -11,44 +12,33 @@ interface Props {
 
 export function AvatarImage({ name, world }: Props) {
   const cleanName = sanitizeName(name);
-  const [avatarUrl, setAvatarUrl] = useState<string>(() => {
-    if (!cleanName || !world) return ANONYMOUS_IMG;
-    const cached = sessionStorage.getItem(`avatar_${cleanName}_${world}`);
-    return cached !== null ? cached || ANONYMOUS_IMG : ANONYMOUS_IMG;
+  const enabled = !!cleanName && !!world;
+
+  const { data } = useQuery({
+    queryKey: ['avatar', cleanName, world],
+    queryFn: async () => {
+      const r = await fetch(
+        `${RELAY_ADDR}/avatar?name=${encodeURIComponent(cleanName)}&world=${encodeURIComponent(world!)}`,
+        { credentials: 'include' },
+      );
+      if (r.status === 401) throw r;
+      const json = (await r.json()) as { avatarUrl?: string };
+      return json.avatarUrl || '';
+    },
+    enabled,
+    staleTime: Infinity,
+    gcTime: Infinity,
   });
 
-  useEffect(() => {
-    if (!cleanName || !world) return;
-
-    const cacheKey = `avatar_${cleanName}_${world}`;
-    if (sessionStorage.getItem(cacheKey) !== null) return;
-
-    let cancelled = false;
-
-    fetch(
-      `${RELAY_ADDR}/avatar?name=${encodeURIComponent(cleanName)}&world=${encodeURIComponent(world)}`,
-      { credentials: 'include' },
-    )
-      .then((r) => r.json())
-      .then((data) => {
-        if (cancelled) return;
-        const url: string = data.avatarUrl || '';
-        sessionStorage.setItem(cacheKey, url);
-        setAvatarUrl(url || ANONYMOUS_IMG);
-      })
-      .catch(() => {});
-
-    return () => {
-      cancelled = true;
-    };
-  }, [cleanName, world]);
+  const [failed, setFailed] = useState(false);
+  const src = failed || !data ? ANONYMOUS_IMG : data;
 
   return (
     <img
-      src={avatarUrl}
+      src={src}
       alt={cleanName}
       style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }}
-      onError={() => setAvatarUrl(ANONYMOUS_IMG)}
+      onError={() => setFailed(true)}
     />
   );
 }

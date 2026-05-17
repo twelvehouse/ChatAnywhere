@@ -1,9 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import clsx from 'clsx';
 import { Folder, Filter } from 'lucide-react';
 import styles from './ImportFiltersModal.module.css';
 import { RELAY_ADDR } from '../../constants/config';
-import { dispatchUnauthorized } from '../../lib/authEvent';
 import type { CustomFilter, FilterFolder } from '../../types/filter';
 
 interface CharacterData {
@@ -39,34 +39,24 @@ const FilterIcon = () => (
 
 export function ImportFiltersModal({ currentFilters, currentFolders, onImport, onClose }: Props) {
   const [step, setStep] = useState<Step>('char-select');
-  const [characters, setCharacters] = useState<CharacterData[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [fetchError, setFetchError] = useState(false);
   const [selectedKey, setSelectedKey] = useState<string | null>(null);
   const [selectedFilters, setSelectedFilters] = useState<Set<string>>(new Set());
   const [conflictingFolders, setConflictingFolders] = useState<string[]>([]);
   const [resolutions, setResolutions] = useState<Record<string, ConflictResolution>>({});
 
-  useEffect(() => {
-    fetch(`${RELAY_ADDR}/settings/characters`, { credentials: 'include' })
-      .then((r) => {
-        if (r.status === 401) {
-          dispatchUnauthorized();
-          return;
-        }
-        if (!r.ok) throw new Error('fetch failed');
-        return r.json() as Promise<CharacterData[]>;
-      })
-      .then((data) => {
-        if (!data) return;
-        setCharacters(data);
-        setLoading(false);
-      })
-      .catch(() => {
-        setFetchError(true);
-        setLoading(false);
-      });
-  }, []);
+  const {
+    data: characters = [],
+    isLoading: loading,
+    isError: fetchError,
+  } = useQuery({
+    queryKey: ['characters'],
+    queryFn: async () => {
+      const r = await fetch(`${RELAY_ADDR}/settings/characters`, { credentials: 'include' });
+      if (r.status === 401) throw r;
+      if (!r.ok) throw new Error('fetch failed');
+      return (await r.json()) as CharacterData[];
+    },
+  });
 
   const selectedCharacter = characters.find((c) => c.key === selectedKey) ?? null;
 
