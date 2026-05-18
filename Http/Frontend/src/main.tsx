@@ -7,8 +7,8 @@ import { dispatchUnauthorized } from './lib/authEvent';
 import './index.css';
 
 if (import.meta.env.DEV && new URLSearchParams(location.search).has('demo')) {
-  const { installMockMode } = await import('./mock/index');
-  installMockMode();
+  const { installDemoMode } = await import('./test/msw/browser');
+  await installDemoMode();
 }
 
 const queryClient = new QueryClient({
