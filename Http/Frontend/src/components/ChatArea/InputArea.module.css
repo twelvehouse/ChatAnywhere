@@ -95,7 +95,11 @@
   /* (5px + 22px + 5px) × composer-scale = 32px × composer-scale for the 1-line
      state, matching .slot min-height so the first line aligns with the
      surrounding controls. composer-scale (defined on .input-area) is floored
-     at 1 so the textarea never renders below its 16px-font baseline height. */
+     at 1 so the textarea never renders below its 16px-font baseline height.
+     min-height pins the empty-state height too — some browsers compute
+     scrollHeight for an empty textarea from font-size rather than line-height,
+     which can clip the placeholder vertically at larger font sizes. */
+  min-height: calc(32px * var(--composer-scale));
   padding: calc(5px * var(--composer-scale)) 0;
   background: transparent;
   border: none;
@@ -122,40 +126,45 @@
 /* ========== Special Char Picker Button ========== */
 @keyframes dice-rattle {
   0% {
-    transform: rotate(0deg);
+    transform: translateY(var(--picker-rest-y, 0)) rotate(0deg);
   }
 
   15% {
-    transform: rotate(12deg);
+    transform: translateY(var(--picker-rest-y, 0)) rotate(12deg);
   }
 
   30% {
-    transform: rotate(-10deg);
+    transform: translateY(var(--picker-rest-y, 0)) rotate(-10deg);
   }
 
   45% {
-    transform: rotate(8deg);
+    transform: translateY(var(--picker-rest-y, 0)) rotate(8deg);
   }
 
   60% {
-    transform: rotate(-6deg);
+    transform: translateY(var(--picker-rest-y, 0)) rotate(-6deg);
   }
 
   75% {
-    transform: rotate(4deg);
+    transform: translateY(var(--picker-rest-y, 0)) rotate(4deg);
   }
 
   90% {
-    transform: rotate(-2deg);
+    transform: translateY(var(--picker-rest-y, 0)) rotate(-2deg);
   }
 
   100% {
-    transform: rotate(0deg);
+    transform: translateY(var(--picker-rest-y, 0)) rotate(0deg);
   }
 }
 
 .char-picker-btn {
-  padding: 0 calc(8px * var(--composer-scale));
+  /* Square footprint matches the send-button slot on the opposite side so the
+     dice glyph centers in a fixed-size container instead of an auto-sized
+     button that follows the FFXIV font's intrinsic metrics. */
+  width: calc(32px * var(--composer-scale));
+  height: calc(32px * var(--composer-scale));
+  padding: 0;
   background: transparent;
   border: none;
   color: var(--text-primary);
@@ -168,13 +177,16 @@
 }
 
 .char-picker-icon {
-  font-family: 'FFXIV-Lodestone', var(--sys-font), sans-serif;
+  font-family: 'FFXIV-Lodestone', sans-serif;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   transform-origin: center;
   transition: color 0.15s;
   line-height: 1;
+  /* Icon-font baseline compensation — em-based so it tracks font size. */
+  --picker-rest-y: -0.09em;
+  transform: translateY(var(--picker-rest-y));
 }
 
 .char-picker-btn:hover .char-picker-icon {

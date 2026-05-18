@@ -166,7 +166,7 @@ function ChatInputRow({
           aria-label="Send"
           data-tooltip="Send Message"
         >
-          <SendHorizontal size={18} aria-hidden />
+          <SendHorizontal size={16} fill="currentColor" strokeWidth={0} aria-hidden />
         </button>
       </div>
       {showCharPicker && (
