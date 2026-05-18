@@ -40,7 +40,18 @@ export function ChannelSelect({ channels, value, onChange, tellMode = false }: P
         data-tooltip-pos="top"
         data-picker-open={open ? 'true' : undefined}
       >
-        <span className="channel-badge" style={getBadgeStyle(currentBadge)}>
+        {/* Trigger badge keeps the channel-badge layout/size (so labels of
+            different lengths don't shift surrounding elements) but the chip
+            frame is hidden so it reads as plain colored text. The transparent
+            border preserves the box dimensions defined by the global class. */}
+        <span
+          className="channel-badge"
+          style={{
+            ...getBadgeStyle(currentBadge),
+            background: 'transparent',
+            borderColor: 'transparent',
+          }}
+        >
           {currentBadge.label}
         </span>
         <ChevronDown

@@ -24,11 +24,13 @@
     transform 0.15s ease;
 }
 
-/* trigger badge: same design as message badges, all calc values multiplied by 1.2 */
+/* Trigger badge: same design as message badges (1.2× larger). composer-scale
+   (falling back to sys-scale outside the composer) keeps the badge floor-aligned
+   with the send-button slot when the user picks a small font size. */
 .ch-select-trigger :global(.channel-badge) {
-  min-width: calc(52px * var(--sys-scale, 1) * 1.2);
-  width: calc(52px * var(--sys-scale, 1) * 1.2);
-  font-size: calc(9.45px * var(--sys-scale, 1) * 1.2);
+  min-width: calc(52px * var(--composer-scale, var(--sys-scale, 1)) * 1.2);
+  width: calc(52px * var(--composer-scale, var(--sys-scale, 1)) * 1.2);
+  font-size: calc(9.45px * var(--composer-scale, var(--sys-scale, 1)) * 1.2);
 }
 
 .ch-select-trigger:hover {

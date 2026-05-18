@@ -1,5 +1,10 @@
 /* ========== Input Area ========== */
 .input-area {
+  /* The textarea's font-size is floored at 16px to dodge iOS Safari's
+     auto-zoom on focus, so every composer dimension that follows must share
+     the same floor: --composer-scale never goes below 1, even when the user
+     picks a font size smaller than the 15px baseline. */
+  --composer-scale: max(1, var(--sys-scale, 1));
   padding: 12px 16px;
   flex-shrink: 0;
   position: relative;
@@ -9,18 +14,36 @@
   background: var(--bg-primary);
 }
 
+/* Discord-style composer: controls anchored to the top edge of the row so
+   that, as the textarea wraps to additional lines, only the textarea grows
+   downward. Each child of the row sits in a 32px-tall slot with content
+   vertically centered; the textarea has matching vertical padding so its
+   first line shares the slot center with the surrounding controls. */
 .chat-input-wrapper {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   background: var(--bg-tertiary);
   border: 1px solid var(--border);
   border-radius: 8px;
-  padding: 12px 16px;
-  gap: 10px;
+  padding: calc(10px * var(--composer-scale));
+  gap: calc(8px * var(--composer-scale));
   transition:
     border-color 0.2s,
     box-shadow 0.2s;
   position: relative;
+}
+
+/* Fixed-height slot hosting each non-textarea control. min-height tracks the
+   textarea's 1-line height (see .chat-input) using the same --composer-scale. */
+.slot {
+  min-height: calc(32px * var(--composer-scale));
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.input-divider {
+  align-self: center;
 }
 
 .chat-input-wrapper:focus-within {
@@ -40,8 +63,6 @@
   flex: 1;
   min-width: 0;
   position: relative;
-  display: flex;
-  align-items: center;
 }
 
 .input-mirror {
@@ -49,17 +70,18 @@
   inset: 0;
   pointer-events: none;
   overflow: hidden;
-  display: flex;
-  align-items: center;
 }
 
 .mirror-text {
-  white-space: pre;
-  flex-shrink: 0;
+  display: block;
+  padding: calc(5px * var(--composer-scale)) 0;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  word-break: break-word;
   font-family: var(--chat-font);
   font-size: max(16px, 1em);
+  line-height: calc(22px * var(--composer-scale));
   color: transparent;
-  will-change: transform;
 }
 
 .overflow-highlight {
@@ -68,8 +90,13 @@
 }
 
 .chat-input {
+  display: block;
   width: 100%;
-  padding: 0;
+  /* (5px + 22px + 5px) × composer-scale = 32px × composer-scale for the 1-line
+     state, matching .slot min-height so the first line aligns with the
+     surrounding controls. composer-scale (defined on .input-area) is floored
+     at 1 so the textarea never renders below its 16px-font baseline height. */
+  padding: calc(5px * var(--composer-scale)) 0;
   background: transparent;
   border: none;
   color: var(--text-primary);
@@ -77,6 +104,15 @@
   font-size: max(16px, 1em); /* Prevent iOS Safari auto-zoom (triggers at < 16px) */
   outline: none;
   position: relative;
+  resize: none;
+  /* JS sets height = scrollHeight, so the textarea grows until max-height kicks in.
+     overflow-y: auto then lets the textarea scroll internally for very long messages. */
+  overflow-y: auto;
+  line-height: calc(22px * var(--composer-scale));
+  max-height: 30vh;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .chat-input::placeholder {
@@ -119,11 +155,11 @@
 }
 
 .char-picker-btn {
-  padding: 0 8px;
+  padding: 0 calc(8px * var(--composer-scale));
   background: transparent;
   border: none;
   color: var(--text-primary);
-  font-size: calc(18px * var(--sys-scale, 1));
+  font-size: calc(18px * var(--composer-scale));
   cursor: pointer;
   flex-shrink: 0;
   display: flex;
@@ -134,9 +170,9 @@
 .char-picker-icon {
   font-family: 'FFXIV-Lodestone', var(--sys-font), sans-serif;
   display: inline-flex;
-  align-items: flex-end;
+  align-items: center;
   justify-content: center;
-  transform-origin: bottom center;
+  transform-origin: center;
   transition: color 0.15s;
   line-height: 1;
 }
@@ -271,25 +307,24 @@
 /* ========== Input row inside tell container (no outer border) ========== */
 .tell-input-inner {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   background: var(--bg-tertiary);
-  padding: 12px 16px;
-  gap: 10px;
+  padding: calc(10px * var(--composer-scale));
+  gap: calc(8px * var(--composer-scale));
   position: relative;
   border-radius: 0 0 7px 7px;
 }
 
 /* ========== Send Button ========== */
 .send-btn {
-  width: calc(32px * var(--sys-scale, 1));
-  height: calc(32px * var(--sys-scale, 1));
+  width: calc(32px * var(--composer-scale));
+  height: calc(32px * var(--composer-scale));
   flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: center;
   border-radius: 6px;
   border: none;
-  margin-right: 4px;
   cursor: pointer;
   transition:
     background 0.15s,
@@ -311,8 +346,8 @@
 }
 
 .send-btn svg {
-  width: calc(16px * var(--sys-scale, 1));
-  height: calc(16px * var(--sys-scale, 1));
+  width: calc(16px * var(--composer-scale));
+  height: calc(16px * var(--composer-scale));
 }
 
 .send-btn:not(:disabled):hover {

@@ -1,7 +1,7 @@
-import { useRef, useState } from 'react';
-import type { KeyboardEvent } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import type { ClipboardEvent, KeyboardEvent } from 'react';
 import clsx from 'clsx';
-import { Pin, Send } from 'lucide-react';
+import { Pin, SendHorizontal } from 'lucide-react';
 import { useSettingsStore } from '../../store/settingsStore';
 import { useSessionStore } from '../../store/sessionStore';
 import styles from './InputArea.module.css';
@@ -35,6 +35,11 @@ function PinIcon() {
   return <Pin size="1em" aria-hidden />;
 }
 
+/** Strip every line break from a string. Game chat doesn't accept newlines. */
+function stripNewlines(text: string): string {
+  return text.replace(/[\r\n]+/g, '');
+}
+
 interface ChatInputRowProps {
   innerClass: string;
   sendChannels: ChannelOption[];
@@ -43,7 +48,7 @@ interface ChatInputRowProps {
   inTellMode: boolean;
   inputText: string;
   onInputChange: (text: string) => void;
-  onKeyDown: (e: KeyboardEvent<HTMLInputElement>) => void;
+  onKeyDown: (e: KeyboardEvent<HTMLTextAreaElement>) => void;
   placeholder: string;
   isConnected: boolean;
   showCharPicker: boolean;
@@ -72,17 +77,31 @@ function ChatInputRow({
   effectiveLimit,
   isOverLimit,
 }: ChatInputRowProps) {
-  const inputRef = useRef<HTMLInputElement>(null);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
   const mirrorTextRef = useRef<HTMLSpanElement>(null);
 
-  const syncScroll = () => {
-    if (inputRef.current && mirrorTextRef.current) {
-      mirrorTextRef.current.style.transform = `translateX(-${inputRef.current.scrollLeft}px)`;
-    }
-  };
+  // Match the mirror element's height so the overflow highlight stays aligned
+  // with the textarea as it grows vertically.
+  useEffect(() => {
+    const ta = inputRef.current;
+    if (!ta) return;
+    ta.style.height = 'auto';
+    ta.style.height = `${ta.scrollHeight}px`;
+  }, [inputText]);
 
-  const scheduleSync = () => {
-    requestAnimationFrame(syncScroll);
+  const handlePaste = (e: ClipboardEvent<HTMLTextAreaElement>) => {
+    const pasted = e.clipboardData.getData('text');
+    if (!/[\r\n]/.test(pasted)) return; // no newlines → let the browser handle it
+    e.preventDefault();
+    const cleaned = stripNewlines(pasted);
+    const ta = e.currentTarget;
+    const { selectionStart, selectionEnd, value } = ta;
+    const next = value.slice(0, selectionStart) + cleaned + value.slice(selectionEnd);
+    onInputChange(next);
+    // Restore the caret after React re-renders.
+    requestAnimationFrame(() => {
+      ta.selectionStart = ta.selectionEnd = selectionStart + cleaned.length;
+    });
   };
 
   const overflowIndex = isOverLimit
@@ -91,12 +110,16 @@ function ChatInputRow({
 
   return (
     <div className={innerClass}>
-      <ChannelSelect
-        channels={sendChannels}
-        value={selectedSendPrefix}
-        onChange={onChannelChange}
-        tellMode={inTellMode}
-      />
+      {/* Each control sits in a fixed-height "slot" so the textarea is the
+          only element that grows downward when the message wraps. */}
+      <div className={styles.slot}>
+        <ChannelSelect
+          channels={sendChannels}
+          value={selectedSendPrefix}
+          onChange={onChannelChange}
+          tellMode={inTellMode}
+        />
+      </div>
       <div className={styles['input-divider']} />
       <div className={styles['input-container']}>
         {isOverLimit && (
@@ -107,49 +130,45 @@ function ChatInputRow({
             </span>
           </div>
         )}
-        <input
+        <textarea
           ref={inputRef}
-          type="text"
+          rows={1}
           className={styles['chat-input']}
           placeholder={placeholder}
           value={inputText}
-          onChange={(e) => {
-            onInputChange(e.target.value);
-            scheduleSync();
-          }}
-          onKeyDown={(e) => {
-            onKeyDown(e);
-            scheduleSync();
-          }}
-          onScroll={syncScroll}
-          onClick={scheduleSync}
-          onSelect={scheduleSync}
+          onChange={(e) => onInputChange(stripNewlines(e.target.value))}
+          onKeyDown={onKeyDown}
+          onPaste={handlePaste}
           disabled={!isConnected}
           autoFocus
         />
       </div>
-      <button
-        type="button"
-        className={styles['char-picker-btn']}
-        onMouseDown={(e) => e.stopPropagation()}
-        onClick={onToggleCharPicker}
-        aria-label="Emotes & Symbols"
-        data-tooltip="Emotes & Symbols"
-        data-picker-open={showCharPicker ? 'true' : undefined}
-      >
-        <span className={styles['char-picker-icon']}>&#xE03E;</span>
-      </button>
-      <button
-        type="button"
-        className={styles['send-btn']}
-        onClick={onSend}
-        disabled={!inputText.trim() || !isConnected || isOverLimit}
-        data-over-limit={isOverLimit ? 'true' : undefined}
-        aria-label="Send"
-        data-tooltip="Send Message"
-      >
-        <Send size={16} aria-hidden />
-      </button>
+      <div className={styles.slot}>
+        <button
+          type="button"
+          className={styles['char-picker-btn']}
+          onMouseDown={(e) => e.stopPropagation()}
+          onClick={onToggleCharPicker}
+          aria-label="Emotes & Symbols"
+          data-tooltip="Emotes & Symbols"
+          data-picker-open={showCharPicker ? 'true' : undefined}
+        >
+          <span className={styles['char-picker-icon']}>&#xE03E;</span>
+        </button>
+      </div>
+      <div className={styles.slot}>
+        <button
+          type="button"
+          className={styles['send-btn']}
+          onClick={onSend}
+          disabled={!inputText.trim() || !isConnected || isOverLimit}
+          data-over-limit={isOverLimit ? 'true' : undefined}
+          aria-label="Send"
+          data-tooltip="Send Message"
+        >
+          <SendHorizontal size={18} aria-hidden />
+        </button>
+      </div>
       {showCharPicker && (
         <EmoteSymbolPicker
           onInsert={(text) => onInputChange(inputText + text)}
@@ -222,10 +241,12 @@ export function InputArea({
     setInputText('');
   };
 
-  const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
+  const handleKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === 'Enter') {
-      if (ctrlEnterToSend && !e.ctrlKey) return;
+      // The game's chat API doesn't accept newlines, so we never let Enter (or
+      // Shift+Enter) insert one — it either sends or is a no-op.
       e.preventDefault();
+      if (ctrlEnterToSend && !e.ctrlKey) return;
       handleSend();
     }
   };
