@@ -1,0 +1,6 @@
+#!/usr/bin/env sh
+# Lint staged frontend changes and run the full test suite before allowing the commit.
+# Set HUSKY=0 to skip this hook in an emergency, or pass `git commit --no-verify`.
+cd Http/Frontend || exit 1
+npx lint-staged || exit 1
+npm test --silent || exit 1

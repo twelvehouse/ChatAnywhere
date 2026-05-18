@@ -56,5 +56,10 @@
     "workerDirectory": [
       "public"
     ]
+  },
+  "lint-staged": {
+    "src/**/*.{ts,tsx}": [
+      "eslint"
+    ]
   }
 }
