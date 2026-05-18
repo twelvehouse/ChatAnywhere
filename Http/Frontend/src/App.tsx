@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 import styles from './App.module.css';
 import { addGfdStylesheet } from './lib/gfd';
@@ -187,20 +187,17 @@ function AppContent() {
     setActiveFilterName(name);
   };
 
-  const handleReset = useCallback(() => setSettingsEpoch((n) => n + 1), []);
+  const handleReset = () => setSettingsEpoch((n) => n + 1);
 
-  const handleEnablePersonalFilters = useCallback(
-    async (copyFromGlobal: boolean) => {
-      await enablePersonalFilters(copyFromGlobal);
-      setSettingsEpoch((n) => n + 1);
-    },
-    [enablePersonalFilters],
-  );
+  const handleEnablePersonalFilters = async (copyFromGlobal: boolean) => {
+    await enablePersonalFilters(copyFromGlobal);
+    setSettingsEpoch((n) => n + 1);
+  };
 
-  const handleDisablePersonalFilters = useCallback(async () => {
+  const handleDisablePersonalFilters = async () => {
     await disablePersonalFilters();
     setSettingsEpoch((n) => n + 1);
-  }, [disablePersonalFilters]);
+  };
 
   useEffect(() => {
     if (isConnected && !localPlayerName) {

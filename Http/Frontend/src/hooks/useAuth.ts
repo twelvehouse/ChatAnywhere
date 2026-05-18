@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { RELAY_ADDR } from '../constants/config';
 
 export type AuthStatus =
@@ -49,7 +49,7 @@ export function useAuth() {
     return () => window.removeEventListener('auth:unauthorized', handler);
   }, []);
 
-  const authenticate = useCallback(async (passcode: string): Promise<AuthResult> => {
+  const authenticate = async (passcode: string): Promise<AuthResult> => {
     try {
       const res = await fetch(`${RELAY_ADDR}/auth`, {
         method: 'POST',
@@ -66,7 +66,7 @@ export function useAuth() {
     } catch {
       return 'error';
     }
-  }, []);
+  };
 
   return { status, authenticate };
 }

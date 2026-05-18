@@ -1,5 +1,5 @@
 import type { UIEvent } from 'react';
-import { useEffect, useRef, useLayoutEffect, useCallback } from 'react';
+import { useEffect, useRef, useLayoutEffect } from 'react';
 import { MessageSquare, AlertCircle } from 'lucide-react';
 import { useSessionStore } from '../../store/sessionStore';
 import styles from './MessageList.module.css';
@@ -163,11 +163,11 @@ export function MessageList({
   }, [isLoadingOlder, messagesContainerRef]);
 
   // Wrap loadOlder to capture the current scrollHeight before the state update.
-  const handleLoadOlder = useCallback(() => {
+  const handleLoadOlder = () => {
     const container = messagesContainerRef.current;
     prevScrollHeightRef.current = container?.scrollHeight ?? 0;
     loadOlder();
-  }, [loadOlder, messagesContainerRef]);
+  };
 
   // IntersectionObserver on the top sentinel: triggers a page load when the user
   // scrolls far enough toward the top of the message list.

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useCallback, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { Dispatch, SetStateAction } from 'react';
 import { RELAY_ADDR } from '../constants/config';
 import { dispatchUnauthorized } from '../lib/authEvent';
@@ -51,7 +51,7 @@ export function usePaginatedHistory(setMessages: Dispatch<SetStateAction<ChatMes
   }, [setMessages]);
 
   // Load an older page of messages and prepend to the list.
-  const loadOlder = useCallback(() => {
+  const loadOlder = () => {
     if (isLoadingRef.current || !hasMoreRef.current) return;
     const before = oldestTimestampRef.current;
     if (before === null) return;
@@ -84,7 +84,7 @@ export function usePaginatedHistory(setMessages: Dispatch<SetStateAction<ChatMes
         isLoadingRef.current = false;
         setIsLoadingOlder(false);
       });
-  }, [setMessages]);
+  };
 
   return { loadOlder, hasMore, isLoadingOlder };
 }

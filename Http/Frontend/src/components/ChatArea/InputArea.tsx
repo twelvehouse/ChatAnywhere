@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import type { KeyboardEvent } from 'react';
 import clsx from 'clsx';
 import { Pin, Send } from 'lucide-react';
@@ -75,15 +75,15 @@ function ChatInputRow({
   const inputRef = useRef<HTMLInputElement>(null);
   const mirrorTextRef = useRef<HTMLSpanElement>(null);
 
-  const syncScroll = useCallback(() => {
+  const syncScroll = () => {
     if (inputRef.current && mirrorTextRef.current) {
       mirrorTextRef.current.style.transform = `translateX(-${inputRef.current.scrollLeft}px)`;
     }
-  }, []);
+  };
 
-  const scheduleSync = useCallback(() => {
+  const scheduleSync = () => {
     requestAnimationFrame(syncScroll);
-  }, [syncScroll]);
+  };
 
   const overflowIndex = isOverLimit
     ? findOverflowIndex(inputText, effectiveLimit)
