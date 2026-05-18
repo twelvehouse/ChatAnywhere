@@ -147,7 +147,17 @@ ChatAnywhere would not exist without these projects:
 | [NetStone](https://github.com/xivapi/NetStone) | Lodestone character avatar lookups |
 | [OpenGraph-Net](https://github.com/ghorsey/OpenGraph-Net) | URL Open Graph preview metadata |
 | [Watson.Lite](https://github.com/jchristn/WatsonWebserver) | Embedded HTTP server and SSE support |
+| [React](https://react.dev/) + [React Compiler](https://react.dev/learn/react-compiler) | Frontend framework with automatic memoization |
+| [Vite](https://vitejs.dev/) | Build tool and dev server |
+| [TanStack Query](https://tanstack.com/query) | Server-state caching and request deduplication |
+| [Zustand](https://github.com/pmndrs/zustand) | Client-state management (settings, session) |
 | [@dnd-kit](https://dndkit.com/) | Drag-and-drop filter and folder reordering |
+| [react-error-boundary](https://github.com/bvaughn/react-error-boundary) | Error boundary for the message list |
+| [lucide-react](https://lucide.dev/) | Icon set |
+| [clsx](https://github.com/lukeed/clsx) | Conditional className composition |
+| [Vitest](https://vitest.dev/) + [Testing Library](https://testing-library.com/) | Unit and component testing |
+| [MSW](https://mswjs.io/) | HTTP mocking shared between tests and the `?demo` page |
+| [Husky](https://typicode.github.io/husky/) + [lint-staged](https://github.com/lint-staged/lint-staged) | Pre-commit lint + test gate |
 
 > **A note on ChatTwo:**
 > This project started as a fork of similar functionality found in ChatTwo. It has been largely rewritten for my own needs, but some code and approaches remain. Thanks for the OSS.
