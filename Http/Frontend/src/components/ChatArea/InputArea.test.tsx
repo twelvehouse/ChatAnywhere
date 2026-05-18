@@ -9,7 +9,7 @@ import { useSessionStore } from '../../store/sessionStore';
 
 const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
 
-const channels: ChannelOption[] = [{ label: 'Say', shortLabel: 'Say', prefix: '/s ' }];
+const channels: ChannelOption[] = [{ label: 'Say', prefix: '/s ' }];
 
 function renderInput(overrides?: Partial<Parameters<typeof InputArea>[0]>) {
   const onSend = vi.fn();
