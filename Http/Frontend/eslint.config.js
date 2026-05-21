@@ -21,6 +21,8 @@ export default tseslint.config(
     rules: {
       ...reactHooks.configs.recommended.rules,
       'react-refresh/only-export-components': ['warn', { allowConstantExport: true }],
+      // React Compiler handles memoization automatically, so exhaustive-deps warnings are noise.
+      'react-hooks/exhaustive-deps': 'off',
       // React Compiler rules (v7+): downgrade to warn — these patterns are intentional in this project.
       // refs-during-render: used to keep refs in sync with state for event handlers/effects.
       // set-state-in-effect: used for conditional early-return guards in effects.
