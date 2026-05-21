@@ -1,6 +1,6 @@
 import { useState, useRef } from 'react';
 import clsx from 'clsx';
-import { ChevronDown, Check } from 'lucide-react';
+import { ChevronDown, Check, Lock } from 'lucide-react';
 import styles from './ChannelSelect.module.css';
 import { useOnClickOutside } from '../../hooks/useOnClickOutside';
 import { FALLBACK_CHANNEL } from '../../constants/channels';
@@ -15,9 +15,16 @@ interface Props {
   value: string;
   onChange: (prefix: string) => void;
   tellMode?: boolean;
+  locked?: boolean;
 }
 
-export function ChannelSelect({ channels, value, onChange, tellMode = false }: Props) {
+export function ChannelSelect({
+  channels,
+  value,
+  onChange,
+  tellMode = false,
+  locked = false,
+}: Props) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
   const theme = useTheme();
@@ -36,10 +43,11 @@ export function ChannelSelect({ channels, value, onChange, tellMode = false }: P
     <div className={styles['ch-select']} ref={ref}>
       <button
         type="button"
-        className={styles['ch-select-trigger']}
-        onClick={() => setOpen((o) => !o)}
-        tabIndex={0}
-        data-tooltip="Switch Channel"
+        className={clsx(styles['ch-select-trigger'], locked && styles.locked)}
+        onClick={locked ? undefined : () => setOpen((o) => !o)}
+        tabIndex={locked ? -1 : 0}
+        aria-disabled={locked || undefined}
+        data-tooltip={locked ? undefined : 'Switch Channel'}
         data-tooltip-pos="top"
         data-picker-open={open ? 'true' : undefined}
       >
@@ -57,16 +65,26 @@ export function ChannelSelect({ channels, value, onChange, tellMode = false }: P
         >
           {currentBadge.label}
         </span>
-        <ChevronDown
-          className={clsx(styles['ch-select-chevron'], open && styles.open)}
-          size={12}
-          strokeWidth={1.5}
-          color={currentBadgeColor}
-          aria-hidden
-        />
+        {locked ? (
+          <Lock
+            className={styles['ch-select-chevron']}
+            size={11}
+            strokeWidth={2}
+            color={currentBadgeColor}
+            aria-hidden
+          />
+        ) : (
+          <ChevronDown
+            className={clsx(styles['ch-select-chevron'], open && styles.open)}
+            size={12}
+            strokeWidth={1.5}
+            color={currentBadgeColor}
+            aria-hidden
+          />
+        )}
       </button>
 
-      {open && (
+      {open && !locked && (
         <div className={styles['ch-select-menu']}>
           {channels.map((ch) => {
             const badge = getBadgeInfoByPrefix(ch.prefix);

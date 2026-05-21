@@ -47,6 +47,7 @@ interface ChatInputRowProps {
   selectedSendPrefix: string;
   onChannelChange: (prefix: string) => void;
   inTellMode: boolean;
+  isDmView: boolean;
   inputText: string;
   onInputChange: (text: string) => void;
   onKeyDown: (e: KeyboardEvent<HTMLTextAreaElement>) => void;
@@ -66,6 +67,7 @@ function ChatInputRow({
   selectedSendPrefix,
   onChannelChange,
   inTellMode,
+  isDmView,
   inputText,
   onInputChange,
   onKeyDown,
@@ -119,6 +121,7 @@ function ChatInputRow({
           value={selectedSendPrefix}
           onChange={onChannelChange}
           tellMode={inTellMode}
+          locked={isDmView}
         />
       </div>
       <div className={styles['input-divider']} />
@@ -258,6 +261,7 @@ export function InputArea({
     selectedSendPrefix,
     onChannelChange: handleChannelChange,
     inTellMode,
+    isDmView,
     inputText,
     onInputChange: setInputText,
     onKeyDown: handleKeyDown,

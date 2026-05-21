@@ -41,6 +41,11 @@
   /* Misc surface tints */
   --connector: rgb(255, 255, 255, 0.15);
 
+  /* Tooltip */
+  --tooltip-bg: #2c303d;
+  --tooltip-fg: var(--text-primary);
+  --tooltip-border: var(--border);
+
   /* Shared Font Stack for Chat */
   --chat-font: var(--sys-font, 'Inter'), 'FFXIV-Lodestone', system-ui, -apple-system, sans-serif;
 }
@@ -88,6 +93,9 @@
   --shadow-md: 0 4px 16px rgb(0, 0, 0, 0.1);
   --shadow-input: 0 -4px 12px rgb(0, 0, 0, 0.06);
   --connector: rgb(0, 0, 0, 0.15);
+  --tooltip-bg: var(--bg-primary);
+  --tooltip-fg: var(--text-primary);
+  --tooltip-border: rgb(0, 0, 0, 0.12);
 }
 
 /* ========== Reset & Base ========== */
@@ -156,8 +164,8 @@ body {
   left: 50%;
   transform: translateX(-50%) translateY(4px);
   padding: 6px 10px;
-  background: var(--bg-tertiary);
-  color: var(--text-primary);
+  background: var(--tooltip-bg);
+  color: var(--tooltip-fg);
   font-family: var(--chat-font), sans-serif;
   font-size: 0.75rem;
   font-weight: 600;
@@ -165,7 +173,7 @@ body {
   white-space: nowrap;
   border-radius: 6px;
   box-shadow: var(--shadow-md);
-  border: 1px solid var(--border);
+  border: 1px solid var(--tooltip-border);
   opacity: 0;
   pointer-events: none;
   transition:
@@ -182,7 +190,9 @@ body {
   left: 50%;
   transform: translateX(-50%);
   border: 5px solid transparent;
-  border-top-color: var(--border);
+  /* Arrow fill matches body; drop-shadow adds the border outline. */
+  border-top-color: var(--tooltip-bg);
+  filter: drop-shadow(0 1px 0 var(--tooltip-border));
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.2s ease;
@@ -209,7 +219,8 @@ body {
   bottom: auto;
   top: calc(100% + 1px);
   border-top-color: transparent;
-  border-bottom-color: var(--border);
+  border-bottom-color: var(--tooltip-bg);
+  filter: drop-shadow(0 -1px 0 var(--tooltip-border));
 }
 
 [data-tooltip][data-tooltip-pos='bottom']:hover::before {

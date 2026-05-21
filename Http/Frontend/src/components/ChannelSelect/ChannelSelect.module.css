@@ -18,10 +18,6 @@
   font-family: inherit;
   font-size: inherit;
   cursor: pointer;
-  transition:
-    filter 0.15s,
-    opacity 0.15s,
-    transform 0.15s ease;
 }
 
 /* Trigger badge: same design as message badges (1.2× larger). composer-scale
@@ -33,9 +29,23 @@
   font-size: calc(9.45px * var(--composer-scale, var(--sys-scale, 1)) * 1.2);
 }
 
-.ch-select-trigger:hover {
+/* Hover feedback is applied to the inner badge/chevron, NOT the trigger, so
+   the tooltip pseudo-element on the trigger doesn't inherit the filter. */
+.ch-select-trigger :global(.channel-badge),
+.ch-select-trigger .ch-select-chevron {
+  transition:
+    filter 0.15s,
+    opacity 0.15s;
+}
+
+.ch-select-trigger:hover :global(.channel-badge),
+.ch-select-trigger:hover .ch-select-chevron {
   filter: brightness(1.2);
   opacity: 0.8;
+}
+
+.ch-select-trigger.locked {
+  cursor: default;
 }
 
 .ch-select-chevron {
