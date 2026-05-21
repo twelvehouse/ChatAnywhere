@@ -64,6 +64,9 @@
   "lint-staged": {
     "src/**/*.{ts,tsx}": [
       "eslint"
+    ],
+    "src/**/*.css": [
+      "stylelint"
     ]
   }
 }
