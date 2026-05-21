@@ -1,12 +1,15 @@
 import { create } from 'zustand';
 import type { CustomFilter, FilterFolder } from '../types/filter';
 
+export type ThemeMode = 'dark' | 'light' | 'system';
+
 /**
  * Mirrors the C# FrontendSettings schema and is the single source of truth
  * for everything persisted via /settings (PUT/GET). Reply state and other
  * transient UI state belong in separate stores.
  */
 export interface SettingsState {
+  theme: ThemeMode;
   fontFamily: string;
   fontSize: number;
   italicizeSystem: boolean;
@@ -24,6 +27,7 @@ export interface SettingsState {
 }
 
 interface SettingsActions {
+  setTheme: (v: ThemeMode) => void;
   setFontFamily: (v: string) => void;
   setFontSize: (v: number) => void;
   setItalicizeSystem: (v: boolean) => void;
@@ -43,6 +47,7 @@ interface SettingsActions {
 }
 
 export const useSettingsStore = create<SettingsState & SettingsActions>((set) => ({
+  theme: 'dark',
   fontFamily: 'Inter',
   fontSize: 14,
   italicizeSystem: true,
@@ -58,6 +63,7 @@ export const useSettingsStore = create<SettingsState & SettingsActions>((set) =>
   retainSyncSendPrefix: true,
   largeLinkPreviews: false,
 
+  setTheme: (v) => set({ theme: v }),
   setFontFamily: (v) => set({ fontFamily: v }),
   setFontSize: (v) => set({ fontSize: v }),
   setItalicizeSystem: (v) => set({ italicizeSystem: v }),

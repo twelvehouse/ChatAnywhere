@@ -8,8 +8,9 @@
   --bg-primary: #13141a;
   --bg-secondary: #1a1c24;
   --bg-tertiary: #22252f;
-  --bg-hover: rgba(255, 255, 255, 0.04);
-  --bg-active: rgba(137, 180, 250, 0.15);
+  --bg-hover: rgb(255, 255, 255, 0.04);
+  --bg-active: rgb(137, 180, 250, 0.15);
+  --message-hover: rgb(255, 255, 255, 0.035);
 
   /* Text */
   --text-primary: #cdd6f4;
@@ -26,18 +27,67 @@
   --offline: #f38ba8;
 
   /* Borders */
-  --border: rgba(255, 255, 255, 0.06);
-  --border-focus: rgba(137, 180, 250, 0.5);
+  --border: rgb(255, 255, 255, 0.06);
+  --border-focus: rgb(137, 180, 250, 0.5);
 
   /* Sidebar */
   --sidebar-width: 240px;
 
   /* Shadows */
-  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.4);
-  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.5);
+  --shadow-sm: 0 1px 3px rgb(0, 0, 0, 0.4);
+  --shadow-md: 0 4px 16px rgb(0, 0, 0, 0.5);
+  --shadow-input: 0 -4px 12px rgb(0, 0, 0, 0.15);
+
+  /* Misc surface tints */
+  --connector: rgb(255, 255, 255, 0.15);
 
   /* Shared Font Stack for Chat */
   --chat-font: var(--sys-font, 'Inter'), 'FFXIV-Lodestone', system-ui, -apple-system, sans-serif;
+}
+
+/* Derived once — picks up the active theme's --offline at use time. */
+:root {
+  --overflow-highlight: color-mix(in srgb, var(--offline) 35%, transparent);
+}
+
+/* ========== Design Tokens (Light Theme) ==========
+ *
+ * Derivation logic (see Claude Design "Light Mode Preview" handoff):
+ *  bg-*     : invert luminance of the dark token (oklch approx, L_light ≈ 1 − L_dark)
+ *  text-*   : same luminance inversion
+ *  accent   : keep hue 220, retune luminance to satisfy WCAG AA (4.5:1) on white
+ *  online/offline: keep hue, retune luminance for white-bg contrast
+ *  border   : rgba(white, x) → rgba(black, x) (flip channel)
+ *  shadow   : opacity × 0.20 — dark shadows are invisible on dark bg, but
+ *             clearly visible on light bg, so the visually-equivalent value is
+ *             much lower (0.40 × 0.20 = 0.08, 0.50 × 0.20 = 0.10).
+ *  Channel badge colors are adapted per-instance at render time via
+ *  adaptChannelColor() (lib/channelUtils.ts), not via tokens.
+ */
+.theme-light {
+  --bg-base: #edf0f7;
+  --bg-primary: #f3f4fa;
+  --bg-secondary: #eaecf2;
+  --bg-tertiary: #e0e3ec;
+  --bg-hover: rgb(0, 0, 0, 0.04);
+  --bg-active: rgb(74, 125, 220, 0.1);
+  --message-hover: rgb(0, 0, 0, 0.035);
+  --text-primary: #1e2030;
+  --text-secondary: #4c527a;
+  --text-chat: #363b5a;
+  --text-dim: #6b7194;
+  --text-muted: #9399b2;
+  --text-accent: #4a7de6;
+  --accent: #4a7de6;
+  --accent-dim: rgb(74, 125, 220, 0.15);
+  --online: #2a9e52;
+  --offline: #c93b5c;
+  --border: rgb(0, 0, 0, 0.08);
+  --border-focus: rgb(74, 125, 220, 0.4);
+  --shadow-sm: 0 1px 4px rgb(0, 0, 0, 0.08);
+  --shadow-md: 0 4px 16px rgb(0, 0, 0, 0.1);
+  --shadow-input: 0 -4px 12px rgb(0, 0, 0, 0.06);
+  --connector: rgb(0, 0, 0, 0.15);
 }
 
 /* ========== Reset & Base ========== */
@@ -59,8 +109,8 @@ body,
 
 body {
   font-family:
-    'Inter',
-    'FFXIV-Lodestone',
+    Inter,
+    FFXIV-Lodestone,
     system-ui,
     -apple-system,
     sans-serif;
@@ -72,7 +122,7 @@ body {
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
   /* Windows rendering fix: Force clean edges with a very subtle shadow and smoothing */
-  text-shadow: 0 0 1px rgba(0, 0, 0, 0.01);
+  text-shadow: 0 0 1px rgb(0, 0, 0, 0.01);
 }
 
 /* ========== Scrollbar ========== */
@@ -266,27 +316,12 @@ body {
   white-space: nowrap;
 }
 
-/* backwards compatibility alias */
-.message-badge {
-  font-size: 0.65em;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  border: 1px solid;
-  border-radius: 3px;
-  padding: 0 5px;
-  line-height: 1.6;
-}
-
 /* ========== Shared UI: Modal Overlay ========== */
 /* Used in SettingsModal and LinkConfirmModal */
 .modal-overlay {
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.65);
+  inset: 0 0 0 0;
+  background: rgb(0, 0, 0, 0.65);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -379,7 +414,7 @@ body {
   transition:
     transform 0.25s cubic-bezier(0.4, 0, 0.2, 1),
     background 0.25s;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 1px 4px rgb(0, 0, 0, 0.3);
 }
 
 .toggle-switch.on .toggle-knob {
@@ -432,11 +467,8 @@ body {
   display: flex;
   flex-direction: column;
   padding: calc(6px * var(--sys-scale, 1)) calc(20px * var(--sys-scale, 1));
-  border-left: 2px solid transparent;
   transition:
     background 0.15s,
-    border-color 0.15s,
-    padding-left 0.15s,
     filter 0.15s;
   animation: msg-in 0.25s cubic-bezier(0.25, 0.8, 0.25, 1) both;
 }
@@ -449,7 +481,7 @@ body {
 }
 
 .message:hover {
-  background: rgba(255, 255, 255, 0.035) !important;
+  background: var(--message-hover) !important;
 }
 
 .message-avatar {
@@ -494,7 +526,7 @@ body {
   font-family: var(--chat-font);
   color: var(--text-chat);
   line-height: 1.5;
-  word-break: break-word;
+  overflow-wrap: anywhere;
 }
 
 .message-content.message-content-system {
@@ -565,8 +597,8 @@ body {
   top: 50%;
   bottom: calc(-4px * var(--sys-scale, 1));
   width: calc(29px * var(--sys-scale, 1));
-  border-left: 2px solid rgba(255, 255, 255, 0.15);
-  border-top: 2px solid rgba(255, 255, 255, 0.15);
+  border-left: 2px solid var(--connector);
+  border-top: 2px solid var(--connector);
   border-top-left-radius: 6px;
 }
 

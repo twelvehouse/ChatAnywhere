@@ -126,8 +126,7 @@
 /* ========== Scrollable emote list ========== */
 .emote-list {
   flex: 1;
-  overflow-y: auto;
-  overflow-x: hidden;
+  overflow: hidden auto;
   scrollbar-width: thin;
   scrollbar-color: var(--bg-tertiary) transparent;
 }
@@ -261,7 +260,7 @@
 
 .history-divider {
   height: 1px;
-  background: rgba(255, 255, 255, 0.15);
+  background: rgb(255, 255, 255, 0.15);
   margin: calc(4px * var(--sys-scale, 1)) calc(10px * var(--sys-scale, 1));
 }
 

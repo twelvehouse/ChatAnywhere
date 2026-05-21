@@ -11,7 +11,7 @@
   display: flex;
   flex-direction: column;
   z-index: 200;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 8px 32px rgb(0, 0, 0, 0.4);
   overflow: hidden;
 }
 
@@ -46,17 +46,17 @@
 
 .tab-btn:hover {
   color: var(--text-secondary);
-  background: rgba(255, 255, 255, 0.04);
+  background: rgb(255, 255, 255, 0.04);
 }
 
 .tab-btn.active {
   background: var(--bg-secondary);
   color: var(--text-primary);
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 1px 4px rgb(0, 0, 0, 0.3);
 }
 
 /* Smartphone */
-@media (max-width: 600px) {
+@media (width <= 600px) {
   .picker {
     position: fixed;
     bottom: 72px;

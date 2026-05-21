@@ -1,8 +1,7 @@
 /* ========== Symbols Tab ========== */
 .scroll {
   flex: 1;
-  overflow-y: auto;
-  overflow-x: hidden;
+  overflow: hidden auto;
   padding: calc(8px * var(--sys-scale, 1)) calc(6px * var(--sys-scale, 1));
   scrollbar-width: thin;
   scrollbar-color: var(--bg-tertiary) transparent;
@@ -47,7 +46,7 @@
 }
 
 .char-btn {
-  font-family: 'FFXIV-Lodestone', var(--sys-font), sans-serif;
+  font-family: FFXIV-Lodestone, var(--sys-font), sans-serif;
   font-size: calc(18px * var(--sys-scale, 1));
   width: 100%;
   aspect-ratio: 1;
@@ -71,11 +70,11 @@
 }
 
 .char-btn:active {
-  background: rgba(88, 101, 242, 0.25);
+  background: rgb(88, 101, 242, 0.25);
   transform: scale(0.82);
 }
 
-@media (max-width: 600px) {
+@media (width <= 600px) {
   .grid {
     grid-template-columns: repeat(8, 1fr);
   }

@@ -32,6 +32,8 @@ const PREVIEW_EMOTE: ChatMessage = {
 const NOOP = () => {};
 
 export function AppearanceSettings() {
+  const theme = useSettingsStore((s) => s.theme);
+  const setTheme = useSettingsStore((s) => s.setTheme);
   const fontFamily = useSettingsStore((s) => s.fontFamily);
   const fontSize = useSettingsStore((s) => s.fontSize);
   const italicizeSystem = useSettingsStore((s) => s.italicizeSystem);
@@ -63,6 +65,24 @@ export function AppearanceSettings() {
           tellModeAll={false}
           onReply={NOOP}
         />
+      </div>
+
+      <div className="form-section">
+        <div className="form-section-title">THEME</div>
+        <div className={styles['theme-radio-group']} role="radiogroup" aria-label="Theme">
+          {(['light', 'dark', 'system'] as const).map((mode) => (
+            <button
+              key={mode}
+              type="button"
+              role="radio"
+              aria-checked={theme === mode}
+              className={clsx(styles['theme-radio'], theme === mode && styles.active)}
+              onClick={() => setTheme(mode)}
+            >
+              {mode === 'light' ? 'Light' : mode === 'dark' ? 'Dark' : 'System'}
+            </button>
+          ))}
+        </div>
       </div>
 
       <div className="form-section">

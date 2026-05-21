@@ -4,7 +4,8 @@ import { ChevronDown, Check } from 'lucide-react';
 import styles from './ChannelSelect.module.css';
 import { useOnClickOutside } from '../../hooks/useOnClickOutside';
 import { FALLBACK_CHANNEL } from '../../constants/channels';
-import { getBadgeInfoByPrefix, getBadgeStyle, getChannelInfo } from '../../lib/channelUtils';
+import { getBadgeInfoByPrefix, getChannelInfo } from '../../lib/channelUtils';
+import { useTheme } from '../../hooks/useTheme';
 import type { ChannelOption } from '../../types/chat';
 
 const TELL_BADGE = getChannelInfo(12);
@@ -19,6 +20,7 @@ interface Props {
 export function ChannelSelect({ channels, value, onChange, tellMode = false }: Props) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
+  const theme = useTheme();
 
   const current = channels.find((c) => c.prefix === value) ?? channels[0];
   const currentBadge = tellMode
@@ -26,6 +28,7 @@ export function ChannelSelect({ channels, value, onChange, tellMode = false }: P
     : current
       ? getBadgeInfoByPrefix(current.prefix)
       : FALLBACK_CHANNEL;
+  const currentBadgeColor = theme.channelTextColor(currentBadge);
 
   useOnClickOutside(ref, () => setOpen(false), open);
 
@@ -47,7 +50,7 @@ export function ChannelSelect({ channels, value, onChange, tellMode = false }: P
         <span
           className="channel-badge"
           style={{
-            ...getBadgeStyle(currentBadge),
+            ...theme.badgeStyle(currentBadge),
             background: 'transparent',
             borderColor: 'transparent',
           }}
@@ -58,7 +61,7 @@ export function ChannelSelect({ channels, value, onChange, tellMode = false }: P
           className={clsx(styles['ch-select-chevron'], open && styles.open)}
           size={12}
           strokeWidth={1.5}
-          color={currentBadge.color}
+          color={currentBadgeColor}
           aria-hidden
         />
       </button>
@@ -67,6 +70,7 @@ export function ChannelSelect({ channels, value, onChange, tellMode = false }: P
         <div className={styles['ch-select-menu']}>
           {channels.map((ch) => {
             const badge = getBadgeInfoByPrefix(ch.prefix);
+            const badgeColor = theme.channelTextColor(badge);
             const active = ch.prefix === value;
             return (
               <button
@@ -74,15 +78,15 @@ export function ChannelSelect({ channels, value, onChange, tellMode = false }: P
                 type="button"
                 className={clsx(styles['ch-select-item'], active && styles.active)}
                 style={{
-                  color: badge.color,
-                  background: active ? `${badge.color}22` : undefined,
+                  color: badgeColor,
+                  background: active ? theme.channelSelectActiveBg(badge) : undefined,
                 }}
                 onClick={() => {
                   onChange(ch.prefix);
                   setOpen(false);
                 }}
               >
-                <span className={styles['ch-select-item-badge']} style={{ color: badge.color }}>
+                <span className={styles['ch-select-item-badge']} style={{ color: badgeColor }}>
                   {badge.label}
                 </span>
                 <span className={styles['ch-select-item-label']}>{ch.label}</span>
@@ -91,7 +95,7 @@ export function ChannelSelect({ channels, value, onChange, tellMode = false }: P
                     className={styles['ch-select-check']}
                     size={12}
                     strokeWidth={1.8}
-                    color={badge.color}
+                    color={badgeColor}
                     aria-hidden
                   />
                 )}

@@ -59,7 +59,7 @@
 
 .remove-domain-btn:hover {
   color: var(--offline);
-  background: rgba(243, 139, 168, 0.1);
+  background: rgb(243, 139, 168, 0.1);
 }
 
 .empty-state {

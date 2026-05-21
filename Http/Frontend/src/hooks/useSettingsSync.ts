@@ -4,6 +4,7 @@ import { RELAY_ADDR } from '../constants/config';
 import type { CustomFilter, FilterFolder } from '../types/filter';
 import { TRACKED_CHANNEL_TYPES } from '../constants/channels';
 import { useSettingsStore, type SettingsState } from '../store/settingsStore';
+import { cacheTheme } from '../lib/themeBootstrap';
 
 const DEFAULT_FILTER: CustomFilter = {
   name: 'General',
@@ -50,6 +51,8 @@ export function useSettingsSync({ refetchEpoch, isLoggedIn, onFiltersReady }: Pr
     if (!serverSettings) return;
     const data = serverSettings;
     const patch: Partial<SettingsState> = {};
+    if (data.theme === 'light' || data.theme === 'dark' || data.theme === 'system')
+      patch.theme = data.theme;
     if (typeof data.fontFamily === 'string') patch.fontFamily = data.fontFamily;
     if (typeof data.fontSize === 'number') patch.fontSize = data.fontSize;
     if (typeof data.italicizeSystem === 'boolean') patch.italicizeSystem = data.italicizeSystem;
@@ -86,6 +89,10 @@ export function useSettingsSync({ refetchEpoch, isLoggedIn, onFiltersReady }: Pr
       useSettingsStore.getState().hydrate(patch);
       onFiltersReadyRef.current(loadedFilters, loadedFolders);
     }
+
+    // Cache here, not via the subscribe below: hydrate runs before subscribe
+    // is registered, so the subscribe path would miss this initial change.
+    if (patch.theme) cacheTheme(patch.theme);
   }, [serverSettings]);
 
   // Debounced PUT to server whenever any settings field changes (after initial load).
@@ -94,6 +101,9 @@ export function useSettingsSync({ refetchEpoch, isLoggedIn, onFiltersReady }: Pr
     const unsubscribe = useSettingsStore.subscribe((state, prev) => {
       // Skip if nothing relevant changed (action functions are stable references)
       if (state === prev) return;
+      // Theme cache is written immediately (not debounced) so a reload
+      // before the debounced PUT lands still reflects the user's choice.
+      if (state.theme !== prev.theme) cacheTheme(state.theme);
       if (!isLoggedInRef.current) return;
       if (timerRef.current) clearTimeout(timerRef.current);
       timerRef.current = setTimeout(() => {
@@ -104,6 +114,7 @@ export function useSettingsSync({ refetchEpoch, isLoggedIn, onFiltersReady }: Pr
           credentials: 'include',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
+            theme: s.theme,
             fontFamily: s.fontFamily,
             fontSize: s.fontSize,
             italicizeSystem: s.italicizeSystem,

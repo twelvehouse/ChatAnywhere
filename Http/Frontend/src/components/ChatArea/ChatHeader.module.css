@@ -45,7 +45,7 @@
   background: var(--bg-hover);
 }
 
-@media (max-width: 768px) {
+@media (width <= 768px) {
   .hamburger-btn {
     display: flex;
     align-items: center;

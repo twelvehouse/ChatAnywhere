@@ -2,7 +2,7 @@
   position: fixed;
   inset: 0;
   z-index: 600;
-  background: rgba(0, 0, 0, 0.6);
+  background: rgb(0, 0, 0, 0.6);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -112,7 +112,7 @@
 
 .char-item.selected {
   border-color: var(--accent, #89b4fa);
-  background: rgba(137, 180, 250, 0.08);
+  background: rgb(137, 180, 250, 0.08);
   color: var(--text-primary);
 }
 
@@ -167,12 +167,12 @@
 
 .tree-folder-row.folder-checked {
   border-color: var(--accent, #89b4fa);
-  background: rgba(137, 180, 250, 0.08);
+  background: rgb(137, 180, 250, 0.08);
 }
 
 .tree-folder-row.folder-indeterminate {
-  border-color: rgba(137, 180, 250, 0.45);
-  background: rgba(137, 180, 250, 0.04);
+  border-color: rgb(137, 180, 250, 0.45);
+  background: rgb(137, 180, 250, 0.04);
 }
 
 .tree-folder-icon {
@@ -210,7 +210,7 @@
 }
 
 .tree-leaf.leaf-selected {
-  background: rgba(137, 180, 250, 0.08);
+  background: rgb(137, 180, 250, 0.08);
   color: var(--text-primary);
   border-left: 2px solid var(--accent, #89b4fa);
   padding-left: 10px;

@@ -6,6 +6,7 @@ import { usePaginatedHistory } from './hooks/useHistory';
 import { useScrollBehavior } from './hooks/useScrollBehavior';
 import { useSSE } from './hooks/useSSE';
 import { useSettingsSync } from './hooks/useSettingsSync';
+import { useEffectiveTheme } from './hooks/useEffectiveTheme';
 import { useFilterManagement } from './hooks/useFilterManagement';
 import { useAuth } from './hooks/useAuth';
 import { useSettingsStore } from './store/settingsStore';
@@ -259,10 +260,11 @@ function AppContent() {
     lastGameChannelRef,
   });
 
-  // ── Font effects ───────────────────────────────────────────────
+  // ── Theme class on <body> tracks the *effective* theme (system → resolved) ──
+  const effectiveTheme = useEffectiveTheme();
   useEffect(() => {
-    document.body.className = 'theme-dark';
-  }, []);
+    document.body.className = `theme-${effectiveTheme}`;
+  }, [effectiveTheme]);
 
   useEffect(() => {
     document.documentElement.style.setProperty('--sys-font', `"${fontFamily}"`);

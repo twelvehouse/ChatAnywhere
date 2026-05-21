@@ -10,7 +10,7 @@
   position: relative;
   z-index: 1;
   border-top: 1px solid var(--border);
-  box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.15);
+  box-shadow: var(--shadow-input);
   background: var(--bg-primary);
 }
 
@@ -43,19 +43,16 @@
 }
 
 .input-divider {
+  width: 1px;
+  height: calc(18px * var(--sys-scale, 1));
+  background: var(--border);
+  flex-shrink: 0;
   align-self: center;
 }
 
 .chat-input-wrapper:focus-within {
   border-color: var(--border-focus);
   box-shadow: 0 0 0 2px var(--accent-dim);
-}
-
-.input-divider {
-  width: 1px;
-  height: calc(18px * var(--sys-scale, 1));
-  background: var(--border);
-  flex-shrink: 0;
 }
 
 /* ========== Input container + overflow highlight mirror ========== */
@@ -77,7 +74,6 @@
   padding: calc(5px * var(--composer-scale)) 0;
   white-space: pre-wrap;
   overflow-wrap: anywhere;
-  word-break: break-word;
   font-family: var(--chat-font);
   font-size: max(16px, 1em);
   line-height: calc(22px * var(--composer-scale));
@@ -85,7 +81,7 @@
 }
 
 .overflow-highlight {
-  background: rgba(240, 71, 71, 0.35);
+  background: var(--overflow-highlight);
   border-radius: 2px;
 }
 
@@ -116,7 +112,6 @@
   max-height: 30vh;
   white-space: pre-wrap;
   overflow-wrap: anywhere;
-  word-break: break-word;
 }
 
 .chat-input::placeholder {
@@ -177,7 +172,7 @@
 }
 
 .char-picker-icon {
-  font-family: 'FFXIV-Lodestone', sans-serif;
+  font-family: FFXIV-Lodestone, sans-serif;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -212,14 +207,19 @@
   box-shadow: 0 0 0 2px var(--accent-dim);
 }
 
-/* ========== Tell Banner (sits inside container, above input) ========== */
+/* ========== Tell Banner (sits inside container, above input) ==========
+ *
+ * Tinted with the Tell channel color via CSS variables. InputArea always sets
+ * --tell-* inline (see theme/{dark,light}.ts → tellVars), so these var()
+ * lookups never need fallbacks.
+ */
 .tell-banner {
   display: flex;
   align-items: center;
   gap: calc(6px * var(--sys-scale, 1));
   padding: calc(6px * var(--sys-scale, 1)) calc(12px * var(--sys-scale, 1));
-  background: rgba(255, 105, 180, 0.08);
-  border-bottom: 1px solid rgba(255, 105, 180, 0.2);
+  background: var(--tell-bg);
+  border-bottom: 1px solid var(--tell-border);
   border-radius: 7px 7px 0 0;
   font-size: calc(12.5px * var(--sys-scale, 1));
   color: var(--text-secondary);
@@ -244,12 +244,11 @@
 .tell-banner-name {
   flex: 1;
   min-width: 0;
-  overflow-x: clip;
-  overflow-y: visible;
+  overflow: clip visible;
   text-overflow: ellipsis;
   white-space: nowrap;
   font-weight: 600;
-  color: rgb(255, 105, 180);
+  color: var(--tell-color);
   font-family: var(--chat-font);
   line-height: 1;
 }
@@ -283,13 +282,13 @@
 }
 
 .tell-pin-btn.pinned {
-  background: rgba(255, 105, 180, 0.12);
-  color: rgb(255, 105, 180);
-  border-color: rgba(255, 105, 180, 0.4);
+  background: var(--tell-pin-bg);
+  color: var(--tell-color);
+  border-color: var(--tell-pin-border);
 }
 
 .tell-pin-btn.pinned:hover {
-  background: rgba(255, 105, 180, 0.2);
+  background: var(--tell-pin-bg-hover);
 }
 
 .tell-dismiss-btn {
@@ -312,7 +311,7 @@
 }
 
 .tell-dismiss-btn:hover {
-  background: rgba(243, 139, 168, 0.1);
+  background: rgb(243, 139, 168, 0.1);
   color: var(--offline);
 }
 
@@ -346,7 +345,7 @@
 }
 
 .send-btn[data-over-limit='true']:disabled {
-  background: rgba(240, 71, 71, 0.25);
+  background: rgb(240, 71, 71, 0.25);
   color: var(--text-muted);
   cursor: not-allowed;
 }

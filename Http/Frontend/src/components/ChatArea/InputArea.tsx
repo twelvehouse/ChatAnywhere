@@ -4,6 +4,7 @@ import clsx from 'clsx';
 import { Pin, SendHorizontal } from 'lucide-react';
 import { useSettingsStore } from '../../store/settingsStore';
 import { useSessionStore } from '../../store/sessionStore';
+import { useTheme } from '../../hooks/useTheme';
 import styles from './InputArea.module.css';
 import { ChannelSelect } from '../ChannelSelect/ChannelSelect';
 import { EmoteSymbolPicker } from '../EmoteSymbolPicker/EmoteSymbolPicker';
@@ -209,6 +210,7 @@ export function InputArea({
   onToggleReplyPin,
 }: Props) {
   const ctrlEnterToSend = useSettingsStore((s) => s.ctrlEnterToSend);
+  const theme = useTheme();
   const isConnected = useSessionStore((s) => s.isConnected);
   const inputAreaRef = useRef<HTMLDivElement>(null);
   const [inputText, setInputText] = useState('');
@@ -272,7 +274,7 @@ export function InputArea({
   return (
     <div className={styles['input-area']} ref={inputAreaRef}>
       {inTellMode ? (
-        <div className={styles['tell-mode-container']}>
+        <div className={styles['tell-mode-container']} style={theme.tellVars}>
           <div className={styles['tell-banner']}>
             <span className={styles['tell-banner-label']}>Tell to</span>
             <div className={styles['tell-avatar']}>

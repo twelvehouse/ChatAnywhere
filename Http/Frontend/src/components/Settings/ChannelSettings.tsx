@@ -2,9 +2,10 @@ import type { Dispatch, SetStateAction } from 'react';
 import clsx from 'clsx';
 import styles from './ChannelSettings.module.css';
 import { ALL_CHANNELS } from '../../constants/channels';
-import { getBadgeInfoByPrefix, getBadgeStyle } from '../../lib/channelUtils';
+import { getBadgeInfoByPrefix } from '../../lib/channelUtils';
 import type { ChannelOption } from '../../types/chat';
 import { useSettingsStore } from '../../store/settingsStore';
+import { useTheme } from '../../hooks/useTheme';
 
 interface Props {
   serverChannels: ChannelOption[];
@@ -19,6 +20,7 @@ export function ChannelSettings({
 }: Props) {
   const disabledChannels = useSettingsStore((s) => s.disabledChannels);
   const setDisabledChannels = useSettingsStore((s) => s.setDisabledChannels);
+  const theme = useTheme();
 
   const mergedChannels: ChannelOption[] = [
     ...ALL_CHANNELS,
@@ -58,7 +60,7 @@ export function ChannelSettings({
               className={styles['ch-toggle-row']}
               onClick={() => toggleChannel(ch.prefix)}
             >
-              <span className="channel-badge" style={getBadgeStyle(badge)}>
+              <span className="channel-badge" style={theme.badgeStyle(badge)}>
                 {badge.label}
               </span>
               <span className={styles['ch-toggle-label']}>{ch.label}</span>

@@ -12,7 +12,7 @@
   inset: 0;
   z-index: 500;
   backdrop-filter: blur(4px);
-  background: rgba(0, 0, 0, 0.45);
+  background: rgb(0, 0, 0, 0.45);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -24,7 +24,7 @@
 
 .login-overlay-text {
   font-size: 0.78rem;
-  color: rgba(205, 214, 244, 0.45);
+  color: rgb(205, 214, 244, 0.45);
   letter-spacing: 0.06em;
   user-select: none;
 }
@@ -38,7 +38,7 @@
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: rgba(205, 214, 244, 0.35);
+  background: rgb(205, 214, 244, 0.35);
   animation: dotPulse 1.4s ease-in-out infinite both;
 }
 
@@ -68,12 +68,12 @@
   display: none;
 }
 
-@media (max-width: 768px) {
+@media (width <= 768px) {
   .sidebar-overlay {
     display: block;
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.5);
+    background: rgb(0, 0, 0, 0.5);
     z-index: 199;
     backdrop-filter: blur(2px);
     animation: overlayFadeIn 0.25s ease-out;

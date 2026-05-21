@@ -1,6 +1,7 @@
 import clsx from 'clsx';
 import { useSettingsStore } from '../../store/settingsStore';
-import { getChannelInfo, getBadgeStyle } from '../../lib/channelUtils';
+import { getChannelInfo } from '../../lib/channelUtils';
+import { useTheme } from '../../hooks/useTheme';
 import { sanitizeName, formatTime } from '../../lib/formatUtils';
 import { renderPayloads, urlRegex } from '../../lib/renderUtils';
 import { AvatarImage } from './AvatarImage';
@@ -66,6 +67,7 @@ export function MessageItem({
   const storeTellModeAll = useSettingsStore((s) => s.tellModeAll);
   const storeLargePreviews = useSettingsStore((s) => s.largeLinkPreviews);
   const trustedDomains = useSettingsStore((s) => s.trustedDomains);
+  const theme = useTheme();
   const italicizeSystem = italicizeSystemProp ?? storeItalicize;
   const useColoredBackground = useColoredBackgroundProp ?? storeColored;
   const tellModeAll = tellModeAllProp ?? storeTellModeAll;
@@ -117,8 +119,7 @@ export function MessageItem({
         hasNextGrouped && 'message-has-next',
       )}
       style={{
-        background: useColoredBackground ? ch.bg : undefined,
-        borderLeft: `3px solid ${ch.color}44`,
+        background: useColoredBackground ? theme.messageBgColor(ch) : undefined,
         cursor: isClickable ? 'pointer' : undefined,
       }}
       onClick={handleClick}
@@ -149,11 +150,11 @@ export function MessageItem({
         <div className="message-body">
           {!hideHeader && (
             <div className="message-header">
-              <span className="channel-badge" style={getBadgeStyle(ch)}>
+              <span className="channel-badge" style={theme.badgeStyle(ch)}>
                 {ch.label}
               </span>
               {hasAuthor && (
-                <span className="message-author" style={{ color: ch.color }}>
+                <span className="message-author" style={{ color: theme.channelTextColor(ch) }}>
                   {sanitizeName(msg.SenderName)}
                 </span>
               )}
