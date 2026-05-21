@@ -2,8 +2,7 @@ import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { RELAY_ADDR } from '../../constants/config';
 import { sanitizeName } from '../../lib/formatUtils';
-
-const ANONYMOUS_IMG = '/assets/anonymous.png';
+import { useTheme } from '../../hooks/useTheme';
 
 interface Props {
   name: string;
@@ -13,6 +12,7 @@ interface Props {
 export function AvatarImage({ name, world }: Props) {
   const cleanName = sanitizeName(name);
   const enabled = !!cleanName && !!world;
+  const theme = useTheme();
 
   const { data } = useQuery({
     queryKey: ['avatar', cleanName, world],
@@ -31,7 +31,7 @@ export function AvatarImage({ name, world }: Props) {
   });
 
   const [failed, setFailed] = useState(false);
-  const src = failed || !data ? ANONYMOUS_IMG : data;
+  const src = failed || !data ? theme.avatarPlaceholder : data;
 
   return (
     <img

@@ -11,4 +11,6 @@ export interface ThemeTokens {
   channelSelectActiveBg(ch: ChannelInfo): string;
   /** CSS variables driving the Tell banner & pin button (see InputArea.module.css). */
   tellVars: CSSProperties;
+  /** Path to the avatar fallback image used when /avatar lookup fails. */
+  avatarPlaceholder: string;
 }

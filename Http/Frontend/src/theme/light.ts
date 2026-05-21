@@ -27,4 +27,5 @@ export const lightTheme: ThemeTokens = {
     '--tell-pin-border': rgbToRgba(TELL_LIGHT, 0.35),
     '--tell-pin-bg-hover': rgbToRgba(TELL_LIGHT, 0.14),
   } as CSSProperties,
+  avatarPlaceholder: '/assets/anonymous-light.png',
 };

@@ -20,4 +20,5 @@ export const darkTheme: ThemeTokens = {
     '--tell-pin-border': rgbToRgba(TELL_RAW, 0.4),
     '--tell-pin-bg-hover': rgbToRgba(TELL_RAW, 0.2),
   } as CSSProperties,
+  avatarPlaceholder: '/assets/anonymous-dark.png',
 };
