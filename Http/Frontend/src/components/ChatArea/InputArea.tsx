@@ -1,7 +1,9 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import type { CSSProperties } from 'react';
 import type { ClipboardEvent, KeyboardEvent } from 'react';
 import clsx from 'clsx';
 import { Pin, SendHorizontal } from 'lucide-react';
+import { RichTextarea, type RichTextareaHandle } from 'rich-textarea';
 import { useSettingsStore } from '../../store/settingsStore';
 import { useSessionStore } from '../../store/sessionStore';
 import { useTheme } from '../../hooks/useTheme';
@@ -80,17 +82,49 @@ function ChatInputRow({
   effectiveLimit,
   isOverLimit,
 }: ChatInputRowProps) {
-  const inputRef = useRef<HTMLTextAreaElement>(null);
-  const mirrorTextRef = useRef<HTMLSpanElement>(null);
+  const inputRef = useRef<RichTextareaHandle>(null);
+  const chatFontSize = useSettingsStore((s) => s.fontSize);
+  const chatFontFamily = useSettingsStore((s) => s.fontFamily);
 
-  // Match the mirror element's height so the overflow highlight stays aligned
-  // with the textarea as it grows vertically.
-  useEffect(() => {
+  // Drive font via inline style so rich-textarea's backdrop sync runs against
+  // resolved values, not CSS variables that may not have settled yet.
+  const composerScale = Math.max(1, chatFontSize / 15);
+  const richStyle = useMemo<CSSProperties>(
+    () => ({
+      width: '100%',
+      maxHeight: '30vh',
+      fontSize: Math.max(16, chatFontSize), // iOS auto-zoom floor
+      fontFamily: `"${chatFontFamily}", FFXIV-Lodestone, system-ui, -apple-system, sans-serif`,
+      lineHeight: `${22 * composerScale}px`,
+      padding: `${5 * composerScale}px 0`,
+      minHeight: `${32 * composerScale}px`,
+    }),
+    [chatFontSize, chatFontFamily, composerScale],
+  );
+
+  // rich-textarea's autoHeight counts the placeholder in scrollHeight, so we
+  // recompute height ourselves with an empty-text guard.
+  useLayoutEffect(() => {
     const ta = inputRef.current;
     if (!ta) return;
+    if (!inputText) {
+      ta.style.height = '';
+      return;
+    }
     ta.style.height = 'auto';
     ta.style.height = `${ta.scrollHeight}px`;
   }, [inputText]);
+
+  useEffect(() => {
+    const recompute = () => {
+      const ta = inputRef.current;
+      if (!ta || !ta.value) return;
+      ta.style.height = 'auto';
+      ta.style.height = `${ta.scrollHeight}px`;
+    };
+    window.addEventListener('resize', recompute);
+    return () => window.removeEventListener('resize', recompute);
+  }, []);
 
   const handlePaste = (e: ClipboardEvent<HTMLTextAreaElement>) => {
     const pasted = e.clipboardData.getData('text');
@@ -107,10 +141,6 @@ function ChatInputRow({
     });
   };
 
-  const overflowIndex = isOverLimit
-    ? findOverflowIndex(inputText, effectiveLimit)
-    : inputText.length;
-
   return (
     <div className={innerClass}>
       {/* Each control sits in a fixed-height "slot" so the textarea is the
@@ -126,17 +156,10 @@ function ChatInputRow({
       </div>
       <div className={styles['input-divider']} />
       <div className={styles['input-container']}>
-        {isOverLimit && (
-          <div className={styles['input-mirror']} aria-hidden="true">
-            <span ref={mirrorTextRef} className={styles['mirror-text']}>
-              {inputText.slice(0, overflowIndex)}
-              <span className={styles['overflow-highlight']}>{inputText.slice(overflowIndex)}</span>
-            </span>
-          </div>
-        )}
-        <textarea
+        <RichTextarea
           ref={inputRef}
           rows={1}
+          style={richStyle}
           className={styles['chat-input']}
           placeholder={placeholder}
           value={inputText}
@@ -145,7 +168,18 @@ function ChatInputRow({
           onPaste={handlePaste}
           disabled={!isConnected}
           autoFocus
-        />
+        >
+          {(value) => {
+            if (!isOverLimit) return value;
+            const idx = findOverflowIndex(value, effectiveLimit);
+            return (
+              <>
+                {value.slice(0, idx)}
+                <span className={styles['overflow-highlight']}>{value.slice(idx)}</span>
+              </>
+            );
+          }}
+        </RichTextarea>
       </div>
       <div className={styles.slot}>
         <button

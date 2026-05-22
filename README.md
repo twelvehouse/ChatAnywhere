@@ -155,6 +155,7 @@ ChatAnywhere would not exist without these projects:
 | [react-error-boundary](https://github.com/bvaughn/react-error-boundary) | Error boundary for the message list |
 | [lucide-react](https://lucide.dev/) | Icon set |
 | [clsx](https://github.com/lukeed/clsx) | Conditional className composition |
+| [rich-textarea](https://github.com/inokawa/rich-textarea) | Textarea with character-range highlighting for the over-limit indicator |
 | [Vitest](https://vitest.dev/) + [Testing Library](https://testing-library.com/) | Unit and component testing |
 | [MSW](https://mswjs.io/) | HTTP mocking shared between tests and the `?demo` page |
 | [Husky](https://typicode.github.io/husky/) + [lint-staged](https://github.com/lint-staged/lint-staged) | Pre-commit lint + test gate |
