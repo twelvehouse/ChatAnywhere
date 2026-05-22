@@ -21,7 +21,7 @@ export const MOCK_SETTINGS = {
   fontFamily: 'Inter',
   fontSize: 14,
   italicizeSystem: true,
-  useColoredBackground: true,
+  useColoredBackground: false,
   largeLinkPreviews: false,
   disabledChannels: [],
   trustedDomains: [],

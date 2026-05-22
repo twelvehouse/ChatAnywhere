@@ -1,4 +1,4 @@
-import { http, HttpResponse } from 'msw';
+import { http, HttpResponse, passthrough } from 'msw';
 import {
   MOCK_PLAYER,
   MOCK_CHANNELS,
@@ -56,7 +56,7 @@ export const handlers = [
   // ── Channels ────────────────────────────────────────────────────
   http.get('/channels', () => HttpResponse.json(MOCK_CHANNELS)),
 
-  // ── Avatar (whitelist only — unknown names get null URL so the UI falls back to anonymous) ──
+  // ── Avatar (whitelist only — unknown names pass through to the real server) ──
   http.get('/avatar', ({ request }) => {
     const url = new URL(request.url);
     const name = url.searchParams.get('name') ?? '';
@@ -64,7 +64,7 @@ export const handlers = [
       const avatarUrl = name === MOCK_PLAYER.name ? MOCK_PLAYER_AVATAR_URL : getAvatarForName(name);
       return HttpResponse.json({ avatarUrl });
     }
-    return HttpResponse.json({ avatarUrl: '' });
+    return passthrough();
   }),
 
   // ── Send (no-op in mock) ────────────────────────────────────────
