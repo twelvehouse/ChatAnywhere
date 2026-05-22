@@ -62,8 +62,6 @@ party numbers ①–⑧, raid signs (Attack / Bind / Circle etc.), instance mark
 URLs from trusted sites (Lodestone, YouTube, Twitter/X, Twitch, Imgur, and more) automatically render an inline preview card showing the page title, description, and thumbnail.
 YouTube links show an embedded player you can watch without leaving the chat window.
 
-![URL preview card](images/readme-ogp.png)
-
 ### Link safety
 
 Clicking a URL in chat opens a confirmation dialog before leaving the page.
@@ -73,6 +71,7 @@ You can whitelist trusted domains so subsequent clicks open immediately without 
 
 ![Appearance settings](images/readme-appearance.png)
 
+- Switch between **Light**, **Dark**, and **System** (follows your OS) themes
 - Choose any **Google Font** for the chat window
 - Adjust **font size**
 - Toggle **italic rendering** for system messages
