@@ -70,6 +70,12 @@ export function useSettingsSync({ refetchEpoch, isLoggedIn, onFiltersReady }: Pr
       patch.retainSyncSendPrefix = data.retainSyncSendPrefix;
     if (typeof data.largeLinkPreviews === 'boolean')
       patch.largeLinkPreviews = data.largeLinkPreviews;
+    if (typeof data.sendDelayEnabled === 'boolean') patch.sendDelayEnabled = data.sendDelayEnabled;
+    if (typeof data.sendDelaySeconds === 'number' && Number.isFinite(data.sendDelaySeconds))
+      // Clamp to the slider's [1, 10] range.
+      patch.sendDelaySeconds = Math.max(1, Math.min(10, Math.round(data.sendDelaySeconds)));
+    if (typeof data.sendDelayAlwaysQueue === 'boolean')
+      patch.sendDelayAlwaysQueue = data.sendDelayAlwaysQueue;
 
     const loadedFilters: CustomFilter[] = Array.isArray(data.filters)
       ? (data.filters as CustomFilter[])
@@ -129,6 +135,9 @@ export function useSettingsSync({ refetchEpoch, isLoggedIn, onFiltersReady }: Pr
             emoteSortByName: s.emoteSortByName,
             retainSyncSendPrefix: s.retainSyncSendPrefix,
             largeLinkPreviews: s.largeLinkPreviews,
+            sendDelayEnabled: s.sendDelayEnabled,
+            sendDelaySeconds: s.sendDelaySeconds,
+            sendDelayAlwaysQueue: s.sendDelayAlwaysQueue,
           }),
         }).catch(() => {});
       }, 500);

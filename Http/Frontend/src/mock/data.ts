@@ -23,6 +23,9 @@ export const MOCK_SETTINGS = {
   italicizeSystem: true,
   useColoredBackground: false,
   largeLinkPreviews: false,
+  sendDelayEnabled: true,
+  sendDelaySeconds: 3,
+  sendDelayAlwaysQueue: false,
   disabledChannels: [],
   trustedDomains: [],
   filters: [

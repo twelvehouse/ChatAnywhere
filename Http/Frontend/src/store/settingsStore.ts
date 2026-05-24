@@ -24,6 +24,9 @@ export interface SettingsState {
   emoteSortByName: boolean;
   retainSyncSendPrefix: boolean;
   largeLinkPreviews: boolean;
+  sendDelayEnabled: boolean;
+  sendDelaySeconds: number;
+  sendDelayAlwaysQueue: boolean;
 }
 
 interface SettingsActions {
@@ -42,6 +45,9 @@ interface SettingsActions {
   setEmoteSortByName: (v: boolean) => void;
   setRetainSyncSendPrefix: (v: boolean) => void;
   setLargeLinkPreviews: (v: boolean) => void;
+  setSendDelayEnabled: (v: boolean) => void;
+  setSendDelaySeconds: (v: number) => void;
+  setSendDelayAlwaysQueue: (v: boolean) => void;
   /** Bulk-apply server-loaded values without triggering individual sets. */
   hydrate: (partial: Partial<SettingsState>) => void;
 }
@@ -62,6 +68,9 @@ export const useSettingsStore = create<SettingsState & SettingsActions>((set) =>
   emoteSortByName: false,
   retainSyncSendPrefix: true,
   largeLinkPreviews: false,
+  sendDelayEnabled: false,
+  sendDelaySeconds: 3,
+  sendDelayAlwaysQueue: false,
 
   setTheme: (v) => set({ theme: v }),
   setFontFamily: (v) => set({ fontFamily: v }),
@@ -79,6 +88,9 @@ export const useSettingsStore = create<SettingsState & SettingsActions>((set) =>
   setEmoteSortByName: (v) => set({ emoteSortByName: v }),
   setRetainSyncSendPrefix: (v) => set({ retainSyncSendPrefix: v }),
   setLargeLinkPreviews: (v) => set({ largeLinkPreviews: v }),
+  setSendDelayEnabled: (v) => set({ sendDelayEnabled: v }),
+  setSendDelaySeconds: (v) => set({ sendDelaySeconds: v }),
+  setSendDelayAlwaysQueue: (v) => set({ sendDelayAlwaysQueue: v }),
 
   hydrate: (partial) => set(partial),
 }));

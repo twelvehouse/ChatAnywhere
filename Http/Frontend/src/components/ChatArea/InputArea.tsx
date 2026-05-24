@@ -1,12 +1,15 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import type { CSSProperties } from 'react';
-import type { ClipboardEvent, KeyboardEvent } from 'react';
+import type { ClipboardEvent, KeyboardEvent as ReactKeyboardEvent } from 'react';
 import clsx from 'clsx';
 import { Pin, SendHorizontal } from 'lucide-react';
 import { RichTextarea, type RichTextareaHandle } from 'rich-textarea';
+import { CountdownCircleTimer } from 'react-countdown-circle-timer';
 import { useSettingsStore } from '../../store/settingsStore';
 import { useSessionStore } from '../../store/sessionStore';
+import { usePendingSendStore } from '../../store/pendingSendStore';
 import { useTheme } from '../../hooks/useTheme';
+import { useEffectiveTheme } from '../../hooks/useEffectiveTheme';
 import styles from './InputArea.module.css';
 import { ChannelSelect } from '../ChannelSelect/ChannelSelect';
 import { EmoteSymbolPicker } from '../EmoteSymbolPicker/EmoteSymbolPicker';
@@ -43,6 +46,47 @@ function stripNewlines(text: string): string {
   return text.replace(/[\r\n]+/g, '');
 }
 
+function PendingSendBanner({
+  duration,
+  onComplete,
+  onCancel,
+}: {
+  duration: number;
+  onComplete: () => void;
+  onCancel: () => void;
+}) {
+  const effectiveTheme = useEffectiveTheme();
+  // Matches --accent per theme.
+  const colors = effectiveTheme === 'dark' ? '#89b4fa' : '#4a7de6';
+  const trailColor =
+    effectiveTheme === 'dark' ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.08)';
+  return (
+    <button
+      type="button"
+      className={styles['pending-banner']}
+      onClick={onCancel}
+      aria-label="Cancel pending send"
+    >
+      <div className={styles['pending-circle']} aria-hidden>
+        <CountdownCircleTimer
+          isPlaying
+          duration={duration}
+          colors={colors}
+          trailColor={trailColor}
+          size={18}
+          strokeWidth={2.5}
+          onComplete={() => {
+            onComplete();
+            return { shouldRepeat: false };
+          }}
+        />
+      </div>
+      <span className={styles['pending-label']}>Queued</span>
+      <span className={styles['pending-hint']}>Tap to cancel</span>
+    </button>
+  );
+}
+
 interface ChatInputRowProps {
   innerClass: string;
   sendChannels: ChannelOption[];
@@ -52,7 +96,7 @@ interface ChatInputRowProps {
   isDmView: boolean;
   inputText: string;
   onInputChange: (text: string) => void;
-  onKeyDown: (e: KeyboardEvent<HTMLTextAreaElement>) => void;
+  onKeyDown: (e: ReactKeyboardEvent<HTMLTextAreaElement>) => void;
   placeholder: string;
   isConnected: boolean;
   showCharPicker: boolean;
@@ -61,6 +105,8 @@ interface ChatInputRowProps {
   onExecuteEmote: (command: string) => void;
   effectiveLimit: number;
   isOverLimit: boolean;
+  isLocked: boolean;
+  onCancelPending: () => void;
 }
 
 function ChatInputRow({
@@ -81,6 +127,8 @@ function ChatInputRow({
   onExecuteEmote,
   effectiveLimit,
   isOverLimit,
+  isLocked,
+  onCancelPending,
 }: ChatInputRowProps) {
   const inputRef = useRef<RichTextareaHandle>(null);
   const chatFontSize = useSettingsStore((s) => s.fontSize);
@@ -126,6 +174,15 @@ function ChatInputRow({
     return () => window.removeEventListener('resize', recompute);
   }, []);
 
+  // Returning from a queue cancel: restore focus and place caret at end.
+  useEffect(() => {
+    if (isLocked) return;
+    const ta = inputRef.current;
+    if (!ta) return;
+    ta.focus();
+    ta.setSelectionRange(ta.value.length, ta.value.length);
+  }, [isLocked]);
+
   const handlePaste = (e: ClipboardEvent<HTMLTextAreaElement>) => {
     const pasted = e.clipboardData.getData('text');
     if (!/[\r\n]/.test(pasted)) return; // no newlines → let the browser handle it
@@ -142,7 +199,7 @@ function ChatInputRow({
   };
 
   return (
-    <div className={innerClass}>
+    <div className={clsx(innerClass, isLocked && styles['is-locked'])}>
       {/* Each control sits in a fixed-height "slot" so the textarea is the
           only element that grows downward when the message wraps. */}
       <div className={styles.slot}>
@@ -151,7 +208,7 @@ function ChatInputRow({
           value={selectedSendPrefix}
           onChange={onChannelChange}
           tellMode={inTellMode}
-          locked={isDmView}
+          locked={isDmView || isLocked}
         />
       </div>
       <div className={styles['input-divider']} />
@@ -166,7 +223,7 @@ function ChatInputRow({
           onChange={(e) => onInputChange(stripNewlines(e.target.value))}
           onKeyDown={onKeyDown}
           onPaste={handlePaste}
-          disabled={!isConnected}
+          disabled={!isConnected || isLocked}
           autoFocus
         >
           {(value) => {
@@ -190,6 +247,7 @@ function ChatInputRow({
           aria-label="Emotes & Symbols"
           data-tooltip="Emotes & Symbols"
           data-picker-open={showCharPicker ? 'true' : undefined}
+          disabled={isLocked}
         >
           <span className={styles['char-picker-icon']}>&#xE03E;</span>
         </button>
@@ -199,7 +257,7 @@ function ChatInputRow({
           type="button"
           className={styles['send-btn']}
           onClick={onSend}
-          disabled={!inputText.trim() || !isConnected || isOverLimit}
+          disabled={isLocked || !inputText.trim() || !isConnected || isOverLimit}
           data-over-limit={isOverLimit ? 'true' : undefined}
           aria-label="Send"
           data-tooltip="Send Message"
@@ -207,10 +265,19 @@ function ChatInputRow({
           <SendHorizontal size={16} fill="currentColor" strokeWidth={0} aria-hidden />
         </button>
       </div>
-      {showCharPicker && (
+      {showCharPicker && !isLocked && (
         <EmoteSymbolPicker
           onInsert={(text) => onInputChange(inputText + text)}
           onExecute={onExecuteEmote}
+        />
+      )}
+      {/* Catches clicks inside the input row; PendingSendBackdrop handles the rest of the page. */}
+      {isLocked && (
+        <button
+          type="button"
+          className={styles['pending-overlay']}
+          onClick={onCancelPending}
+          aria-label="Cancel pending send"
         />
       )}
     </div>
@@ -247,10 +314,51 @@ export function InputArea({
   onToggleReplyPin,
 }: Props) {
   const ctrlEnterToSend = useSettingsStore((s) => s.ctrlEnterToSend);
+  const sendDelayEnabled = useSettingsStore((s) => s.sendDelayEnabled);
+  const sendDelaySeconds = useSettingsStore((s) => s.sendDelaySeconds);
+  const sendDelayAlwaysQueue = useSettingsStore((s) => s.sendDelayAlwaysQueue);
+  const setPendingCancelHandler = usePendingSendStore((s) => s.setCancelHandler);
   const theme = useTheme();
   const isConnected = useSessionStore((s) => s.isConnected);
   const inputAreaRef = useRef<HTMLDivElement>(null);
   const [inputText, setInputText] = useState('');
+  // Snapshot so settings changes mid-countdown don't shift the timer.
+  const [pendingDuration, setPendingDuration] = useState(0);
+  const isPending = pendingDuration > 0;
+  const pendingTriggerRef = useRef<'kbd' | 'mouse'>('mouse');
+
+  useEffect(() => {
+    if (!isPending) return;
+    setPendingCancelHandler(() => setPendingDuration(0));
+    return () => setPendingCancelHandler(null);
+  }, [isPending, setPendingCancelHandler]);
+
+  // Escape always cancels. Enter cancels too, but for kbd-triggered pending we
+  // wait for Enter to be released first so auto-repeat doesn't self-cancel.
+  useEffect(() => {
+    if (!isPending) return;
+    let enterArmed = pendingTriggerRef.current === 'mouse';
+    const armEnter = (e: KeyboardEvent) => {
+      if (e.key === 'Enter') enterArmed = true;
+    };
+    const cancel = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        setPendingDuration(0);
+        return;
+      }
+      if (e.key === 'Enter' && enterArmed) {
+        e.preventDefault();
+        setPendingDuration(0);
+      }
+    };
+    if (!enterArmed) document.addEventListener('keyup', armEnter);
+    document.addEventListener('keydown', cancel);
+    return () => {
+      document.removeEventListener('keyup', armEnter);
+      document.removeEventListener('keydown', cancel);
+    };
+  }, [isPending]);
 
   const currentChannel =
     sendChannels.find((c) => c.prefix === selectedSendPrefix) ?? sendChannels[0];
@@ -274,19 +382,39 @@ export function InputArea({
     if (inTellMode) onClearReply();
   };
 
-  const handleSend = () => {
-    if (!inputText.trim() || !isConnected || isOverLimit) return;
+  const dispatchSend = () => {
     onSend(inputText);
     setInputText('');
+    setPendingDuration(0);
   };
 
-  const handleKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
+  // explicit = Ctrl+Enter or Send button click; bypasses the queue unless sendDelayAlwaysQueue is on.
+  const handleSend = (explicit: boolean) => {
+    if (!inputText.trim() || !isConnected || isOverLimit) return;
+    const shouldQueue =
+      sendDelayEnabled && sendDelaySeconds > 0 && (sendDelayAlwaysQueue || !explicit);
+    if (shouldQueue) {
+      setPendingDuration(sendDelaySeconds);
+      return;
+    }
+    dispatchSend();
+  };
+
+  const handleCancelPending = () => {
+    setPendingDuration(0);
+  };
+
+  const handleKeyDown = (e: ReactKeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === 'Enter') {
       // The game's chat API doesn't accept newlines, so we never let Enter (or
       // Shift+Enter) insert one — it either sends or is a no-op.
       e.preventDefault();
+      // While pending, defer to the document-level Enter handler so we don't
+      // accidentally re-queue and reset the countdown.
+      if (isPending) return;
       if (ctrlEnterToSend && !e.ctrlKey) return;
-      handleSend();
+      pendingTriggerRef.current = 'kbd';
+      handleSend(e.ctrlKey);
     }
   };
 
@@ -303,16 +431,35 @@ export function InputArea({
     isConnected,
     showCharPicker,
     onToggleCharPicker,
-    onSend: handleSend,
+    onSend: () => {
+      pendingTriggerRef.current = 'mouse';
+      handleSend(true);
+    },
     onExecuteEmote,
     effectiveLimit,
     isOverLimit,
+    isLocked: isPending,
+    onCancelPending: handleCancelPending,
   };
 
+  const pendingBanner = isPending ? (
+    <PendingSendBanner
+      duration={pendingDuration}
+      onComplete={dispatchSend}
+      onCancel={handleCancelPending}
+    />
+  ) : null;
+
   return (
-    <div className={styles['input-area']} ref={inputAreaRef}>
+    <div
+      className={clsx(styles['input-area'], isPending && styles['input-area-pending'])}
+      ref={inputAreaRef}
+    >
       {inTellMode ? (
-        <div className={styles['tell-mode-container']} style={theme.tellVars}>
+        <div
+          className={clsx(styles['tell-mode-container'], isPending && styles.lifted)}
+          style={theme.tellVars}
+        >
           <div className={styles['tell-banner']}>
             <span className={styles['tell-banner-label']}>Tell to</span>
             <div className={styles['tell-avatar']}>
@@ -328,6 +475,7 @@ export function InputArea({
                   replyPinned ? 'Unpin (auto-dismiss after send)' : 'Pin (keep after send)'
                 }
                 data-tooltip={replyPinned ? 'Keep after send' : 'Send once'}
+                disabled={isPending}
               >
                 <PinIcon />
                 <span>{replyPinned ? 'Pinned' : 'Pin'}</span>
@@ -340,12 +488,19 @@ export function InputArea({
                 onClick={onClearReply}
                 aria-label="Exit Tell mode"
                 data-tooltip="Cancel"
+                disabled={isPending}
               >
                 ×
               </button>
             )}
           </div>
+          {pendingBanner}
           <ChatInputRow {...rowProps} innerClass={styles['tell-input-inner']} />
+        </div>
+      ) : isPending ? (
+        <div className={styles['pending-mode-container']}>
+          {pendingBanner}
+          <ChatInputRow {...rowProps} innerClass={styles['pending-input-inner']} />
         </div>
       ) : (
         <ChatInputRow {...rowProps} innerClass={styles['chat-input-wrapper']} />

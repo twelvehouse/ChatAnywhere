@@ -20,6 +20,7 @@ import { ChatArea } from './components/ChatArea/ChatArea';
 import { SettingsModal } from './components/Settings/SettingsModal';
 import { LinkConfirmModal } from './components/Settings/LinkConfirmModal';
 import { PasscodeModal } from './components/Auth/PasscodeModal';
+import { PendingSendBackdrop } from './components/Common/PendingSendBackdrop';
 import { useFilterMode } from './hooks/useFilterMode';
 import type { ChatMessage, ChannelOption, TellPartner } from './types/chat';
 
@@ -549,6 +550,8 @@ function AppContent() {
           onClose={() => setConfirmLink(null)}
         />
       )}
+
+      <PendingSendBackdrop />
     </div>
   );
 }
