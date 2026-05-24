@@ -102,7 +102,6 @@ interface ChatInputRowProps {
   showCharPicker: boolean;
   onToggleCharPicker: () => void;
   onSend: () => void;
-  onExecuteEmote: (command: string) => void;
   effectiveLimit: number;
   isOverLimit: boolean;
   isLocked: boolean;
@@ -124,7 +123,6 @@ function ChatInputRow({
   showCharPicker,
   onToggleCharPicker,
   onSend,
-  onExecuteEmote,
   effectiveLimit,
   isOverLimit,
   isLocked,
@@ -265,12 +263,6 @@ function ChatInputRow({
           <SendHorizontal size={16} fill="currentColor" strokeWidth={0} aria-hidden />
         </button>
       </div>
-      {showCharPicker && !isLocked && (
-        <EmoteSymbolPicker
-          onInsert={(text) => onInputChange(inputText + text)}
-          onExecute={onExecuteEmote}
-        />
-      )}
       {/* Catches clicks inside the input row; PendingSendBackdrop handles the rest of the page. */}
       {isLocked && (
         <button
@@ -435,7 +427,6 @@ export function InputArea({
       pendingTriggerRef.current = 'mouse';
       handleSend(true);
     },
-    onExecuteEmote,
     effectiveLimit,
     isOverLimit,
     isLocked: isPending,
@@ -504,6 +495,12 @@ export function InputArea({
         </div>
       ) : (
         <ChatInputRow {...rowProps} innerClass={styles['chat-input-wrapper']} />
+      )}
+      {showCharPicker && !isPending && (
+        <EmoteSymbolPicker
+          onInsert={(text) => setInputText(inputText + text)}
+          onExecute={onExecuteEmote}
+        />
       )}
     </div>
   );

@@ -1,8 +1,10 @@
 /* ========== EmoteSymbolPicker: outer container ========== */
+/* Anchored to .input-area on desktop; .input-area's 16px right padding is what
+   the old `right: 0` (relative to the row) used to land on, so we mirror it. */
 .picker {
   position: absolute;
-  bottom: calc(100% + 8px);
-  right: 0;
+  bottom: calc(100% - 4px);
+  right: 16px;
   width: calc(420px * var(--sys-scale, 1));
   height: calc(400px * var(--sys-scale, 1));
   background: var(--bg-secondary);
@@ -55,14 +57,15 @@
   box-shadow: 0 1px 4px rgb(0, 0, 0, 0.3);
 }
 
-/* Smartphone */
+/* Smartphone: expand below the input row instead of floating above it.
+   Sits in the normal flow inside .input-area, so the message list shrinks. */
 @media (width <= 600px) {
   .picker {
-    position: fixed;
-    bottom: 72px;
-    right: 8px;
-    left: 8px;
-    width: auto;
-    height: calc(400px * var(--sys-scale, 1));
+    position: static;
+    width: 100%;
+    height: calc(320px * var(--sys-scale, 1));
+    margin-top: 8px;
+    border-radius: 8px;
+    box-shadow: none;
   }
 }
