@@ -192,17 +192,11 @@
 
   .settings-modal {
     width: 100%;
-    height: min(90vh, 660px);
-    border-radius: 8px 8px 0 0;
-    align-self: flex-end;
-    margin-bottom: 0;
+    /* 100dvh tracks the dynamic viewport so mobile browser chrome doesn't clip the bottom. */
+    height: 100dvh;
+    border-radius: 0;
     position: relative;
     overflow: visible;
-  }
-
-  /* adjust overlay to align the modal to the bottom of the screen */
-  :global(.modal-overlay) {
-    align-items: flex-end;
   }
 
   .settings-sidebar {
