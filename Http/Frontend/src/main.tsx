@@ -6,6 +6,7 @@ import { dispatchUnauthorized } from './lib/authEvent';
 import { bootstrapTheme } from './lib/themeBootstrap';
 import { useSettingsStore } from './store/settingsStore';
 import './index.css';
+import './theme';
 
 // Apply cached theme to <body> and seed the store before render — otherwise
 // AppContent's mount would briefly overwrite body class with the store

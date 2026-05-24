@@ -1,0 +1,44 @@
+.theme-light {
+  /* Background layers */
+  --bg-base: #d1eaf6;
+  --bg-primary: #fff;
+  --bg-secondary: #fff4fa;
+  --bg-tertiary: #eaf4fa;
+  --bg-hover: rgb(0, 0, 0, 0.04);
+  --bg-active: rgb(162, 201, 236, 0.35);
+  --message-hover: rgb(0, 0, 0, 0.035);
+
+  /* Text */
+  --text-primary: #1e2030;
+  --text-secondary: #4c527a;
+  --text-chat: #363b5a;
+  --text-dim: #6b7194;
+  --text-muted: #9399b2;
+  --text-accent: #3175b8;
+
+  /* Accent & status */
+  --accent: #3175b8;
+  --accent-dim: rgb(162, 201, 236, 0.35);
+  --online: #2a9e52;
+  --offline: #c93b5c;
+
+  /* Borders */
+  --border: rgb(0, 0, 0, 0.08);
+  --border-focus: rgb(49, 117, 184, 0.4);
+
+  /* Shadows */
+  --shadow-sm: 0 1px 4px rgb(0, 0, 0, 0.08);
+  --shadow-md: 0 4px 16px rgb(0, 0, 0, 0.1);
+  --shadow-input: 0 -4px 12px rgb(0, 0, 0, 0.06);
+
+  /* Misc surface tints */
+  --connector: rgb(0, 0, 0, 0.15);
+
+  /* Tooltip */
+  --tooltip-bg: var(--bg-primary);
+  --tooltip-fg: var(--text-primary);
+  --tooltip-border: rgb(0, 0, 0, 0.12);
+
+  /* PendingSendBackdrop overlay */
+  --backdrop-overlay-bg: rgb(0, 0, 0, 0.1);
+}

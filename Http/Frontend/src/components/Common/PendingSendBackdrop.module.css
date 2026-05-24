@@ -3,17 +3,13 @@
   inset: 0;
   /* Above input-area's frame (30) but below the lifted pending container (32). */
   z-index: 31;
-  background: rgb(0 0 0 / 22%);
+  background: var(--backdrop-overlay-bg);
   border: none;
   padding: 0;
   margin: 0;
   cursor: pointer;
   backdrop-filter: blur(1.5px);
   animation: backdrop-fade-in 0.18s ease-out;
-}
-
-body.theme-light .backdrop {
-  background: rgb(0 0 0 / 3%);
 }
 
 @keyframes backdrop-fade-in {

@@ -3,8 +3,13 @@ import type { ThemeTokens } from './types';
 import { darkTheme } from './dark';
 import { lightTheme } from './light';
 
-// Theme registry. Add a new theme = new file implementing ThemeTokens +
-// extend ResolvedTheme + register here. Consumers use useTheme() unchanged.
+// Side-effect: load the CSS variable definitions for each theme.
+import './dark.css';
+import './light.css';
+
+// Theme registry. Adding a new theme = new {name}.ts + {name}.css in this
+// folder, an import line above, and a registration here. Extend ResolvedTheme
+// to include the name. Consumers use useTheme() unchanged.
 export const THEMES = {
   dark: darkTheme,
   light: lightTheme,
