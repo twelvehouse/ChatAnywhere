@@ -57,6 +57,11 @@ Enable *Confirm mode* in Settings to require a second tap before the emote fires
 **Symbols tab** — gives quick access to every FFXIV private-use symbol:
 party numbers ①–⑧, raid signs (Attack / Bind / Circle etc.), instance markers, time icons, and more.
 
+### Send queue
+
+After pressing Send, the message waits briefly before being delivered — giving you a moment to catch a typo or stop an accidental send.
+A countdown ring shows the time remaining. Tap anywhere in the message box to cancel and get your text back.
+
 ### Link preview
 
 URLs from trusted sites (Lodestone, YouTube, Twitter/X, Twitch, Imgur, and more) automatically render an inline preview card showing the page title, description, and thumbnail.
