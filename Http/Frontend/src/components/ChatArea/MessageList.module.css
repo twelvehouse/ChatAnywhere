@@ -110,6 +110,37 @@
   height: 1px;
 }
 
+/* ========== Top Marker (end of history) ========== */
+.top-marker {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 16px 14px;
+}
+
+.top-marker::before,
+.top-marker::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(
+    to right,
+    transparent 0%,
+    var(--border) 25%,
+    var(--border) 75%,
+    transparent 100%
+  );
+}
+
+.top-marker-node {
+  width: 5px;
+  height: 5px;
+  margin: 0 14px;
+  transform: rotate(45deg);
+  background: var(--text-muted);
+  opacity: 0.7;
+}
+
 .loading-older {
   text-align: center;
   padding: 8px 0;

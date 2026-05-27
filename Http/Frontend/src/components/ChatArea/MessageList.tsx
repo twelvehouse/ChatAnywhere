@@ -219,6 +219,11 @@ export function MessageList({
         <div className={styles.messages} ref={messagesContainerRef} onScroll={onScroll}>
           <div ref={messagesInnerRef} className={styles['messages-inner']}>
             {hasMore && <div ref={topSentinelRef} className={styles['load-more-sentinel']} />}
+            {!hasMore && messages.length > 0 && (
+              <div className={styles['top-marker']} aria-hidden="true">
+                <span className={styles['top-marker-node']} />
+              </div>
+            )}
             {isLoadingOlder && (
               <div className={styles['loading-older']}>Loading older messages…</div>
             )}
