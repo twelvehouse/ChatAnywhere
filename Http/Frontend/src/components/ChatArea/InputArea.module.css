@@ -76,24 +76,17 @@
   border-radius: 2px;
 }
 
+/* font-size, font-family, line-height, padding, min-height are passed via
+   inline `style` on RichTextarea — see InputArea.tsx for why. */
 .chat-input {
   display: block;
   width: 100%;
-  /* (5px + 22px + 5px) × composer-scale = 32px × composer-scale for the 1-line
-     state, matching .slot min-height so the first line aligns with the
-     surrounding controls. composer-scale (defined on .input-area) is floored
-     at 1 so the textarea never renders below its 16px-font baseline height. */
-  min-height: calc(32px * var(--composer-scale));
-  padding: calc(5px * var(--composer-scale)) 0;
   background: transparent;
   border: none;
   color: var(--text-primary);
-  font-family: var(--chat-font);
-  font-size: max(16px, 1em); /* Prevent iOS Safari auto-zoom (triggers at < 16px) */
   outline: none;
   resize: none;
   overflow-y: auto;
-  line-height: calc(22px * var(--composer-scale));
   max-height: 30vh;
   white-space: pre-wrap;
   overflow-wrap: anywhere;

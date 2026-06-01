@@ -132,12 +132,11 @@ function ChatInputRow({
   const chatFontSize = useSettingsStore((s) => s.fontSize);
   const chatFontFamily = useSettingsStore((s) => s.fontFamily);
 
-  // Drive font via inline style so rich-textarea's backdrop sync runs against
-  // resolved values, not CSS variables that may not have settled yet.
+  // rich-textarea's backdrop layer is synced from the textarea's resolved style,
+  // and CSS-variable-driven values don't re-sync when the var changes — passing
+  // these as inline style forces re-sync on every font-setting update.
   const composerScale = Math.max(1, chatFontSize / 15);
   const richStyle: CSSProperties = {
-    width: '100%',
-    maxHeight: '30vh',
     fontSize: Math.max(16, chatFontSize), // iOS auto-zoom floor
     fontFamily: `"${chatFontFamily}", FFXIV-Lodestone, system-ui, -apple-system, sans-serif`,
     lineHeight: `${22 * composerScale}px`,
