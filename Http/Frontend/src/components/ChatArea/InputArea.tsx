@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import type { CSSProperties } from 'react';
 import type { ClipboardEvent, KeyboardEvent as ReactKeyboardEvent } from 'react';
 import clsx from 'clsx';
@@ -135,18 +135,15 @@ function ChatInputRow({
   // Drive font via inline style so rich-textarea's backdrop sync runs against
   // resolved values, not CSS variables that may not have settled yet.
   const composerScale = Math.max(1, chatFontSize / 15);
-  const richStyle = useMemo<CSSProperties>(
-    () => ({
-      width: '100%',
-      maxHeight: '30vh',
-      fontSize: Math.max(16, chatFontSize), // iOS auto-zoom floor
-      fontFamily: `"${chatFontFamily}", FFXIV-Lodestone, system-ui, -apple-system, sans-serif`,
-      lineHeight: `${22 * composerScale}px`,
-      padding: `${5 * composerScale}px 0`,
-      minHeight: `${32 * composerScale}px`,
-    }),
-    [chatFontSize, chatFontFamily, composerScale],
-  );
+  const richStyle: CSSProperties = {
+    width: '100%',
+    maxHeight: '30vh',
+    fontSize: Math.max(16, chatFontSize), // iOS auto-zoom floor
+    fontFamily: `"${chatFontFamily}", FFXIV-Lodestone, system-ui, -apple-system, sans-serif`,
+    lineHeight: `${22 * composerScale}px`,
+    padding: `${5 * composerScale}px 0`,
+    minHeight: `${32 * composerScale}px`,
+  };
 
   // rich-textarea's autoHeight counts the placeholder in scrollHeight, so we
   // recompute height ourselves with an empty-text guard.
