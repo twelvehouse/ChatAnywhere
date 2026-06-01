@@ -236,7 +236,12 @@ function AppContent() {
   });
 
   // ── Hooks ──────────────────────────────────────────────────────
-  const { loadOlder, hasMore, isLoadingOlder } = usePaginatedHistory(setMessages);
+  const {
+    loadOlder,
+    reload: reloadHistory,
+    hasMore,
+    isLoadingOlder,
+  } = usePaginatedHistory(setMessages);
 
   const {
     messagesContainerRef,
@@ -248,7 +253,7 @@ function AppContent() {
     setHasUnreadDown,
   } = useScrollBehavior({ activeFilterName, filteredMessagesLength: filteredMessages.length });
 
-  useSSE({
+  const { reconnect: reconnectSSE } = useSSE({
     setMessages,
     setServerChannels,
     setSelectedSendPrefix,
@@ -260,6 +265,14 @@ function AppContent() {
     filtersRef,
     lastGameChannelRef,
   });
+
+  const handleManualReconnect = () => {
+    reconnectSSE();
+    reloadHistory();
+    setUnreadMap({});
+    setHasUnreadDown(false);
+    setBannerCount(0);
+  };
 
   // ── Theme class on <body> tracks the *effective* theme (system → resolved) ──
   const effectiveTheme = useEffectiveTheme();
@@ -503,6 +516,7 @@ function AppContent() {
         bannerCount={bannerCount}
         hasUnreadDown={hasUnreadDown}
         loadOlder={loadOlder}
+        onReconnect={handleManualReconnect}
         hasMore={hasMore}
         isLoadingOlder={isLoadingOlder}
         messagesContainerRef={messagesContainerRef}

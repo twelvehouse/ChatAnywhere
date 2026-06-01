@@ -8,6 +8,7 @@ const LIMIT = 200;
 
 interface Result {
   loadOlder: () => void;
+  reload: () => void;
   hasMore: boolean;
   isLoadingOlder: boolean;
 }
@@ -23,13 +24,15 @@ export function usePaginatedHistory(setMessages: Dispatch<SetStateAction<ChatMes
   const [hasMore, setHasMore] = useState(false);
   const [isLoadingOlder, setIsLoadingOlder] = useState(false);
 
-  // Refs keep stable references inside the loadOlder callback without re-creating it.
   const hasMoreRef = useRef(false);
   const isLoadingRef = useRef(false);
   const oldestTimestampRef = useRef<number | null>(null);
 
-  // Initial load: fetch the newest LIMIT messages.
-  useEffect(() => {
+  // Bumped on each reload() so in-flight loadOlder responses can detect they're stale.
+  const reloadEpochRef = useRef(0);
+
+  const fetchLatest = () => {
+    const epoch = ++reloadEpochRef.current;
     fetch(`${RELAY_ADDR}/history?limit=${LIMIT}`, { credentials: 'include' })
       .then((r) => {
         if (r.status === 401) {
@@ -39,15 +42,20 @@ export function usePaginatedHistory(setMessages: Dispatch<SetStateAction<ChatMes
         return r.json();
       })
       .then((data: ChatMessage[]) => {
-        if (Array.isArray(data) && data.length > 0) {
+        if (epoch !== reloadEpochRef.current) return;
+        if (Array.isArray(data)) {
           setMessages(data);
-          oldestTimestampRef.current = data[0].Timestamp;
+          oldestTimestampRef.current = data.length > 0 ? data[0].Timestamp : null;
           const more = data.length === LIMIT;
           hasMoreRef.current = more;
           setHasMore(more);
         }
       })
       .catch(() => {});
+  };
+
+  useEffect(() => {
+    fetchLatest();
   }, [setMessages]);
 
   // Load an older page of messages and prepend to the list.
@@ -58,6 +66,7 @@ export function usePaginatedHistory(setMessages: Dispatch<SetStateAction<ChatMes
 
     isLoadingRef.current = true;
     setIsLoadingOlder(true);
+    const epoch = reloadEpochRef.current;
 
     fetch(`${RELAY_ADDR}/history?limit=${LIMIT}&before=${before}`, { credentials: 'include' })
       .then((r) => {
@@ -68,6 +77,7 @@ export function usePaginatedHistory(setMessages: Dispatch<SetStateAction<ChatMes
         return r.json();
       })
       .then((data: ChatMessage[]) => {
+        if (epoch !== reloadEpochRef.current) return; // discarded by reload()
         if (Array.isArray(data) && data.length > 0) {
           oldestTimestampRef.current = data[0].Timestamp;
           setMessages((prev) => [...data, ...prev]);
@@ -86,5 +96,5 @@ export function usePaginatedHistory(setMessages: Dispatch<SetStateAction<ChatMes
       });
   };
 
-  return { loadOlder, hasMore, isLoadingOlder };
+  return { loadOlder, reload: fetchLatest, hasMore, isLoadingOlder };
 }

@@ -1,6 +1,6 @@
 import type { UIEvent } from 'react';
 import { useEffect, useRef, useLayoutEffect } from 'react';
-import { MessageSquare, AlertCircle } from 'lucide-react';
+import { MessageSquare, AlertCircle, RefreshCw } from 'lucide-react';
 import { useSessionStore } from '../../store/sessionStore';
 import styles from './MessageList.module.css';
 import { ErrorBoundary } from '../ErrorBoundary';
@@ -9,6 +9,11 @@ import { TELL_INCOMING, TELL_OUTGOING } from '../../constants/channels';
 import type { ChatMessage } from '../../types/chat';
 
 const TELL_SCAN_LIMIT = 200;
+
+const PULL_THRESHOLD = 80;
+const PULL_MAX = 140;
+const PULL_HYSTERESIS = 74; // ~92% of threshold — kills edge-flicker on finger jitter
+const PULL_RESISTANCE = 0.42;
 
 /**
  * Returns true when name+world identify the same player.
@@ -95,6 +100,7 @@ interface Props {
   bannerCount: number;
   hasUnreadDown: boolean;
   loadOlder: () => void;
+  onReconnect: () => void;
   hasMore: boolean;
   isLoadingOlder: boolean;
   messagesContainerRef: React.RefObject<HTMLDivElement | null>;
@@ -114,6 +120,7 @@ export function MessageList({
   bannerCount,
   hasUnreadDown,
   loadOlder,
+  onReconnect,
   hasMore,
   isLoadingOlder,
   messagesContainerRef,
@@ -133,9 +140,9 @@ export function MessageList({
     : messages.map((_, idx) => findTellRef(messages, idx));
 
   const topSentinelRef = useRef<HTMLDivElement>(null);
-  // Captures scrollHeight immediately before triggering a load, used to restore position after prepend.
+  const wrapperRef = useRef<HTMLDivElement>(null);
+  // Captures scrollHeight before a prepend so position can be restored afterward.
   const prevScrollHeightRef = useRef(0);
-  // Tracks the previous isLoadingOlder value to detect the transition true→false (load completed).
   const wasLoadingOlderRef = useRef(false);
 
   // Expose plain scroll-to-bottom (no virtualizer).
@@ -202,8 +209,98 @@ export function MessageList({
     }
   }, [messages.length, hasMore, isLoadingOlder, handleLoadOlder, messagesContainerRef]);
 
+  // Pull-to-reconnect — touch only (no wheel/PC support by design).
+  useEffect(() => {
+    const wrapper = wrapperRef.current;
+    const container = messagesContainerRef.current;
+    const inner = messagesInnerRef.current;
+    if (!wrapper || !container || !inner) return;
+
+    let engaged = false;
+    let startY = 0;
+    let currentPull = 0;
+    let ready = false;
+
+    const isAtBottom = () =>
+      container.scrollHeight - container.scrollTop - container.clientHeight < 2;
+
+    const applyPull = (px: number) => {
+      currentPull = px;
+      wrapper.style.setProperty('--pull-y', px + 'px');
+      const nextReady = ready ? px >= PULL_HYSTERESIS : px >= PULL_THRESHOLD;
+      if (nextReady !== ready) {
+        ready = nextReady;
+        wrapper.dataset.ready = ready ? '1' : '0';
+      }
+    };
+
+    let releaseTimer: ReturnType<typeof setTimeout> | null = null;
+    const reset = () => {
+      currentPull = 0;
+      ready = false;
+      inner.classList.add(styles['is-releasing']);
+      wrapper.style.setProperty('--pull-y', '0px');
+      wrapper.dataset.ready = '0';
+      if (releaseTimer) clearTimeout(releaseTimer);
+      releaseTimer = setTimeout(() => {
+        inner.classList.remove(styles['is-releasing']);
+        releaseTimer = null;
+      }, 360);
+    };
+
+    const onTouchStart = (e: TouchEvent) => {
+      if (e.touches.length !== 1) return;
+      if (!isAtBottom()) return;
+      engaged = true;
+      startY = e.touches[0].clientY;
+      currentPull = 0;
+      inner.classList.remove(styles['is-releasing']);
+    };
+
+    const onTouchMove = (e: TouchEvent) => {
+      if (!engaged) return;
+      const dy = startY - e.touches[0].clientY;
+
+      if (dy <= 0) {
+        if (currentPull > 0) applyPull(0);
+        return;
+      }
+      if (!isAtBottom()) {
+        engaged = false;
+        if (currentPull > 0) applyPull(0);
+        return;
+      }
+
+      const eased =
+        dy < PULL_THRESHOLD ? dy : PULL_THRESHOLD + (dy - PULL_THRESHOLD) * PULL_RESISTANCE;
+      applyPull(Math.min(eased, PULL_MAX));
+      // preventDefault suppresses iOS rubber-band so our translate is the only motion.
+      if (e.cancelable) e.preventDefault();
+    };
+
+    const onTouchEnd = () => {
+      if (!engaged) return;
+      const shouldFire = currentPull >= PULL_THRESHOLD;
+      engaged = false;
+      reset();
+      if (shouldFire) onReconnect();
+    };
+
+    container.addEventListener('touchstart', onTouchStart, { passive: true });
+    container.addEventListener('touchmove', onTouchMove, { passive: false });
+    container.addEventListener('touchend', onTouchEnd);
+    container.addEventListener('touchcancel', onTouchEnd);
+
+    return () => {
+      container.removeEventListener('touchstart', onTouchStart);
+      container.removeEventListener('touchmove', onTouchMove);
+      container.removeEventListener('touchend', onTouchEnd);
+      container.removeEventListener('touchcancel', onTouchEnd);
+    };
+  }, [messagesContainerRef, messagesInnerRef, onReconnect]);
+
   return (
-    <div className={styles['messages-wrapper']}>
+    <div className={styles['messages-wrapper']} ref={wrapperRef} data-ready="0">
       {bannerCount > 0 && (
         <div className={styles['unread-banner']} onClick={onDismissBanner}>
           <span>
@@ -214,6 +311,18 @@ export function MessageList({
           </span>
         </div>
       )}
+
+      <div className={styles['pull-reveal']} aria-hidden="true">
+        <RefreshCw className={styles['pull-reveal-icon']} strokeWidth={2.25} />
+        <span className={styles['pull-reveal-label']}>
+          <span className={styles['pull-reveal-label-text']} data-state="idle">
+            Pull to reconnect
+          </span>
+          <span className={styles['pull-reveal-label-text']} data-state="ready">
+            Release to reconnect
+          </span>
+        </span>
+      </div>
 
       <ErrorBoundary>
         <div className={styles.messages} ref={messagesContainerRef} onScroll={onScroll}>

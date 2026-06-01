@@ -5,18 +5,158 @@
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  /* Written by the pull-to-reconnect touch handler; inherited by inner + reveal. */
+  --pull-y: 0px;
 }
 
 .messages {
   flex: 1;
   overflow-y: auto;
+  position: relative;
+  z-index: 1;
   padding: 16px 6px 0 0;
   display: flex;
   flex-direction: column;
+  /* Transparent so .pull-reveal (z-index 0 sibling) shows through when inner translates. */
+  overscroll-behavior-y: contain;
 }
 
 .messages-inner {
   flex: 1 0 auto;
+  /* Opaque — hides .pull-reveal at rest; translateY exposes it.
+     Must match .chat-area's background so the reveal is invisible at pull-y=0. */
+  background: var(--bg-primary);
+  transform: translateY(calc(var(--pull-y) * -1));
+  will-change: transform;
+}
+
+.messages-inner.is-releasing {
+  transition: transform 320ms cubic-bezier(0.34, 1.2, 0.4, 1);
+}
+
+/* ========== Pull-to-Reconnect (touch-only) ========== */
+/* Sibling of .messages on the layer below, contributing nothing to scrollHeight. */
+.pull-reveal {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 120px;
+  z-index: 0;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding-bottom: 14px;
+
+  color: var(--text-muted);
+  pointer-events: none;
+  user-select: none;
+}
+
+.pull-reveal::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: clamp(0px, calc(var(--pull-y) * 1.8), 240px);
+  height: 1px;
+  transform: translateX(-50%);
+  background: linear-gradient(
+    to right,
+    transparent 0%,
+    var(--border) 30%,
+    var(--border) 70%,
+    transparent 100%
+  );
+  opacity: clamp(0, calc(var(--pull-y) / 60), 1);
+  transition: opacity 200ms ease;
+}
+
+.pull-reveal-icon {
+  width: 16px;
+  height: 16px;
+  color: var(--text-muted);
+  transform: rotate(calc(clamp(0, var(--pull-y) / 80, 1) * -180deg));
+  transform-origin: center;
+  transition:
+    color 200ms ease,
+    transform 60ms linear;
+  opacity: clamp(0, calc(var(--pull-y) / 24), 1);
+}
+
+.pull-reveal-label {
+  font-size: 0.78rem;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  line-height: 1;
+  position: relative;
+  display: inline-grid;
+  opacity: clamp(0, calc((var(--pull-y) - 8px) / 28), 1);
+  transition: color 220ms ease;
+}
+
+.pull-reveal-label-text {
+  grid-area: 1 / 1;
+  transition:
+    opacity 200ms ease,
+    transform 200ms ease;
+}
+.pull-reveal-label-text[data-state='idle'] {
+  opacity: 1;
+  transform: translateY(0);
+}
+.pull-reveal-label-text[data-state='ready'] {
+  opacity: 0;
+  transform: translateY(3px);
+}
+
+/* ---- Ready state (data-ready toggled on the wrapper) ---- */
+.messages-wrapper[data-ready='1'] .pull-reveal-icon {
+  color: var(--accent);
+  transform: rotate(-180deg);
+  transition:
+    color 220ms ease,
+    transform 320ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.messages-wrapper[data-ready='1'] .pull-reveal-label {
+  color: var(--accent);
+}
+.messages-wrapper[data-ready='1'] .pull-reveal-label-text[data-state='idle'] {
+  opacity: 0;
+  transform: translateY(-3px);
+}
+.messages-wrapper[data-ready='1'] .pull-reveal-label-text[data-state='ready'] {
+  opacity: 1;
+  transform: translateY(0);
+}
+.messages-wrapper[data-ready='1'] .pull-reveal::before {
+  animation: pull-tick 360ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes pull-tick {
+  0%,
+  100% {
+    background: linear-gradient(
+      to right,
+      transparent,
+      color-mix(in srgb, var(--accent) 70%, var(--border)) 30%,
+      color-mix(in srgb, var(--accent) 70%, var(--border)) 70%,
+      transparent
+    );
+  }
+  45% {
+    background: linear-gradient(
+      to right,
+      transparent,
+      var(--accent) 30%,
+      var(--accent) 70%,
+      transparent
+    );
+    width: 280px;
+  }
 }
 
 /* ========== Unread Banner ========== */

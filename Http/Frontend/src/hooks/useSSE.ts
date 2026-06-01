@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import type { Dispatch, SetStateAction, RefObject } from 'react';
 import { RELAY_ADDR } from '../constants/config';
 import { useSessionStore } from '../store/sessionStore';
@@ -19,6 +19,10 @@ interface UseSSEOptions {
   lastGameChannelRef: RefObject<string>;
 }
 
+interface UseSSEResult {
+  reconnect: () => void;
+}
+
 export function useSSE({
   setMessages,
   setServerChannels,
@@ -30,15 +34,17 @@ export function useSSE({
   activeFilterNameRef,
   filtersRef,
   lastGameChannelRef,
-}: UseSSEOptions): void {
+}: UseSSEOptions): UseSSEResult {
   const setConnected = useSessionStore((s) => s.setConnected);
   const setPlayer = useSessionStore((s) => s.setPlayer);
-  // SSE connection with exponential-backoff reconnect
-  useEffect(() => {
-    let sse: EventSource | null = null;
-    let reconnectTimeout: ReturnType<typeof setTimeout>;
-    let retryCount = 0;
 
+  // Hoisted so reconnect() (called from outside the effect) can reach them.
+  const sseRef = useRef<EventSource | null>(null);
+  const reconnectTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const retryCountRef = useRef(0);
+  const forceReconnectRef = useRef<() => void>(() => {});
+
+  useEffect(() => {
     const updateChannels = (incoming: ChannelOption[]) => {
       setServerChannels(incoming);
       setSelectedSendPrefix((prev) => {
@@ -48,7 +54,8 @@ export function useSSE({
     };
 
     const connectSSE = () => {
-      sse = new EventSource(`${RELAY_ADDR}/sse`, { withCredentials: true });
+      const sse = new EventSource(`${RELAY_ADDR}/sse`, { withCredentials: true });
+      sseRef.current = sse;
 
       sse.onmessage = (event) => {
         try {
@@ -56,7 +63,7 @@ export function useSSE({
 
           if (data.type === 'connected') {
             setConnected(true);
-            retryCount = 0;
+            retryCountRef.current = 0;
             return;
           }
           if (data.type === 'ping') return;
@@ -123,16 +130,30 @@ export function useSSE({
 
       sse.onerror = () => {
         setConnected(false);
-        if (sse) sse.close();
-        retryCount++;
-        reconnectTimeout = setTimeout(connectSSE, Math.min(1000 * 2 ** retryCount, 30000));
+        if (sseRef.current) sseRef.current.close();
+        retryCountRef.current++;
+        reconnectTimeoutRef.current = setTimeout(
+          connectSSE,
+          Math.min(1000 * 2 ** retryCountRef.current, 30000),
+        );
       };
+    };
+
+    forceReconnectRef.current = () => {
+      if (reconnectTimeoutRef.current) {
+        clearTimeout(reconnectTimeoutRef.current);
+        reconnectTimeoutRef.current = null;
+      }
+      if (sseRef.current) sseRef.current.close();
+      retryCountRef.current = 0;
+      setConnected(false);
+      connectSSE();
     };
 
     connectSSE();
     return () => {
-      if (sse) sse.close();
-      clearTimeout(reconnectTimeout);
+      if (sseRef.current) sseRef.current.close();
+      if (reconnectTimeoutRef.current) clearTimeout(reconnectTimeoutRef.current);
     };
   }, [
     setConnected,
@@ -148,4 +169,6 @@ export function useSSE({
     lastGameChannelRef,
     isNearBottomRef,
   ]);
+
+  return { reconnect: () => forceReconnectRef.current() };
 }

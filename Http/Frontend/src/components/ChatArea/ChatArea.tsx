@@ -18,6 +18,7 @@ interface Props {
   bannerCount: number;
   hasUnreadDown: boolean;
   loadOlder: () => void;
+  onReconnect: () => void;
   hasMore: boolean;
   isLoadingOlder: boolean;
   messagesContainerRef: React.RefObject<HTMLDivElement | null>;
@@ -53,6 +54,7 @@ export function ChatArea({
   bannerCount,
   hasUnreadDown,
   loadOlder,
+  onReconnect,
   hasMore,
   isLoadingOlder,
   messagesContainerRef,
@@ -92,6 +94,7 @@ export function ChatArea({
         bannerCount={bannerCount}
         hasUnreadDown={hasUnreadDown}
         loadOlder={loadOlder}
+        onReconnect={onReconnect}
         hasMore={hasMore}
         isLoadingOlder={isLoadingOlder}
         messagesContainerRef={messagesContainerRef}
