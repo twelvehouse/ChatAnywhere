@@ -315,6 +315,12 @@ function AppContent() {
           src: url('${RELAY_ADDR}/files/FFXIV_Lodestone_SSF.ttf') format('truetype');
           unicode-range: U+E000-F8FF;
         }
+        /* Declared last so it is tried first; it only holds glyphs the Lodestone font lacks. */
+        @font-face {
+          font-family: 'FFXIV-Lodestone';
+          src: url('${RELAY_ADDR}/files/ChatAnywhere_Symbols.ttf') format('truetype');
+          unicode-range: U+E000-F8FF;
+        }
       `;
       document.head.appendChild(style);
     }

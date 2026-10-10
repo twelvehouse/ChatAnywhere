@@ -71,7 +71,7 @@ public sealed class Plugin : IAsyncDalamudPlugin
 
         Sender      = new ChatSender(Log);
         Receiver    = new ChatReceiver(Chat, ClientState, ObjectTable, Log);
-        FontManager = new FontManager(Interface, Log);
+        FontManager = new FontManager(Interface, DataManager, Log);
         Server      = new WebServer(this, Sender, Receiver, Log);
 
         SettingsWindow = new SettingsWindow(this);

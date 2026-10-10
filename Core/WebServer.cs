@@ -87,6 +87,7 @@ public class WebServer : IAsyncDisposable
             _host.Routes.PreAuthentication.Static.Add(HttpMethod.GET,     "/files/gfdata.gfd",              _gameFiles.GetGfdData,       ExceptionRoute);
             _host.Routes.PreAuthentication.Static.Add(HttpMethod.GET,     "/files/fonticon_ps5.tex",        _gameFiles.GetTexData,       ExceptionRoute);
             _host.Routes.PreAuthentication.Static.Add(HttpMethod.GET,     "/files/FFXIV_Lodestone_SSF.ttf", _gameFiles.GetLodestoneFont, ExceptionRoute);
+            _host.Routes.PreAuthentication.Static.Add(HttpMethod.GET,     "/files/ChatAnywhere_Symbols.ttf", _gameFiles.GetSymbolFont,   ExceptionRoute);
             _host.Routes.PreAuthentication.Static.Add(HttpMethod.GET,     "/emotes",   _gameFiles.HandleGetEmotes,       ExceptionRoute);
 
             _host.Events.Logger = msg => _log.Debug($"[Watson] {msg}");

@@ -20,9 +20,19 @@ internal class GameFileHandler
         _auth = auth;
     }
 
-    internal async Task GetLodestoneFont(HttpContextBase ctx)
+    internal Task GetLodestoneFont(HttpContextBase ctx) => SendFont(ctx, _plugin.FontManager.GameSymFont);
+
+    internal async Task GetSymbolFont(HttpContextBase ctx)
     {
-        var data = _plugin.FontManager.GameSymFont;
+        var path = _plugin.FontManager.SymbolFontPath;
+        var data = path != null && File.Exists(path) ? await File.ReadAllBytesAsync(path) : null;
+        // The font is rebuilt when the game adds symbols, so browsers must not reuse a stale copy.
+        ctx.Response.Headers.Add("Cache-Control", "no-cache");
+        await SendFont(ctx, data);
+    }
+
+    private static async Task SendFont(HttpContextBase ctx, byte[]? data)
+    {
         if (data != null)
         {
             ctx.Response.StatusCode = 200;
