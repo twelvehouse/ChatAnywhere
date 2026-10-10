@@ -128,12 +128,14 @@ public class WebServer : IAsyncDisposable
 
     public async ValueTask DisposeAsync()
     {
+        // Stop first; SSE clients reconnecting during dispose crash the game.
+        await _tokenSource.CancelAsync().ConfigureAwait(false);
+        _host?.Stop();
+
         _receiver.OnMessageReceived -= _sse.OnChatMessageReceived;
         _receiver.Dispose();
         _ogp.Dispose();
         await _sseManager.DisposeAsync().ConfigureAwait(false);
-        await _tokenSource.CancelAsync().ConfigureAwait(false);
-        _host?.Stop();
         _host?.Dispose();
         _tokenSource.Dispose();
         IsRunning = false;
