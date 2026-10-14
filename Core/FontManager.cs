@@ -24,7 +24,12 @@ public class FontManager
         if (GameSymFont == null) return;
         try
         {
-            var fdt = data.GetFile(SymbolFontBuilder.FdtPath)!.Data;
+            var fdt = data.GetFile(SymbolFontBuilder.FdtPath)?.Data;
+            if (fdt == null)
+            {
+                Log.Error($"[FontManager] {SymbolFontBuilder.FdtPath} not found");
+                return;
+            }
 
             // Rebuild whenever the game font, the Lodestone font or the builder changes.
             using var sha = SHA256.Create();
@@ -41,13 +46,23 @@ public class FontManager
                 return;
             }
 
-            foreach (var old in Directory.GetFiles(dir, "ChatAnywhere_Symbols.*.ttf"))
-                File.Delete(old);
-
             var font = SymbolFontBuilder.Build(data, fdt, GameSymFont, Log);
             if (font == null) return;
-            File.WriteAllBytes(path, font);
+            WriteAtomic(path, font);
             SymbolFontPath = path;
+
+            foreach (var old in Directory.GetFiles(dir, "ChatAnywhere_Symbols.*.ttf"))
+            {
+                if (old == path) continue;
+                try
+                {
+                    File.Delete(old);
+                }
+                catch (Exception ex)
+                {
+                    Log.Warning(ex, $"[FontManager] Failed to delete old symbol font: {old}");
+                }
+            }
         }
         catch (Exception ex)
         {
@@ -69,26 +84,49 @@ public class FontManager
 
             if (File.Exists(filePath))
             {
-                GameSymFont = File.ReadAllBytes(filePath);
-                Log.Info($"[FontManager] Font loaded from file: {GameSymFont.Length} bytes");
+                var cached = File.ReadAllBytes(filePath);
+                if (IsFont(cached))
+                {
+                    GameSymFont = cached;
+                    Log.Info($"[FontManager] Font loaded from file: {GameSymFont.Length} bytes");
+                    return;
+                }
+                Log.Warning("[FontManager] Cached font is invalid, downloading again...");
             }
             else
             {
                 Log.Info("[FontManager] Font file missing, downloading...");
-                using var client = new HttpClient();
-                GameSymFont = client.GetAsync("https://img.finalfantasyxiv.com/lds/pc/global/fonts/FFXIV_Lodestone_SSF.ttf")
-                    .Result
-                    .Content
-                    .ReadAsByteArrayAsync()
-                    .Result;
-
-                File.WriteAllBytes(filePath, GameSymFont);
-                Log.Info($"[FontManager] Font downloaded and saved: {GameSymFont.Length} bytes");
             }
+
+            using var client = new HttpClient { Timeout = TimeSpan.FromSeconds(30) };
+            using var response = client.GetAsync("https://img.finalfantasyxiv.com/lds/pc/global/fonts/FFXIV_Lodestone_SSF.ttf").Result;
+            response.EnsureSuccessStatusCode();
+            var font = response.Content.ReadAsByteArrayAsync().Result;
+            if (!IsFont(font))
+                throw new InvalidDataException("Downloaded file is not a font");
+
+            WriteAtomic(filePath, font);
+            GameSymFont = font;
+            Log.Info($"[FontManager] Font downloaded and saved: {GameSymFont.Length} bytes");
         }
         catch (Exception ex)
         {
             Log.Error(ex, "[FontManager] Failed to load font");
         }
+    }
+
+    // Keeps an error page from being cached as the font.
+    private static bool IsFont(byte[] data)
+    {
+        if (data.Length < 12) return false;
+        var tag = data.AsSpan(0, 4);
+        return tag.SequenceEqual(new byte[] { 0, 1, 0, 0 }) || tag.SequenceEqual("OTTO"u8);
+    }
+
+    private static void WriteAtomic(string path, byte[] data)
+    {
+        var tmp = path + ".tmp";
+        File.WriteAllBytes(tmp, data);
+        File.Move(tmp, path, true);
     }
 }
